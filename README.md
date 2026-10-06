@@ -14,7 +14,28 @@ PoC를 위한 MVP 웹앱입니다.
 - Next.js 14 (App Router)
 - TypeScript
 - Tailwind CSS
-- 파일 기반 JSON 저장소 (PoC용, 추후 Supabase 등으로 전환 가능)
+- **Neon (Postgres)** — Vercel 연동
+
+## 배포
+
+## 배포 정보
+Vercel (팀 설정 없음. 개인 free)
+- https://facilitator-mvp.vercel.app/
+
+## DB (Neon)
+
+Vercel 프로젝트에 Neon 스토어가 연결되어 있으면 `DATABASE_URL` 환경변수가 자동 주입됩니다.
+
+앱 최초 요청 시:
+1. 필요한 테이블(`users`, `groups`, `stages`, `progresses`)을 생성
+2. 테이블이 비어 있으면 `src/data/mock.ts` 초기 데이터를 시드
+
+로컬 개발 시 `.env.local`에 Neon connection string을 넣으세요:
+
+```bash
+# .env.local
+DATABASE_URL=postgresql://user:pass@ep-xxx.region.aws.neon.tech/neondb?sslmode=require
+```
 
 ## 실행 방법
 
@@ -34,10 +55,10 @@ npm run dev
 - **학습자**: 박학습, 최학습 등
 - **관리자**: 운영 관리자
 
-## 데이터 수정
+## 데이터
 
-- 초기 데이터: `src/data/mock.ts`
-- 런타임 데이터: `src/data/db.json` (제출/승인 시 자동 업데이트)
+- 초기 시드 데이터: `src/data/mock.ts`
+- 런타임 데이터: Neon Postgres (제출/승인 시 DB 업데이트)
 
 ## 주요 흐름
 
