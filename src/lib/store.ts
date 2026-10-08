@@ -74,6 +74,7 @@ async function ensureSchemaAndSeed() {
       `;
     }
     for (const s of initialData.stages) {
+      const materialsJson = JSON.stringify(s.materials);
       await sql`
         INSERT INTO stages (id, stage_order, title, description, materials, pass_condition)
         VALUES (
@@ -81,7 +82,7 @@ async function ensureSchemaAndSeed() {
           ${s.order},
           ${s.title},
           ${s.description},
-          ${JSON.stringify(s.materials)}::jsonb,
+          ${materialsJson}::jsonb,
           ${s.passCondition}
         )
       `;
@@ -107,6 +108,7 @@ async function ensureSchemaAndSeed() {
 
   // stages는 mock.ts 기준으로 항상 동기화 (가이드/로드맵 업데이트 반영)
   for (const s of initialData.stages) {
+    const materialsJson = JSON.stringify(s.materials);
     await sql`
       INSERT INTO stages (id, stage_order, title, description, materials, pass_condition)
       VALUES (
@@ -114,7 +116,7 @@ async function ensureSchemaAndSeed() {
         ${s.order},
         ${s.title},
         ${s.description},
-        ${JSON.stringify(s.materials)}::jsonb,
+        ${materialsJson}::jsonb,
         ${s.passCondition}
       )
       ON CONFLICT (id) DO UPDATE SET
@@ -137,6 +139,32 @@ function ensureReady() {
     });
   }
   return schemaReady;
+}
+
+/** stages를 mock.ts 기준으로 강제 재동기화 (배포 후 가이드 링크 반영용) */
+export async function syncStagesFromMock() {
+  await ensureReady();
+  const sql = getSql();
+  for (const s of initialData.stages) {
+    const materialsJson = JSON.stringify(s.materials);
+    await sql`
+      INSERT INTO stages (id, stage_order, title, description, materials, pass_condition)
+      VALUES (
+        ${s.id},
+        ${s.order},
+        ${s.title},
+        ${s.description},
+        ${materialsJson}::jsonb,
+        ${s.passCondition}
+      )
+      ON CONFLICT (id) DO UPDATE SET
+        stage_order = EXCLUDED.stage_order,
+        title = EXCLUDED.title,
+        description = EXCLUDED.description,
+        materials = EXCLUDED.materials,
+        pass_condition = EXCLUDED.pass_condition
+    `;
+  }
 }
 
 // ─── Row → Domain mappers ───────────────────────────────────────────
