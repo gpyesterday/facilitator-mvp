@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getData, getUserById } from "@/lib/store";
 import { RegisterFacilitatorForm } from "@/components/RegisterFacilitatorForm";
+import { FacilitatorActiveToggle } from "@/components/FacilitatorActiveToggle";
 
 interface Props {
   searchParams: { userId?: string };
@@ -67,13 +68,16 @@ export default async function AdminPage({ searchParams }: Props) {
                   <th className="text-left px-4 py-3 font-medium text-slate-600">
                     담당 그룹
                   </th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600">
+                    상태
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {facilitators.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={5}
+                      colSpan={6}
                       className="px-4 py-6 text-center text-slate-400"
                     >
                       등록된 퍼실리테이터가 없습니다.
@@ -85,7 +89,12 @@ export default async function AdminPage({ searchParams }: Props) {
                       (g) => g.facilitatorId === fac.id
                     );
                     return (
-                      <tr key={fac.id} className="hover:bg-slate-50">
+                      <tr
+                        key={fac.id}
+                        className={`hover:bg-slate-50 ${
+                          !fac.isActive ? "bg-slate-50/80 opacity-80" : ""
+                        }`}
+                      >
                         <td className="px-4 py-3 text-slate-900 font-medium">
                           {fac.name}
                         </td>
@@ -100,6 +109,13 @@ export default async function AdminPage({ searchParams }: Props) {
                           {group?.name ?? (
                             <span className="text-slate-400">미배정</span>
                           )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <FacilitatorActiveToggle
+                            facilitatorId={fac.id}
+                            isActive={fac.isActive}
+                            name={fac.name}
+                          />
                         </td>
                       </tr>
                     );
