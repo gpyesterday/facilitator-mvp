@@ -6,6 +6,7 @@ import {
   getStages,
   getUserById,
   getGroupById,
+  syncStagesFromMock,
 } from "@/lib/store";
 import { SubmitButton } from "@/components/SubmitButton";
 
@@ -21,6 +22,7 @@ export default async function LearnerPage({ searchParams }: Props) {
   if (!user || user.role !== "learner") notFound();
 
   const progress = await getProgress(userId);
+  await syncStagesFromMock();
   const stages = await getStages();
   const group = user.groupId ? await getGroupById(user.groupId) : null;
   const data = await getData();
@@ -196,6 +198,7 @@ export default async function LearnerPage({ searchParams }: Props) {
                         {stage.description}
                       </p>
 
+                      {/* Materials — only show for current or done stages */}
                       {!isLocked && stage.materials.length > 0 && (
                         <div className="mt-3 space-y-2">
                           {stage.materials.map((m, idx) => {
@@ -230,6 +233,7 @@ export default async function LearnerPage({ searchParams }: Props) {
           </div>
         </section>
 
+        {/* Current Stage Detail + Submit */}
         {isCompleted ? (
           <section className="bg-emerald-50 border border-emerald-200 rounded-2xl p-8 text-center">
             <div className="text-4xl mb-3">🎓</div>
@@ -280,6 +284,7 @@ export default async function LearnerPage({ searchParams }: Props) {
           </section>
         ) : null}
 
+        {/* Facilitator info */}
         {facilitator && (
           <section className="text-sm text-slate-500 text-center">
             담당 퍼실리테이터: <strong>{facilitator.name}</strong>
