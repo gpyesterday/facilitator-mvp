@@ -14,13 +14,15 @@ async function ensureSchemaAndSeed() {
       email TEXT NOT NULL,
       phone TEXT,
       role TEXT NOT NULL CHECK (role IN ('learner', 'facilitator', 'admin')),
-      group_id TEXT
+      group_id TEXT,
+      is_active BOOLEAN NOT NULL DEFAULT true
     )
   `;
 
   // 기존 테이블에 컬럼 추가 (이미 배포된 DB 대응)
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS nickname TEXT`;
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT true`;
 
   await sql`
     CREATE TABLE IF NOT EXISTS groups (
@@ -61,8 +63,8 @@ async function ensureSchemaAndSeed() {
   if (count === 0) {
     for (const u of initialData.users) {
       await sql`
-        INSERT INTO users (id, name, nickname, email, phone, role, group_id)
-        VALUES (${u.id}, ${u.name}, ${u.nickname}, ${u.email}, ${u.phone}, ${u.role}, ${u.groupId})
+        INSERT INTO users (id, name, nickname, email, phone, role, group_id, is_active)
+        VALUES (${u.id}, ${u.name}, ${u.nickname}, ${u.email}, ${u.phone}, ${u.role}, ${u.groupId}, ${u.isActive})
       `;
     }
     for (const g of initialData.groups) {
@@ -127,6 +129,7 @@ function mapUser(row: Record<string, unknown>): User {
     phone: (row.phone as string) ?? null,
     role: row.role as User["role"],
     groupId: (row.group_id as string) ?? null,
+    isActive: row.is_active === false || row.is_active === "f" ? false : true,
   };
 }
 
@@ -349,8 +352,8 @@ export async function createFacilitator(input: {
   const id = `fac-${Date.now()}`;
 
   await sql`
-    INSERT INTO users (id, name, nickname, email, phone, role, group_id)
-    VALUES (${id}, ${name}, ${nickname}, ${email}, ${phone}, 'facilitator', NULL)
+    INSERT INTO users (id, name, nickname, email, phone, role, group_id, is_active)
+    VALUES (${id}, ${name}, ${nickname}, ${email}, ${phone}, 'facilitator', NULL, true)
   `;
 
   const user: User = {
@@ -361,7 +364,33 @@ export async function createFacilitator(input: {
     phone,
     role: "facilitator",
     groupId: null,
+    isActive: true,
   };
 
   return { success: true, user };
+}
+
+/** 퍼실리테이터 활성/비활성 토글 (삭제 아님 — 비활성 시 플랫폼 사용 불가) */
+export async function setFacilitatorActive(
+  facilitatorId: string,
+  isActive: boolean
+): Promise<{ success: boolean; error?: string }> {
+  await ensureReady();
+  const sql = getSql();
+
+  const rows = await sql`
+    SELECT id, role FROM users WHERE id = ${facilitatorId} LIMIT 1
+  `;
+  if (!rows[0]) {
+    return { success: false, error: "사용자를 찾을 수 없습니다." };
+  }
+  if ((rows[0] as { role: string }).role !== "facilitator") {
+    return { success: false, error: "퍼실리테이터만 활성/비활성할 수 있습니다." };
+  }
+
+  await sql`
+    UPDATE users SET is_active = ${isActive} WHERE id = ${facilitatorId}
+  `;
+
+  return { success: true };
 }
