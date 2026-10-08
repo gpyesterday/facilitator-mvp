@@ -103,9 +103,9 @@ export const initialData: AppData = {
     {
       id: 1,
       order: 1,
-      title: "1단계: GenAI 기초 (B1-1 · B1-2)",
+      title: "1단계: GenAI 기초 (B1-1 · B1-2 · B1-3)",
       description:
-        "B1-1 LLM 기반 업무 자동화와 B1-2 멀티모달 콘텐츠 제작을 통해 GenAI 기초 역량을 익히는 단계입니다.",
+        "B1-1 LLM 기반 업무 자동화, B1-2 멀티모달 콘텐츠 제작, B1-3 노코드 자동화 워크플로 설계를 통해 GenAI 기초 역량을 익히는 단계입니다.",
       materials: [
         {
           title: "B1-1 미션 가이드 (인터랙티브)",
@@ -115,9 +115,13 @@ export const initialData: AppData = {
           title: "B1-2 멀티모달 콘텐츠 제작 가이드 (인터랙티브)",
           url: "/guides/b1-2.html",
         },
+        {
+          title: "B1-3 노코드 자동화 워크플로 설계 가이드 (인터랙티브)",
+          url: "/guides/b1-3.html",
+        },
       ],
       passCondition:
-        "B1-1·B1-2 결과물 제출 후 담당 퍼실리테이터 승인을 받으면 통과합니다.",
+        "B1-1·B1-2·B1-3 결과물 제출 후 담당 퍼실리테이터 승인을 받으면 통과합니다.",
     },
     {
       id: 2,
