@@ -31,6 +31,7 @@ export default async function HomePage() {
           </p>
         </div>
 
+        {/* Admin */}
         <section className="mb-10">
           <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-3">
             관리자
@@ -49,24 +50,38 @@ export default async function HomePage() {
           </div>
         </section>
 
+        {/* Facilitators */}
         <section className="mb-10">
           <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-3">
             퍼실리테이터
           </h3>
           <div className="grid gap-3 sm:grid-cols-2">
-            {facilitators.map((user) => (
-              <Link
-                key={user.id}
-                href={`/facilitator?userId=${user.id}`}
-                className="block p-4 bg-white border border-slate-200 rounded-xl hover:border-indigo-300 hover:shadow-sm transition"
-              >
-                <div className="font-medium text-slate-900">{user.name}</div>
-                <div className="text-sm text-slate-500">{user.email}</div>
-              </Link>
-            ))}
+            {facilitators.map((user) =>
+              user.isActive ? (
+                <Link
+                  key={user.id}
+                  href={`/facilitator?userId=${user.id}`}
+                  className="block p-4 bg-white border border-slate-200 rounded-xl hover:border-indigo-300 hover:shadow-sm transition"
+                >
+                  <div className="font-medium text-slate-900">{user.name}</div>
+                  <div className="text-sm text-slate-500">{user.email}</div>
+                </Link>
+              ) : (
+                <div
+                  key={user.id}
+                  className="block p-4 bg-slate-100 border border-slate-200 rounded-xl opacity-70 cursor-not-allowed"
+                  title="비활성 계정 — 플랫폼 사용 불가"
+                >
+                  <div className="font-medium text-slate-600">{user.name}</div>
+                  <div className="text-sm text-slate-400">{user.email}</div>
+                  <div className="text-xs text-slate-500 mt-1">비활성</div>
+                </div>
+              )
+            )}
           </div>
         </section>
 
+        {/* Learners */}
         <section>
           <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-3">
             학습자

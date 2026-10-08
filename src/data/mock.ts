@@ -11,6 +11,7 @@ export const initialData: AppData = {
       phone: null,
       role: "admin",
       groupId: null,
+      isActive: true,
     },
     // Facilitators
     {
@@ -21,6 +22,7 @@ export const initialData: AppData = {
       phone: "010-1111-1111",
       role: "facilitator",
       groupId: "group-1",
+      isActive: true,
     },
     {
       id: "fac-2",
@@ -30,6 +32,7 @@ export const initialData: AppData = {
       phone: "010-2222-2222",
       role: "facilitator",
       groupId: "group-2",
+      isActive: true,
     },
     // Learners - Group 1
     {
@@ -40,6 +43,7 @@ export const initialData: AppData = {
       phone: "010-3333-3333",
       role: "learner",
       groupId: "group-1",
+      isActive: true,
     },
     {
       id: "learner-2",
@@ -49,6 +53,7 @@ export const initialData: AppData = {
       phone: "010-4444-4444",
       role: "learner",
       groupId: "group-1",
+      isActive: true,
     },
     {
       id: "learner-3",
@@ -58,6 +63,7 @@ export const initialData: AppData = {
       phone: "010-5555-5555",
       role: "learner",
       groupId: "group-1",
+      isActive: true,
     },
     // Learners - Group 2
     {
@@ -68,6 +74,7 @@ export const initialData: AppData = {
       phone: "010-6666-6666",
       role: "learner",
       groupId: "group-2",
+      isActive: true,
     },
     {
       id: "learner-5",
@@ -77,6 +84,7 @@ export const initialData: AppData = {
       phone: "010-7777-7777",
       role: "learner",
       groupId: "group-2",
+      isActive: true,
     },
   ],
   groups: [
