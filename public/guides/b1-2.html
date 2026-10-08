@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B1-2 멀티모달 콘텐츠 제작 - 퍼실리테이션 가이드</title>
+</head>
+<body>
+<p id="loading" style="font-family:sans-serif;padding:24px;color:#666">가이드 로딩 중…</p>
+<script>
+(async () => {
+  const n = 6;
+  const parts = [];
+  for (let i = 0; i < n; i++) {
+    const r = await fetch('/guides/b1-2.b64.' + i + '.txt');
+    if (!r.ok) throw new Error('part ' + i + ' HTTP ' + r.status);
+    parts.push(await r.text());
+  }
+  const b64 = parts.join('').replace(/\s/g, '');
+  const bin = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  const ds = new DecompressionStream('gzip');
+  const stream = new Blob([bin]).stream().pipeThrough(ds);
+  const ab = await new Response(stream).arrayBuffer();
+  const html = new TextDecoder().decode(ab);
+  document.open();
+  document.write(html);
+  document.close();
+})().catch(e => {
+  const el = document.getElementById('loading');
+  el.style.color = '#ef4444';
+  el.textContent = '로드 실패: ' + e;
+});
+</script>
+</body>
+</html>
