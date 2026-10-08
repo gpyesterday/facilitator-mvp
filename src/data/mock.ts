@@ -2,59 +2,79 @@ import { AppData } from "@/types";
 
 export const initialData: AppData = {
   users: [
+    // Admin
     {
       id: "admin-1",
       name: "운영 관리자",
+      nickname: "관리자",
       email: "admin@example.com",
+      phone: null,
       role: "admin",
       groupId: null,
     },
+    // Facilitators
     {
       id: "fac-1",
       name: "김퍼실",
+      nickname: "김퍼실",
       email: "facilitator1@example.com",
+      phone: "010-1111-1111",
       role: "facilitator",
       groupId: "group-1",
     },
     {
       id: "fac-2",
       name: "이퍼실",
+      nickname: "이퍼실",
       email: "facilitator2@example.com",
+      phone: "010-2222-2222",
       role: "facilitator",
       groupId: "group-2",
     },
+    // Learners - Group 1
     {
       id: "learner-1",
       name: "박학습",
+      nickname: "박학습",
       email: "learner1@example.com",
+      phone: "010-3333-3333",
       role: "learner",
       groupId: "group-1",
     },
     {
       id: "learner-2",
       name: "최학습",
+      nickname: "최학습",
       email: "learner2@example.com",
+      phone: "010-4444-4444",
       role: "learner",
       groupId: "group-1",
     },
     {
       id: "learner-3",
       name: "정학습",
+      nickname: "정학습",
       email: "learner3@example.com",
+      phone: "010-5555-5555",
       role: "learner",
       groupId: "group-1",
     },
+    // Learners - Group 2
     {
       id: "learner-4",
       name: "강학습",
+      nickname: "강학습",
       email: "learner4@example.com",
+      phone: "010-6666-6666",
       role: "learner",
       groupId: "group-2",
     },
     {
       id: "learner-5",
       name: "윤학습",
+      nickname: "윤학습",
       email: "learner5@example.com",
+      phone: "010-7777-7777",
       role: "learner",
       groupId: "group-2",
     },
@@ -76,7 +96,8 @@ export const initialData: AppData = {
       id: 1,
       order: 1,
       title: "1단계: 기초 다지기",
-      description: "학습의 기본 개념을 이해하고, 필수 자료를 숙지하는 단계입니다.",
+      description:
+        "학습의 기본 개념을 이해하고, 필수 자료를 숙지하는 단계입니다.",
       materials: [
         {
           title: "오리엔테이션 가이드",
@@ -87,7 +108,8 @@ export const initialData: AppData = {
           url: "https://www.notion.so/example-basics",
         },
       ],
-      passCondition: "모든 자료를 읽고 핵심 내용을 이해한 후 '단계 완료'를 제출하세요. 담당 퍼실리테이터의 승인이 필요합니다.",
+      passCondition:
+        "모든 자료를 읽고 핵심 내용을 이해한 후 '단계 완료'를 제출하세요. 담당 퍼실리테이터의 승인이 필요합니다.",
     },
     {
       id: 2,
@@ -104,7 +126,8 @@ export const initialData: AppData = {
           url: "https://www.notion.so/example-practice",
         },
       ],
-      passCondition: "심화 자료 학습 + 실습 과제 완료 후 제출. 퍼실리테이터 승인 필요.",
+      passCondition:
+        "심화 자료 학습 + 실습 과제 완료 후 제출. 퍼실리테이터 승인 필요.",
     },
     {
       id: 3,
@@ -121,7 +144,8 @@ export const initialData: AppData = {
           url: "https://www.notion.so/example-retro",
         },
       ],
-      passCondition: "프로젝트 결과물 제출 + 회고 작성 후 승인받으면 전체 과정 수료.",
+      passCondition:
+        "프로젝트 결과물 제출 + 회고 작성 후 승인받으면 전체 과정 수료.",
     },
   ],
   progresses: [

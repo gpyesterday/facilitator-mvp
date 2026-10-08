@@ -19,7 +19,9 @@ export interface Stage {
 export interface User {
   id: string;
   name: string;
+  nickname: string | null;
   email: string;
+  phone: string | null;
   role: Role;
   groupId: string | null;
 }
