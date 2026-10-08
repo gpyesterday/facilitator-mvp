@@ -10,11 +10,17 @@ async function ensureSchemaAndSeed() {
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
+      nickname TEXT,
       email TEXT NOT NULL,
+      phone TEXT,
       role TEXT NOT NULL CHECK (role IN ('learner', 'facilitator', 'admin')),
       group_id TEXT
     )
   `;
+
+  // 기존 테이블에 컬럼 추가 (이미 배포된 DB 대응)
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS nickname TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone TEXT`;
 
   await sql`
     CREATE TABLE IF NOT EXISTS groups (
@@ -55,8 +61,8 @@ async function ensureSchemaAndSeed() {
   if (count === 0) {
     for (const u of initialData.users) {
       await sql`
-        INSERT INTO users (id, name, email, role, group_id)
-        VALUES (${u.id}, ${u.name}, ${u.email}, ${u.role}, ${u.groupId})
+        INSERT INTO users (id, name, nickname, email, phone, role, group_id)
+        VALUES (${u.id}, ${u.name}, ${u.nickname}, ${u.email}, ${u.phone}, ${u.role}, ${u.groupId})
       `;
     }
     for (const g of initialData.groups) {
@@ -116,7 +122,9 @@ function mapUser(row: Record<string, unknown>): User {
   return {
     id: row.id as string,
     name: row.name as string,
+    nickname: (row.nickname as string) ?? null,
     email: row.email as string,
+    phone: (row.phone as string) ?? null,
     role: row.role as User["role"],
     groupId: (row.group_id as string) ?? null,
   };
@@ -309,4 +317,51 @@ export async function getFacilitatorGroup(facilitatorId: string) {
     SELECT * FROM groups WHERE facilitator_id = ${facilitatorId} LIMIT 1
   `;
   return rows[0] ? mapGroup(rows[0]) : null;
+}
+
+/** 퍼실리테이터 등록 (관리자용) */
+export async function createFacilitator(input: {
+  name: string;
+  nickname: string;
+  email: string;
+  phone: string;
+}): Promise<{ success: boolean; user?: User; error?: string }> {
+  await ensureReady();
+  const sql = getSql();
+
+  const name = input.name.trim();
+  const nickname = input.nickname.trim();
+  const email = input.email.trim().toLowerCase();
+  const phone = input.phone.trim();
+
+  if (!name || !nickname || !email || !phone) {
+    return { success: false, error: "모든 항목을 입력해 주세요." };
+  }
+
+  // 이메일 중복 체크
+  const existing = await sql`
+    SELECT id FROM users WHERE email = ${email} LIMIT 1
+  `;
+  if (existing.length > 0) {
+    return { success: false, error: "이미 등록된 이메일입니다." };
+  }
+
+  const id = `fac-${Date.now()}`;
+
+  await sql`
+    INSERT INTO users (id, name, nickname, email, phone, role, group_id)
+    VALUES (${id}, ${name}, ${nickname}, ${email}, ${phone}, 'facilitator', NULL)
+  `;
+
+  const user: User = {
+    id,
+    name,
+    nickname,
+    email,
+    phone,
+    role: "facilitator",
+    groupId: null,
+  };
+
+  return { success: true, user };
 }
