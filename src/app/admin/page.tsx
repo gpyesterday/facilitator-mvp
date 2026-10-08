@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getData, getUserById } from "@/lib/store";
+import { RegisterFacilitatorForm } from "@/components/RegisterFacilitatorForm";
 
 interface Props {
   searchParams: { userId?: string };
@@ -14,6 +15,7 @@ export default async function AdminPage({ searchParams }: Props) {
   if (!user || user.role !== "admin") notFound();
 
   const data = await getData();
+  const facilitators = data.users.filter((u) => u.role === "facilitator");
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -33,6 +35,82 @@ export default async function AdminPage({ searchParams }: Props) {
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+        {/* 퍼실리테이터 등록 */}
+        <section>
+          <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-4">
+            퍼실리테이터 관리
+          </h2>
+          <RegisterFacilitatorForm />
+        </section>
+
+        {/* 등록된 퍼실리테이터 목록 */}
+        <section>
+          <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-4">
+            등록된 퍼실리테이터 ({facilitators.length}명)
+          </h2>
+          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 border-b border-slate-200">
+                <tr>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600">
+                    이름
+                  </th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600">
+                    닉네임
+                  </th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600">
+                    이메일
+                  </th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600">
+                    휴대전화
+                  </th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600">
+                    담당 그룹
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {facilitators.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-4 py-6 text-center text-slate-400"
+                    >
+                      등록된 퍼실리테이터가 없습니다.
+                    </td>
+                  </tr>
+                ) : (
+                  facilitators.map((fac) => {
+                    const group = data.groups.find(
+                      (g) => g.facilitatorId === fac.id
+                    );
+                    return (
+                      <tr key={fac.id} className="hover:bg-slate-50">
+                        <td className="px-4 py-3 text-slate-900 font-medium">
+                          {fac.name}
+                        </td>
+                        <td className="px-4 py-3 text-slate-600">
+                          {fac.nickname ?? "-"}
+                        </td>
+                        <td className="px-4 py-3 text-slate-600">{fac.email}</td>
+                        <td className="px-4 py-3 text-slate-600">
+                          {fac.phone ?? "-"}
+                        </td>
+                        <td className="px-4 py-3 text-slate-600">
+                          {group?.name ?? (
+                            <span className="text-slate-400">미배정</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Groups */}
         <section>
           <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-4">
             그룹 현황
@@ -71,7 +149,8 @@ export default async function AdminPage({ searchParams }: Props) {
                         >
                           <span>{l.name}</span>
                           <span className="text-slate-400">
-                            Stage {p?.currentStage === 4 ? "수료" : p?.currentStage}
+                            Stage{" "}
+                            {p?.currentStage === 4 ? "수료" : p?.currentStage}
                           </span>
                         </li>
                       );
@@ -83,6 +162,7 @@ export default async function AdminPage({ searchParams }: Props) {
           </div>
         </section>
 
+        {/* Stages overview */}
         <section>
           <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-4">
             학습 로드맵 (3단계)
@@ -112,11 +192,6 @@ export default async function AdminPage({ searchParams }: Props) {
             ))}
           </div>
         </section>
-
-        <p className="text-sm text-slate-400 text-center">
-          ※ 이번 MVP에서는 그룹/단계 편집 기능은 포함하지 않았습니다.  
-          (데이터는 <code className="bg-slate-100 px-1 rounded">src/data/mock.ts</code> 에서 수정 가능)
-        </p>
       </main>
     </div>
   );
