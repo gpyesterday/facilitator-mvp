@@ -1,1 +1,14 @@
-PLACEHOLDER_WILL_REPLACE
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><title>B1-1 가이드 로딩…</title></head>
+<body>
+<p id="s" style="font-family:sans-serif;padding:24px;color:#666">가이드 로딩 중…</p>
+<script>
+(async () => {
+  const parts = await Promise.all([0,1,2].map(i =>
+    fetch('/guides/b1-1-part' + i + '.html').then(r => r.text())
+  ));
+  const html = parts.join('');
+  document.open(); document.write(html); document.close();
+})().catch(e => { document.getElementById('s').textContent = '로드 실패: ' + e; });
+</script>
+</body></html>
