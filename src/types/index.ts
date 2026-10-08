@@ -24,6 +24,8 @@ export interface User {
   phone: string | null;
   role: Role;
   groupId: string | null;
+  /** false면 플랫폼 사용 불가 (삭제 아님) */
+  isActive: boolean;
 }
 
 export interface Group {
