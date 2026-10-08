@@ -126,16 +126,17 @@ export const initialData: AppData = {
     {
       id: 2,
       order: 2,
-      title: "2단계: 심화 학습",
-      description: "심화 자료를 통해 실무 역량을 기르는 단계입니다. (준비 중)",
+      title: "2단계: AI Utilization (A1-1 · …)",
+      description:
+        "A1-1 파이썬으로 프롬프트 관리 프로그램 만들기 등 AI Utilization 미션을 통해 실무 역량을 기르는 단계입니다.",
       materials: [
         {
-          title: "심화 학습 자료 모음",
-          url: "https://www.notion.so/example-advanced",
+          title: "A1-1 파이썬과 작업 이력 가이드 (인터랙티브)",
+          url: "/guides/a1-1.html",
         },
       ],
       passCondition:
-        "심화 자료 학습 + 실습 과제 완료 후 제출. 퍼실리테이터 승인 필요.",
+        "A1-1 결과물 제출 후 담당 퍼실리테이터 승인을 받으면 통과합니다.",
     },
     {
       id: 3,
