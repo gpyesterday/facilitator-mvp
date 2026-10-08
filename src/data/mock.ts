@@ -103,35 +103,27 @@ export const initialData: AppData = {
     {
       id: 1,
       order: 1,
-      title: "1단계: 기초 다지기",
+      title: "1단계: B1-1 LLM 기반 업무 자동화",
       description:
-        "학습의 기본 개념을 이해하고, 필수 자료를 숙지하는 단계입니다.",
+        "LLM의 확률적 생성 원리를 이해하고, 프롬프트 엔지니어링을 통해 원하는 텍스트 결과물을 정교하게 제어하는 기술을 익히는 단계입니다.",
       materials: [
         {
-          title: "오리엔테이션 가이드",
-          url: "https://www.notion.so/example-orientation",
-        },
-        {
-          title: "기초 개념 정리 문서",
-          url: "https://www.notion.so/example-basics",
+          title: "B1-1 미션 가이드 (인터랙티브)",
+          url: "/guides/b1-1.html",
         },
       ],
       passCondition:
-        "모든 자료를 읽고 핵심 내용을 이해한 후 '단계 완료'를 제출하세요. 담당 퍼실리테이터의 승인이 필요합니다.",
+        "모델 비교 보고서 + 시스템 설계 문서 + 10턴 실행 로그 3종을 제출한 뒤 담당 퍼실리테이터 승인을 받으면 통과합니다.",
     },
     {
       id: 2,
       order: 2,
       title: "2단계: 심화 학습",
-      description: "심화 자료를 통해 실무 역량을 기르는 단계입니다.",
+      description: "심화 자료를 통해 실무 역량을 기르는 단계입니다. (준비 중)",
       materials: [
         {
           title: "심화 학습 자료 모음",
           url: "https://www.notion.so/example-advanced",
-        },
-        {
-          title: "실습 과제 가이드",
-          url: "https://www.notion.so/example-practice",
         },
       ],
       passCondition:
@@ -141,15 +133,11 @@ export const initialData: AppData = {
       id: 3,
       order: 3,
       title: "3단계: 프로젝트 & 마무리",
-      description: "배운 내용을 종합하여 프로젝트를 수행하고 마무리하는 단계입니다.",
+      description: "배운 내용을 종합하여 프로젝트를 수행하고 마무리하는 단계입니다. (준비 중)",
       materials: [
         {
           title: "최종 프로젝트 가이드",
           url: "https://www.notion.so/example-project",
-        },
-        {
-          title: "회고 및 피드백 템플릿",
-          url: "https://www.notion.so/example-retro",
         },
       ],
       passCondition:
