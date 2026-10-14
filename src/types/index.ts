@@ -36,7 +36,7 @@ export interface Group {
 
 export interface Progress {
   learnerId: string;
-  currentStage: number; // 1, 2, 3 (or 4 if completed all)
+  currentStage: number; // 1~4 진행 중, 5 = 전체 수료
   status: ProgressStatus;
   submittedAt: string | null;
   reviewedAt: string | null;
