@@ -6,12 +6,20 @@ import {
   getLearnersByGroup,
   getStages,
   getUserById,
+  syncStagesFromMock,
 } from "@/lib/store";
 import { ReviewButtons } from "@/components/ReviewButtons";
 
 interface Props {
   searchParams: { userId?: string };
 }
+
+const STAGE_SHORT: Record<number, string> = {
+  1: "AI 도구",
+  2: "AI 활용",
+  3: "AI 응용",
+  4: "파이널 프로젝트",
+};
 
 export default async function FacilitatorPage({ searchParams }: Props) {
   const { userId } = searchParams;
@@ -53,6 +61,7 @@ export default async function FacilitatorPage({ searchParams }: Props) {
     );
   }
 
+  await syncStagesFromMock();
   const learners = await getLearnersByGroup(group.id);
   const stages = await getStages();
   const data = await getData();
@@ -74,8 +83,9 @@ export default async function FacilitatorPage({ searchParams }: Props) {
   const stageColors: Record<number, string> = {
     1: "bg-slate-100 text-slate-700 border-slate-200",
     2: "bg-blue-50 text-blue-700 border-blue-200",
-    3: "bg-indigo-50 text-indigo-700 border-indigo-200",
-    4: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    3: "bg-violet-50 text-violet-700 border-violet-200",
+    4: "bg-amber-50 text-amber-800 border-amber-200",
+    5: "bg-emerald-50 text-emerald-700 border-emerald-200",
   };
 
   const statusBadge: Record<string, { label: string; className: string }> = {
@@ -96,6 +106,21 @@ export default async function FacilitatorPage({ searchParams }: Props) {
       className: "bg-red-100 text-red-700",
     },
   };
+
+  // 단계별 진입 인원 (현재 해당 단계에 있는 학습자 수; 수료는 5)
+  const stageEntryCounts = [1, 2, 3, 4].map((order) => ({
+    order,
+    label: STAGE_SHORT[order] ?? `${order}단계`,
+    count: learnersWithProgress.filter(
+      (l) => l.progress?.currentStage === order
+    ).length,
+  }));
+  const completedCount = learnersWithProgress.filter(
+    (l) => (l.progress?.currentStage ?? 0) >= 5
+  ).length;
+  const pendingCount = learnersWithProgress.filter(
+    (l) => l.progress?.status === "submitted"
+  ).length;
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -119,8 +144,8 @@ export default async function FacilitatorPage({ searchParams }: Props) {
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-8">
-        {/* Summary */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        {/* Summary: 총원 / 승인대기 / 수료 */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="text-2xl font-bold text-slate-900">
               {learners.length}
@@ -129,35 +154,49 @@ export default async function FacilitatorPage({ searchParams }: Props) {
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="text-2xl font-bold text-amber-600">
-              {
-                learnersWithProgress.filter(
-                  (l) => l.progress?.status === "submitted"
-                ).length
-              }
+              {pendingCount}
             </div>
             <div className="text-sm text-slate-500">승인 대기</div>
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-4">
-            <div className="text-2xl font-bold text-blue-600">
-              {
-                learnersWithProgress.filter(
-                  (l) => l.progress?.currentStage === 2
-                ).length
-              }
-            </div>
-            <div className="text-sm text-slate-500">2단계 진행</div>
-          </div>
-          <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="text-2xl font-bold text-emerald-600">
-              {
-                learnersWithProgress.filter(
-                  (l) => l.progress?.currentStage === 4
-                ).length
-              }
+              {completedCount}
             </div>
             <div className="text-sm text-slate-500">수료 완료</div>
           </div>
         </div>
+
+        {/* 단계별 진입 현황 */}
+        <section className="mb-8">
+          <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-3">
+            단계별 진입 현황
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {stageEntryCounts.map(({ order, label, count }) => (
+              <div
+                key={order}
+                className="bg-white rounded-xl border border-slate-200 p-4"
+              >
+                <div className="text-xs font-medium text-slate-500 mb-1">
+                  {order}단계
+                </div>
+                <div className="text-lg font-semibold text-slate-900 truncate">
+                  {label}
+                </div>
+                <div className="mt-2 text-2xl font-bold text-indigo-600">
+                  {count}
+                  <span className="text-sm font-normal text-slate-400 ml-1">
+                    명
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-slate-400">
+            파이널 프로젝트(4단계)만 팀으로 진행합니다. 위 숫자는 현재 해당 단계에
+            진입해 있는 학습자 수입니다.
+          </p>
+        </section>
 
         {/* Learner Cards */}
         <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-4">
@@ -169,11 +208,16 @@ export default async function FacilitatorPage({ searchParams }: Props) {
             if (!progress) return null;
 
             const stage =
-              progress.currentStage <= 3
+              progress.currentStage <= 4
                 ? stages.find((s) => s.order === progress.currentStage)
                 : null;
 
             const badge = statusBadge[progress.status];
+            const isCompleted = progress.currentStage >= 5;
+            const stageLabel = isCompleted
+              ? "수료 완료"
+              : STAGE_SHORT[progress.currentStage] ??
+                `Stage ${progress.currentStage}`;
 
             return (
               <div
@@ -201,15 +245,22 @@ export default async function FacilitatorPage({ searchParams }: Props) {
                       <span
                         className={`inline-flex px-2.5 py-1 rounded-lg border text-xs font-medium ${
                           stageColors[progress.currentStage] ??
-                          stageColors[4]
+                          stageColors[5]
                         }`}
                       >
-                        {progress.currentStage === 4
+                        {isCompleted
                           ? "수료 완료"
-                          : `Stage ${progress.currentStage}`}
+                          : `${progress.currentStage}단계 · ${stageLabel}`}
                       </span>
-                      {stage && (
-                        <span className="text-slate-600">{stage.title}</span>
+                      {stage && !isCompleted && (
+                        <span className="text-slate-600 text-xs sm:text-sm">
+                          {stage.title}
+                        </span>
+                      )}
+                      {progress.currentStage === 4 && (
+                        <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                          팀 프로젝트
+                        </span>
                       )}
                     </div>
 
