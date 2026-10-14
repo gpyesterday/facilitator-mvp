@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getData, getUserById } from "@/lib/store";
+import { getData, getUserById, syncStagesFromMock } from "@/lib/store";
 import { RegisterFacilitatorForm } from "@/components/RegisterFacilitatorForm";
 import { FacilitatorActiveToggle } from "@/components/FacilitatorActiveToggle";
 
@@ -15,6 +15,7 @@ export default async function AdminPage({ searchParams }: Props) {
   const user = await getUserById(userId);
   if (!user || user.role !== "admin") notFound();
 
+  await syncStagesFromMock();
   const data = await getData();
   const facilitators = data.users.filter((u) => u.role === "facilitator");
 
@@ -165,8 +166,9 @@ export default async function AdminPage({ searchParams }: Props) {
                         >
                           <span>{l.name}</span>
                           <span className="text-slate-400">
-                            Stage{" "}
-                            {p?.currentStage === 4 ? "수료" : p?.currentStage}
+                            {(p?.currentStage ?? 0) >= 5
+                              ? "수료"
+                              : `${p?.currentStage ?? "-"}단계`}
                           </span>
                         </li>
                       );
@@ -181,7 +183,7 @@ export default async function AdminPage({ searchParams }: Props) {
         {/* Stages overview */}
         <section>
           <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-4">
-            학습 로드맵 (3단계)
+            학습 로드맵 (4단계)
           </h2>
           <div className="space-y-3">
             {data.stages.map((stage) => (
