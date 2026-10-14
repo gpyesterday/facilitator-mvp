@@ -33,11 +33,11 @@ export default async function LearnerPage({ searchParams }: Props) {
   if (!progress) notFound();
 
   const currentStage =
-    progress.currentStage <= 3
+    progress.currentStage <= 4
       ? stages.find((s) => s.order === progress.currentStage)
       : null;
 
-  const isCompleted = progress.currentStage === 4;
+  const isCompleted = progress.currentStage >= 5;
 
   const statusLabel: Record<string, string> = {
     in_progress: "학습 중",
@@ -79,8 +79,8 @@ export default async function LearnerPage({ searchParams }: Props) {
             나의 학습 진행 상황
           </h2>
 
-          <div className="flex items-center gap-2 mb-6">
-            {[1, 2, 3].map((step) => {
+          <div className="flex items-center gap-2 mb-6 flex-wrap">
+            {[1, 2, 3, 4].map((step) => {
               const isActive = progress.currentStage === step;
               const isDone = progress.currentStage > step;
               return (
@@ -96,9 +96,9 @@ export default async function LearnerPage({ searchParams }: Props) {
                   >
                     {isDone ? "✓" : step}
                   </div>
-                  {step < 3 && (
+                  {step < 4 && (
                     <div
-                      className={`w-8 h-0.5 ${
+                      className={`w-6 sm:w-8 h-0.5 ${
                         progress.currentStage > step
                           ? "bg-emerald-400"
                           : "bg-slate-200"
@@ -207,7 +207,7 @@ export default async function LearnerPage({ searchParams }: Props) {
                               <a
                                 key={idx}
                                 href={m.url}
-                                target="_blank"
+                                target={isInternal ? "_blank" : "_blank"}
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-2 p-3 rounded-lg border border-slate-200 bg-white hover:border-indigo-300 hover:bg-indigo-50 transition text-slate-800"
                               >
