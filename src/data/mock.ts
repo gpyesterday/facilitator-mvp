@@ -103,9 +103,9 @@ export const initialData: AppData = {
     {
       id: 1,
       order: 1,
-      title: "1단계: GenAI 기초 (B1-1 · B1-2 · B1-3)",
+      title: "1단계: AI 도구",
       description:
-        "B1-1 LLM 기반 업무 자동화, B1-2 멀티모달 콘텐츠 제작, B1-3 노코드 자동화 워크플로 설계를 통해 GenAI 기초 역량을 익히는 단계입니다.",
+        "B1-1 LLM 기반 업무 자동화, B1-2 멀티모달 콘텐츠 제작, B1-3 노코드 자동화 워크플로 설계를 통해 AI 도구 활용 기초 역량을 익히는 단계입니다.",
       materials: [
         {
           title: "B1-1 미션 가이드 (인터랙티브)",
@@ -126,9 +126,9 @@ export const initialData: AppData = {
     {
       id: 2,
       order: 2,
-      title: "2단계: AI Utilization (A1-1 · …)",
+      title: "2단계: AI 활용",
       description:
-        "A1-1 파이썬으로 프롬프트 관리 프로그램 만들기 등 AI Utilization 미션을 통해 실무 역량을 기르는 단계입니다.",
+        "A1-1 파이썬으로 프롬프트 관리 프로그램 만들기 등 AI 활용 미션을 통해 실무 역량을 기르는 단계입니다.",
       materials: [
         {
           title: "A1-1 파이썬과 작업 이력 가이드 (인터랙티브)",
@@ -141,16 +141,27 @@ export const initialData: AppData = {
     {
       id: 3,
       order: 3,
-      title: "3단계: 프로젝트 & 마무리",
-      description: "배운 내용을 종합하여 프로젝트를 수행하고 마무리하는 단계입니다. (준비 중)",
+      title: "3단계: AI 응용",
+      description:
+        "배운 AI 도구·활용 역량을 실제 업무·서비스 맥락에 응용하는 단계입니다. (가이드 준비 중)",
+      materials: [],
+      passCondition:
+        "AI 응용 미션 결과물 제출 후 담당 퍼실리테이터 승인을 받으면 통과합니다.",
+    },
+    {
+      id: 4,
+      order: 4,
+      title: "4단계: 파이널 프로젝트",
+      description:
+        "팀 단위로 진행하는 최종 프로젝트입니다. 1~3단계에서 익힌 역량을 종합해 팀 프로젝트를 수행하고 발표·회고합니다.",
       materials: [
         {
-          title: "최종 프로젝트 가이드",
+          title: "파이널 프로젝트 가이드 (준비 중)",
           url: "https://www.notion.so/example-project",
         },
       ],
       passCondition:
-        "프로젝트 결과물 제출 + 회고 작성 후 승인받으면 전체 과정 수료.",
+        "팀 프로젝트 결과물 제출 + 회고 작성 후 담당 퍼실리테이터 승인을 받으면 전체 과정 수료.",
     },
   ],
   progresses: [
