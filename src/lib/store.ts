@@ -423,10 +423,8 @@ export async function createGroup(
 }
 
 export type LearnerImportRow = {
+  id: string;
   name: string;
-  nickname?: string;
-  email: string;
-  phone?: string;
 };
 
 export async function bulkImportLearners(
@@ -445,15 +443,13 @@ export async function bulkImportLearners(
 
   const normalized = learners
     .map((learner) => {
+      const id = String(learner.id ?? "").trim();
       const name = String(learner.name ?? "").trim();
-      const email = String(learner.email ?? "").trim().toLowerCase();
-      const nickname = String(learner.nickname ?? "").trim();
-      const phone = String(learner.phone ?? "").trim();
 
-      if (!name || !email) return null;
-      return { name, nickname: nickname || null, email, phone: phone || null };
+      if (!id || !name) return null;
+      return { id, name };
     })
-    .filter((learner): learner is LearnerImportRow & { nickname: string | null; phone: string | null } => Boolean(learner));
+    .filter((learner): learner is LearnerImportRow => Boolean(learner));
 
   if (normalized.length === 0) {
     return { success: false, created: 0, error: "유효한 학습자 데이터가 없습니다." };
@@ -462,21 +458,20 @@ export async function bulkImportLearners(
   let created = 0;
   for (const learner of normalized) {
     const existing = await sql`
-      SELECT id FROM users WHERE email = ${learner.email} LIMIT 1
+      SELECT id FROM users WHERE id = ${learner.id} LIMIT 1
     `;
     if (existing.length > 0) {
       continue;
     }
 
-    const id = `learner-${Date.now()}-${created + 1}`;
     await sql`
       INSERT INTO users (id, name, nickname, email, phone, role, group_id, is_active)
-      VALUES (${id}, ${learner.name}, ${learner.nickname}, ${learner.email}, ${learner.phone}, 'learner', ${groupId}, true)
+      VALUES (${learner.id}, ${learner.name}, NULL, '', NULL, 'learner', ${groupId}, true)
     `;
 
     await sql`
       INSERT INTO progresses (learner_id, current_stage, status, submitted_at, reviewed_at, reviewer_id, note)
-      VALUES (${id}, 1, 'in_progress', NULL, NULL, NULL, NULL)
+      VALUES (${learner.id}, 1, 'in_progress', NULL, NULL, NULL, NULL)
       ON CONFLICT (learner_id) DO NOTHING
     `;
 
@@ -484,7 +479,7 @@ export async function bulkImportLearners(
   }
 
   if (created === 0) {
-    return { success: false, created: 0, error: "중복된 이메일이 있어 등록된 학습자가 없습니다." };
+    return { success: false, created: 0, error: "이미 등록된 아이디가 있어 학습자를 등록하지 못했습니다." };
   }
 
   return { success: true, created };

@@ -26,10 +26,8 @@ export async function importLearnersAction({
 }: {
   groupId: string;
   learners: Array<{
+    id: string;
     name: string;
-    nickname?: string;
-    email: string;
-    phone?: string;
   }>;
 }) {
   const result = await bulkImportLearners(groupId, learners);

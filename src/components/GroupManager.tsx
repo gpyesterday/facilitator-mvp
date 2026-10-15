@@ -70,9 +70,7 @@ function parseWorkbookRows(file: File) {
 
 type ImportRow = {
   name: string;
-  email: string;
-  phone?: string;
-  nickname?: string;
+  id: string;
 };
 
 function normalizeLearnerRow(row: Record<string, unknown>): ImportRow | null {
@@ -85,41 +83,21 @@ function normalizeLearnerRow(row: Record<string, unknown>): ImportRow | null {
     "학습자명",
     "학생명",
   ]);
-  const nickname = findValueByAliases(row, [
-    "nickname",
-    "nick",
-    "별명",
-    "닉네임",
-  ]);
-  const email = findValueByAliases(row, [
-    "email",
-    "mail",
-    "e_mail",
-    "이메일",
-    "메일주소",
-  ]);
-  const phone = findValueByAliases(row, [
-    "phone",
-    "phonenumber",
-    "mobile",
-    "tel",
-    "telephone",
-    "휴대폰",
-    "휴대전화",
-    "전화번호",
-    "핸드폰",
+  const id = findValueByAliases(row, [
+    "id",
+    "userid",
+    "learnerid",
+    "studentid",
+    "아이디",
+    "학습자아이디",
+    "학생아이디",
   ]);
 
-  if (!name || !email) {
+  if (!name || !id) {
     return null;
   }
 
-  return {
-    name,
-    nickname: nickname || undefined,
-    email,
-    phone: phone || undefined,
-  };
+  return { name, id };
 }
 
 export function GroupManager({ facilitatorId, groups, initialGroupId }: Props) {
@@ -195,7 +173,7 @@ export function GroupManager({ facilitatorId, groups, initialGroupId }: Props) {
       if (normalized.length === 0) {
         setImportMessage({
           type: "error",
-          text: "파일에서 이름/이메일 컬럼을 찾지 못했습니다. 헤더를 확인해 주세요.",
+          text: "파일에서 이름/아이디 컬럼을 찾지 못했습니다. 첫 행의 헤더를 확인해 주세요.",
         });
         return;
       }
@@ -349,7 +327,10 @@ export function GroupManager({ facilitatorId, groups, initialGroupId }: Props) {
             </div>
 
             <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-3 text-xs text-slate-500">
-              권장 컬럼: 이름, 이메일, 전화번호, 닉네임. 헤더가 있어야 하며, CSV/XLS/XLSX 모두 지원합니다.
+              첫 행에 <span className="font-medium text-slate-700">이름</span>,{" "}
+              <span className="font-medium text-slate-700">아이디</span> 컬럼명을 넣고, 다음 행부터 학습자 한 명씩 입력해 주세요.
+              예: 이름 | 아이디 (홍길동 | hong123). 아이디는 학습자마다 고유해야 합니다.
+              헤더가 있는 CSV/XLS/XLSX 파일을 지원합니다.
             </div>
 
             {importRows.length > 0 && (
@@ -362,16 +343,14 @@ export function GroupManager({ facilitatorId, groups, initialGroupId }: Props) {
                     <thead className="bg-slate-50 text-slate-600">
                       <tr>
                         <th className="px-3 py-2">이름</th>
-                        <th className="px-3 py-2">이메일</th>
-                        <th className="px-3 py-2">전화번호</th>
+                        <th className="px-3 py-2">아이디</th>
                       </tr>
                     </thead>
                     <tbody>
                       {importRows.slice(0, 10).map((row, index) => (
-                        <tr key={`${row.email}-${index}`} className="border-t border-slate-100">
+                        <tr key={`${row.id}-${index}`} className="border-t border-slate-100">
                           <td className="px-3 py-2">{row.name}</td>
-                          <td className="px-3 py-2">{row.email}</td>
-                          <td className="px-3 py-2">{row.phone ?? "-"}</td>
+                          <td className="px-3 py-2">{row.id}</td>
                         </tr>
                       ))}
                     </tbody>
