@@ -377,13 +377,117 @@ export async function getGroupById(groupId: string) {
   return rows[0] ? mapGroup(rows[0]) : null;
 }
 
-export async function getFacilitatorGroup(facilitatorId: string) {
+export async function getFacilitatorGroups(facilitatorId: string): Promise<Group[]> {
   await ensureReady();
   const sql = getSql();
   const rows = await sql`
-    SELECT * FROM groups WHERE facilitator_id = ${facilitatorId} LIMIT 1
+    SELECT * FROM groups WHERE facilitator_id = ${facilitatorId} ORDER BY id
   `;
-  return rows[0] ? mapGroup(rows[0]) : null;
+  return rows.map(mapGroup);
+}
+
+export async function getFacilitatorGroup(facilitatorId: string) {
+  const groups = await getFacilitatorGroups(facilitatorId);
+  return groups[0] ?? null;
+}
+
+export async function createGroup(
+  facilitatorId: string,
+  name: string
+): Promise<{ success: boolean; group?: Group; error?: string }> {
+  await ensureReady();
+  const sql = getSql();
+
+  const trimmedName = name.trim();
+  if (!trimmedName) {
+    return { success: false, error: "그룹 이름을 입력해 주세요." };
+  }
+
+  const existing = await sql`
+    SELECT id FROM groups WHERE facilitator_id = ${facilitatorId} AND name = ${trimmedName} LIMIT 1
+  `;
+  if (existing.length > 0) {
+    return { success: false, error: "이미 같은 이름의 그룹이 있습니다." };
+  }
+
+  const id = `group-${Date.now()}`;
+  await sql`
+    INSERT INTO groups (id, name, facilitator_id)
+    VALUES (${id}, ${trimmedName}, ${facilitatorId})
+  `;
+
+  return {
+    success: true,
+    group: { id, name: trimmedName, facilitatorId },
+  };
+}
+
+export type LearnerImportRow = {
+  name: string;
+  nickname?: string;
+  email: string;
+  phone?: string;
+};
+
+export async function bulkImportLearners(
+  groupId: string,
+  learners: LearnerImportRow[]
+): Promise<{ success: boolean; created: number; error?: string }> {
+  await ensureReady();
+  const sql = getSql();
+
+  const groupRows = await sql`
+    SELECT id FROM groups WHERE id = ${groupId} LIMIT 1
+  `;
+  if (!groupRows[0]) {
+    return { success: false, created: 0, error: "그룹을 찾을 수 없습니다." };
+  }
+
+  const normalized = learners
+    .map((learner) => {
+      const name = String(learner.name ?? "").trim();
+      const email = String(learner.email ?? "").trim().toLowerCase();
+      const nickname = String(learner.nickname ?? "").trim();
+      const phone = String(learner.phone ?? "").trim();
+
+      if (!name || !email) return null;
+      return { name, nickname: nickname || null, email, phone: phone || null };
+    })
+    .filter((learner): learner is LearnerImportRow & { nickname: string | null; phone: string | null } => Boolean(learner));
+
+  if (normalized.length === 0) {
+    return { success: false, created: 0, error: "유효한 학습자 데이터가 없습니다." };
+  }
+
+  let created = 0;
+  for (const learner of normalized) {
+    const existing = await sql`
+      SELECT id FROM users WHERE email = ${learner.email} LIMIT 1
+    `;
+    if (existing.length > 0) {
+      continue;
+    }
+
+    const id = `learner-${Date.now()}-${created + 1}`;
+    await sql`
+      INSERT INTO users (id, name, nickname, email, phone, role, group_id, is_active)
+      VALUES (${id}, ${learner.name}, ${learner.nickname}, ${learner.email}, ${learner.phone}, 'learner', ${groupId}, true)
+    `;
+
+    await sql`
+      INSERT INTO progresses (learner_id, current_stage, status, submitted_at, reviewed_at, reviewer_id, note)
+      VALUES (${id}, 1, 'in_progress', NULL, NULL, NULL, NULL)
+      ON CONFLICT (learner_id) DO NOTHING
+    `;
+
+    created += 1;
+  }
+
+  if (created === 0) {
+    return { success: false, created: 0, error: "중복된 이메일이 있어 등록된 학습자가 없습니다." };
+  }
+
+  return { success: true, created };
 }
 
 /** 퍼실리테이터 등록 (관리자용) */

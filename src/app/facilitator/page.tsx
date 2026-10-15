@@ -2,16 +2,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getData,
-  getFacilitatorGroup,
+  getFacilitatorGroups,
   getLearnersByGroup,
   getStages,
   getUserById,
   syncStagesFromMock,
 } from "@/lib/store";
+import { GroupManager } from "@/components/GroupManager";
 import { LearnerStageSelector } from "@/components/LearnerStageSelector";
 
 interface Props {
-  searchParams: { userId?: string };
+  searchParams: { userId?: string; groupId?: string };
 }
 
 const STAGE_SHORT: Record<number, string> = {
@@ -22,7 +23,7 @@ const STAGE_SHORT: Record<number, string> = {
 };
 
 export default async function FacilitatorPage({ searchParams }: Props) {
-  const { userId } = searchParams;
+  const { userId, groupId } = searchParams;
   if (!userId) notFound();
 
   const user = await getUserById(userId);
@@ -52,17 +53,38 @@ export default async function FacilitatorPage({ searchParams }: Props) {
     );
   }
 
-  const group = await getFacilitatorGroup(userId);
-  if (!group) {
+  const groups = await getFacilitatorGroups(userId);
+  const selectedGroup =
+    groups.find((group) => group.id === groupId) ?? groups[0] ?? null;
+
+  if (!selectedGroup) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>담당 그룹이 배정되지 않았습니다.</p>
+      <div className="min-h-screen bg-slate-50">
+        <header className="bg-white border-b border-slate-200">
+          <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div>
+              <h1 className="text-lg font-bold text-slate-900">
+                퍼실리테이터 대시보드
+              </h1>
+              <p className="text-sm text-slate-500">{user.name}</p>
+            </div>
+            <Link
+              href="/"
+              className="text-sm text-slate-500 hover:text-slate-800"
+            >
+              나가기
+            </Link>
+          </div>
+        </header>
+        <main className="max-w-5xl mx-auto px-6 py-8">
+          <GroupManager facilitatorId={userId} groups={groups} />
+        </main>
       </div>
     );
   }
 
   await syncStagesFromMock();
-  const learners = await getLearnersByGroup(group.id);
+  const learners = await getLearnersByGroup(selectedGroup.id);
   const stages = await getStages();
   const data = await getData();
 
@@ -131,7 +153,7 @@ export default async function FacilitatorPage({ searchParams }: Props) {
               퍼실리테이터 대시보드
             </h1>
             <p className="text-sm text-slate-500">
-              {user.name} · {group.name}
+              {user.name} · {selectedGroup.name}
             </p>
           </div>
           <Link
@@ -144,6 +166,32 @@ export default async function FacilitatorPage({ searchParams }: Props) {
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-8">
+        {groups.length > 0 && (
+          <nav className="mb-6 flex flex-wrap gap-2">
+            {groups.map((group) => (
+              <Link
+                key={group.id}
+                href={`/facilitator?userId=${userId}&groupId=${group.id}`}
+                className={`rounded-full border px-3 py-1.5 text-sm transition ${
+                  selectedGroup.id === group.id
+                    ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                }`}
+              >
+                {group.name}
+              </Link>
+            ))}
+          </nav>
+        )}
+
+        <div className="mb-8">
+          <GroupManager
+            facilitatorId={userId}
+            groups={groups}
+            initialGroupId={selectedGroup.id}
+          />
+        </div>
+
         {/* Summary: 총원 / 승인대기 / 수료 */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-xl border border-slate-200 p-4">
