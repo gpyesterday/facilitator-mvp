@@ -111,9 +111,9 @@ export default async function FacilitatorPage({ searchParams }: Props) {
   const stageEntryCounts = [1, 2, 3, 4].map((order) => ({
     order,
     label: STAGE_SHORT[order] ?? `${order}단계`,
-    count: learnersWithProgress.filter(
+    learners: learnersWithProgress.filter(
       (l) => l.progress?.currentStage === order
-    ).length,
+    ),
   }));
   const completedCount = learnersWithProgress.filter(
     (l) => (l.progress?.currentStage ?? 0) >= 5
@@ -172,7 +172,7 @@ export default async function FacilitatorPage({ searchParams }: Props) {
             단계별 진입 현황
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {stageEntryCounts.map(({ order, label, count }) => (
+            {stageEntryCounts.map(({ order, label, learners: stageLearners }) => (
               <div
                 key={order}
                 className="bg-white rounded-xl border border-slate-200 p-4"
@@ -184,10 +184,15 @@ export default async function FacilitatorPage({ searchParams }: Props) {
                   {label}
                 </div>
                 <div className="mt-2 text-2xl font-bold text-indigo-600">
-                  {count}
+                  {stageLearners.length}
                   <span className="text-sm font-normal text-slate-400 ml-1">
                     명
                   </span>
+                </div>
+                <div className="mt-2 text-sm text-slate-600 break-words">
+                  {stageLearners.length > 0
+                    ? stageLearners.map(({ learner }) => learner.name).join(", ")
+                    : "해당 없음"}
                 </div>
               </div>
             ))}
