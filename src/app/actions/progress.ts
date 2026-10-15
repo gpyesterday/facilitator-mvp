@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { reviewStage, submitStage } from "@/lib/store";
+import { reviewStage, setLearnerStage, submitStage } from "@/lib/store";
 
 export async function submitStageAction(learnerId: string) {
   const success = await submitStage(learnerId);
@@ -19,6 +19,18 @@ export async function reviewStageAction(
   note?: string
 ) {
   const success = await reviewStage(learnerId, reviewerId, decision, note);
+  if (success) {
+    revalidatePath("/learner");
+    revalidatePath("/facilitator");
+  }
+  return { success };
+}
+
+export async function setLearnerStageAction(
+  learnerId: string,
+  stageOrder: number
+) {
+  const success = await setLearnerStage(learnerId, stageOrder);
   if (success) {
     revalidatePath("/learner");
     revalidatePath("/facilitator");

@@ -8,7 +8,7 @@ import {
   getUserById,
   syncStagesFromMock,
 } from "@/lib/store";
-import { ReviewButtons } from "@/components/ReviewButtons";
+import { LearnerStageSelector } from "@/components/LearnerStageSelector";
 
 interface Props {
   searchParams: { userId?: string };
@@ -277,12 +277,10 @@ export default async function FacilitatorPage({ searchParams }: Props) {
                     )}
                   </div>
 
-                  {progress.status === "submitted" && (
-                    <ReviewButtons
-                      learnerId={learner.id}
-                      reviewerId={userId}
-                    />
-                  )}
+                  <LearnerStageSelector
+                    learnerId={learner.id}
+                    currentStage={progress.currentStage}
+                  />
                 </div>
               </div>
             );

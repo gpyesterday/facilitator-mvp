@@ -348,6 +348,31 @@ export async function reviewStage(
   return true;
 }
 
+export async function setLearnerStage(
+  learnerId: string,
+  stageOrder: number
+): Promise<boolean> {
+  if (!Number.isInteger(stageOrder) || stageOrder < 1 || stageOrder > 4) {
+    return false;
+  }
+
+  await ensureReady();
+  const sql = getSql();
+  const rows = await sql`
+    UPDATE progresses
+    SET
+      current_stage = ${stageOrder},
+      status = 'in_progress',
+      submitted_at = NULL,
+      reviewed_at = NULL,
+      reviewer_id = NULL,
+      note = NULL
+    WHERE learner_id = ${learnerId}
+    RETURNING learner_id
+  `;
+  return rows.length > 0;
+}
+
 export async function getStages() {
   await ensureReady();
   const sql = getSql();
