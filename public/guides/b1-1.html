@@ -4,32 +4,1146 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>B1-1 LLM 기반 업무 자동화 - 퍼실리테이션 가이드</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --secondary: #7c3aed;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --bg: #f0f2f5;
+    --card-bg: #ffffff;
+    --text: #1f2937;
+    --text-light: #6b7280;
+    --border: #e5e7eb;
+    --border-radius: 10px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+  header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 30px;
+    border-radius: var(--border-radius);
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+  header h1 { font-size: 24px; margin-bottom: 8px; }
+  header p { font-size: 14px; opacity: 0.9; }
+  .progress-bar {
+    height: 8px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    margin-top: 16px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: white;
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 0;
+    background: var(--card-bg);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 14px 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-light);
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { background: var(--bg); color: var(--primary); }
+  .tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: var(--bg);
+  }
+  .tab-panel {
+    display: none;
+    background: var(--card-bg);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+  }
+  .tab-panel.active { display: block; }
+  .accordion { margin-bottom: 12px; border: 1px solid var(--border); border-radius: var(--border-radius); overflow: hidden; }
+  .accordion-header {
+    background: var(--bg);
+    padding: 14px 18px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+  }
+  .accordion-header:hover { background: #e5e7eb; }
+  .accordion-header::after { content: '▼'; font-size: 12px; color: var(--text-light); transition: transform 0.2s; }
+  .accordion-header.active::after { transform: rotate(180deg); }
+  .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+  .accordion-content .content-inner { padding: 18px; }
+  .checklist { list-style: none; }
+  .checklist li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checkbox {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    margin-top: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .checkbox.checked { background: var(--success); border-color: var(--success); color: white; }
+  .checkbox.checked::after { content: '✓'; font-size: 12px; font-weight: bold; }
+  .btn {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
+  .btn-outline:hover { background: var(--bg); }
+  .btn-sm { padding: 6px 14px; font-size: 12px; }
+  .grid { display: grid; gap: 16px; }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+  .card h3 { margin-bottom: 14px; font-size: 16px; }
+  .card h3::before { content: '📌 '; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .badge-easy { background: #dcfce7; color: #166534; }
+  .badge-mid { background: #fef3c7; color: #92400e; }
+  .badge-hard { background: #fee2e2; color: #991b1b; }
+  .badge-bonus { background: #f3e8ff; color: #7b2cbf; }
+  .callout {
+    padding: 14px 18px;
+    border-radius: var(--border-radius);
+    margin: 12px 0;
+    border-left: 4px solid var(--primary);
+    background: #eff6ff;
+  }
+  .callout.warning { border-left-color: var(--warning); background: #fffbeb; }
+  .callout.danger { border-left-color: var(--danger); background: #fef2f2; }
+  .callout.success { border-left-color: var(--success); background: #dcfce7; }
+  .callout .title { font-weight: 700; margin-bottom: 4px; font-size: 13px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 13px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: var(--bg); font-weight: 700; }
+  tr:nth-child(even) td { background: #fafafa; }
+  .timer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px;
+    background: var(--bg);
+    border-radius: var(--border-radius);
+    margin: 16px 0;
+  }
+  .timer input {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    width: 80px;
+  }
+  .timer-display {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+    font-family: monospace;
+  }
+  .step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 700;
+    margin-right: 8px;
+  }
+  .timeline {
+    position: relative;
+    padding-left: 30px;
+    margin: 20px 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -22px;
+    top: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px var(--border);
+  }
+  .timeline-item:last-child::before { background: var(--success); }
+  .timeline-item .step-label {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .divider {
+    text-align: center;
+    margin: 24px 0;
+    color: var(--text-light);
+    font-size: 12px;
+    position: relative;
+  }
+  .divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border);
+    z-index: 0;
+  }
+  .divider span {
+    background: var(--card-bg);
+    padding: 0 14px;
+    position: relative;
+    z-index: 1;
+  }
+  .action-log {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #0f172a;
+    color: #94a3b8;
+    font-family: monospace;
+    font-size: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+  .action-log .entry {
+    border-bottom: 1px solid #1e293b;
+    padding: 4px 0;
+  }
+  .action-log .entry:last-child { border-bottom: none; }
+  .action-log .entry .time { color: #64748b; }
+  .action-log .entry .check { color: var(--success); }
+  .action-log .entry .fail { color: var(--danger); }
+  .hidden { display: none; }
+  .score-summary {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin: 16px 0;
+  }
+  .score-box {
+    text-align: center;
+    padding: 12px 20px;
+    border-radius: 8px;
+    background: var(--bg);
+  }
+  .score-box .value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--primary);
+  }
+  .score-box .label {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 4px;
+  }
+  .score-box.pass .value { color: var(--success); }
+  .score-box.fail .value { color: var(--danger); }
+  .score-box.warn .value { color: var(--warning); }
+  .hint-box {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  .hint-box .hint-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #92400e;
+    font-size: 13px;
+  }
+  .collapsible-text {
+    display: none;
+    margin-top: 8px;
+    padding: 12px 16px;
+    background: var(--bg);
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .collapsible-text.show { display: block; }
+  .hint-box .toggle-hint {
+    cursor: pointer;
+    color: var(--primary);
+    font-size: 12px;
+    text-decoration: underline;
+  }
+  .tab-container { max-width: 1200px; margin: 0 auto; }
+  .flex-between { display: flex; justify-content: space-between; align-items: center; }
+  .flex-gap { display: flex; gap: 8px; }
+  .text-sm { font-size: 13px; }
+  .text-xs { font-size: 11px; }
+  .mt-4 { margin-top: 16px; }
+  .mb-4 { margin-bottom: 16px; }
+  .mb-2 { margin-bottom: 8px; }
+  .font-bold { font-weight: 700; }
+  .flex-center { display: flex; justify-content: center; align-items: center; }
+  @media(max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } .tabs { font-size: 12px; } .tab-btn { padding: 10px 8px; } }
+</style>
 </head>
 <body>
-<p id="loading" style="font-family:sans-serif;padding:24px;color:#666">가이드 로딩 중…</p>
+<div class="container">
+  <header>
+    <h1>B1-1: LLM 기반 업무 자동화</h1>
+    <p>퍼실리테이션 인터랙티브 가이드 | AI Tools Essentials | 학습난이도: 1</p>
+    <div class="progress-bar">
+      <div class="progress-fill" id="headerProgress"></div>
+    </div>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab-btn active" onclick="switchTab('overview')">📋 미션 개요</button>
+    <button class="tab-btn" onclick="switchTab('deliverables')">📦 결과물 체크</button>
+    <button class="tab-btn" onclick="switchTab('evaluation')">🔍 평가 가이드</button>
+    <button class="tab-btn" onclick="switchTab('facilitation')">🎓 진행 팁</button>
+    <button class="tab-btn" onclick="switchTab('rubric')">⚖️ 채점 루브릭</button>
+    <button class="tab-btn" onclick="switchTab('troubleshooting')">🔧 문제 해결</button>
+  </div>
+
+  <div id="tabContent">
+    <!-- ============ OVERVIEW TAB ============ -->
+    <div id="overview" class="tab-panel active">
+      <div class="card mb-4">
+        <h3>🎯 미션 핵심 목표</h3>
+        <p class="mb-2">LLM의 확률적 생성 원리를 이해하고, 프롬프트 엔지니어링을 통해 원하는 텍스트 결과물을 정교하게 제어하는 기술을 익힌다.</p>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="step-label">Step 1: LLM 3종 이상 비교·선정</div>
+            <p class="text-sm" style="color: var(--text-light);">동일 업무 과업으로 모델별 성능을 평가 축 기반으로 비교</p>
+          </div>
+          <div class="timeline-item">
+            <div class="step-label">Step 2: 페르소나 및 시스템 프롬프트 설계</div>
+            <p class="text-sm" style="color: var(--text-light);">안전장치·출력 규칙·사실 검증 규칙 포함</p>
+          </div>
+          <div class="timeline-item">
+            <div class="step-label">Step 3: Few-shot 예시 + v1→v2 개선</div>
+            <p class="text-sm" style="color: var(--text-light);">단계적 추론 유도 기법 적용 및 전후 비교</p>
+          </div>
+          <div class="timeline-item">
+            <div class="step-label">Step 4: 환할 검증 (5문제 이상)</div>
+            <p class="text-sm" style="color: var(--text-light);">Pass/Fail 기준 명확히 정의</p>
+          </div>
+          <div class="timeline-item">
+            <div class="step-label">Step 5: 10턴 이상 대화 로그</div>
+            <p class="text-sm" style="color: var(--text-light);">조건 변경·추가 정보 반영·문맥 유지 검증</p>
+          </div>
+          <div class="timeline-item" style="background: #dcfce7; padding: 10px 14px; border-radius: 8px;">
+            <div class="step-label">완료! 결과물 3종 제출</div>
+            <p class="text-sm" style="color: var(--text-light);">모델 비교 보고서 + 시스템 설계문서 + 실행 로그</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-2 mb-4">
+        <div class="card">
+          <h3>📋 최종 결과물 3종</h3>
+          <div class="mb-2">
+            <div class="font-bold">1. LLM 모델 비교·선정 보고서</div>
+            <p class="text-xs" style="color: var(--text-light);">3종 모델 비교표 + 평가 축 4개 이상 + 선정 근거</p>
+          </div>
+          <div class="mb-2">
+            <div class="font-bold">2. 시스템 설계 문서</div>
+            <p class="text-xs" style="color: var(--text-light);">페르소나/시스템 프롬프트/Few-shot/개선 이력/v1→v2</p>
+          </div>
+          <div>
+            <div class="font-bold">3. 실행 로그 (10턴 이상)</div>
+            <p class="text-xs" style="color: var(--text-light);">조건 변경 반영 + 문제 지점과 개선 요약</p>
+          </div>
+        </div>
+        <div class="card">
+          <h3>⏱️ 권장 진행 시간</h3>
+          <table>
+            <tr><th>활동</th><th>시간</th></tr>
+            <tr><td>모델 비교·선정</td><td>60분</td></tr>
+            <tr><td>업무 과업 문제 정의</td><td>30분</td></tr>
+            <tr><td>페르소나·시스템 프롬프트 설계</td><td>40분</td></tr>
+            <tr><td>Few-shot + 프롬프트 개선</td><td>50분</td></tr>
+            <tr><td>환할 검증 설계·실행</td><td>40분</td></tr>
+            <tr><td>10턴 대화 로그 작성</td><td>50분</td></tr>
+            <tr><td>결과물 정리·제출</td><td>30분</td></tr>
+            <tr><th>합계</th><th><td>5시간</td></th></tr>
+          </table>
+          <div class="hint-box mt-4">
+            <div class="hint-title">💡 팁</div>
+            <div>총 5시간 기준. 팀 프로젝트라면 역할을 분담하세요.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📊 평가 축 추천 (최소 4개)</h3>
+        <p class="mb-2 text-sm" style="color: var(--text-light);">학습자 보고서에 따라 평가 축은 자유롭게 정의 가능하지만, 아래 6개 축을 기준으로 하면 객관적 평가가 용이합니다.</p>
+        <table>
+          <thead>
+            <tr><th>#</th><th>평가 축</th><th>설명</th><th>학습자 참고 사항</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>정확성(사실/계산)</td><td>사실/수치/정책 오류 여부</td><td>환할 검증 결과로 근거 제시</td></tr>
+            <tr><td>2</td><td>한국어 자연스러움</td><td>자연어fluent, 어색하지 않음</td><td>원어민 수준 X, 비즈니스 문화 고려</td></tr>
+            <tr><td>3</td><td>긴 문맥(10턴) 유지</td><td>조건 변경 시 일관성 유지</td><td>대화 로그로 검증</td></tr>
+            <tr><td>4</td><td>형식 준수(템플릿 출력)</td><td>지정된 출력 규격 준수</td><td>입력 템플릿과 출력 예시 비교</td></tr>
+            <tr><td>5</td><td>속도/안정성</td><td>응답 속도, 반복 시 일정성</td><td>무료 모델 제한 고려</td></tr>
+            <tr><td>6</td><td>비용(토큰/요금제)</td><td>가격 대비 효율</td><td>GPT-4o/Claude 무료 한도 확인</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ DELIVERABLES TAB ============ -->
+    <div id="deliverables" class="tab-panel">
+      <div class="card mb-4">
+        <h3>📦 결과물 체크리스트 (실시간)</h3>
+        <p class="text-sm" style="color: var(--text-light);">학습자가 제출한 결과물을 리뷰하며 체크해주세요. ✔ 클릭하면 누적됩니다.</p>
+        <div class="score-summary">
+          <div class="score-box">
+            <div class="value" id="checkedCount">0</div>
+            <div class="label">체크 완료</div>
+          </div>
+          <div class="score-box">
+            <div class="value">6</div>
+            <div class="label">전체 항목</div>
+          </div>
+        </div>
+        <ul class="checklist" id="deliverableChecklist">
+          <li>
+            <span class="checkbox" onclick="toggleCheck(this)"></span>
+            <div>
+              <div class="font-bold">모델 비교 보고서</div>
+              <p class="text-sm" style="color: var(--text-light);">3종 모델 + 평가 축 4개+ + 점수(1~5) + 근거 + 선정 결론(3줄 이상)</p>
+            </div>
+          </li>
+          <li>
+            <span class="checkbox" onclick="toggleCheck(this)"></span>
+            <div>
+              <div class="font-bold">업무 과업 정의</div>
+              <p class="text-sm" style="color: var(--text-light);">타겟 사용자/입력 데이터/출력 규격/입력 템플릿(1개 이상)</p>
+            </div>
+          </li>
+          <li>
+            <span class="checkbox" onclick="toggleCheck(this)"></span>
+            <div>
+              <div class="font-bold">페르소나 + 시스템 프롬프트</div>
+              <p class="text-sm" style="color: var(--text-light);">역할/목표/출력 규칙/안전장치/사실 처리 규칙 포함</p>
+            </div>
+          </li>
+          <li>
+            <span class="checkbox" onclick="toggleCheck(this)"></span>
+            <div>
+              <div class="font-bold">Few-shot 예시 (3개+)</div>
+              <p class="text-sm" style="color: var(--text-light);">3개 중 1개는 모호한 입력 → 확인 질문 흐름 포함</p>
+            </div>
+          </li>
+          <li>
+            <span class="checkbox" onclick="toggleCheck(this)"></span>
+            <div>
+              <div class="font-bold">환할 검증 (5문제+)</div>
+              <p class="text-sm" style="color: var(--text-light);">기대 정답/허용 오차/출처 + Pass/Fail 기준 (A/B)</p>
+            </div>
+          </li>
+          <li>
+            <span class="checkbox" onclick="toggleCheck(this)"></span>
+            <div>
+              <div class="font-bold">10턴 대화 로그</div>
+              <p class="text-sm" style="color: var(--text-light);">조건 변경/추가 정보/문맥 유지 검증 + 문제 지점 요약</p>
+            </div>
+          </li>
+        </ul>
+        <button class="btn btn-outline mt-4" id="resetBtn" onclick="resetChecklist()">🔄 체크 초기화</button>
+      </div>
+
+      <div class="card">
+        <h3>📝 결과물 예시 양식</h3>
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            모델 비교 보고서 예시
+          </div>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <table>
+                <thead>
+                  <tr><th>모델명</th><th>채널</th><th>정확성</th><th>한국어</th><th>문맥 유지</th><th>형식 준수</th><th>속도/안정성</th><th>비용</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>GPT-4o</td><td>웹 (무료)</td><td>4</td><td>5</td><td>5</td><td>4</td><td>3</td><td>3</td></tr>
+                  <tr><td>Claude 3.5 Sonnet</td><td>웹 (무료)</td><td>5</td><td>4</td><td>5</td><td>5</td><td>4</td><td>5</td></tr>
+                  <tr><td>Gemini 1.5 Pro</td><td>웹 (무료)</td><td>3</td><td>4</td><td>4</td><td>3</td><td>5</td><td>5</td></tr>
+                </tbody>
+              </table>
+              <callout>
+                <div class="callout .title">결론: Claude 3.5 Sonnet 채택</div>
+                <div>1. 긴 문맥 유지와 형식 준수 축에서 높은 점수(5/5) 획득<br>
+                2. 무료 티어 토큰 제한이 넓어 장문 대화에 유리<br>
+                3. 사실 검증 시 "확인 필요" 표기가 자연스러워 환할 억제</div>
+              </callout>
+            </div>
+          </div>
+        </div>
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            시스템 설계 문서 예시
+          </div>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div class="hint-box">
+                <div class="hint-title">업무 과업 입력 템플릿 예시</div>
+                <div>[업무 과업] 회의록 요약<br>
+[원문] (회의 메모/녹취 요약 텍스트)<br>
+[원하는 결과] 결정사항 / Action Items / 리스크 / 후속 일정<br>
+[톤] 간결, 사내 공유용<br>
+[금지] 추측성 표현 금지, 인물 실명 대신 역할명 사용<br>
+[확인 질문 규칙] 정보가 부족하면 최대 3개까지 질문 후 요약 시작</div>
+              </div>
+              <div class="hint-box">
+                <div class="hint-title">페르소나 요약</div>
+                <div>이름: 업무 자동화 코치 (PM 출신)<br>
+원칙: (1) 사실/수치/정책은 확인 가능해야 함 (2) 부족하면 질문 (3) 최종 출력은 템플릿 준수</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            실행 로그 예시 (10턴)
+          </div>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <table>
+                <thead><tr><th>턴</th><th>발신자</th><th>내용</th></tr></thead>
+                <tbody>
+                  <tr><td>1</td><td>사용자</td><td>회의록 원문 제공</td></tr>
+                  <tr><td>2</td><td>AI</td><td>확인 질문 2개 (누락 정보)</td></tr>
+                  <tr><td>3</td><td>사용자</td><td>추가 정보 제공</td></tr>
+                  <tr><td>4</td><td>AI</td><td>템플릿 요약 출력</td></tr>
+                  <tr><td>…</td><td></td><td>중간에 톤 변경, 책임자명 변경 요청</td></tr>
+                  <tr><td>10</td><td>AI</td><td>변경 반영 + 기존 결정사항 유지</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ EVALUATION TAB ============ -->
+    <div id="evaluation" class="tab-panel">
+      <div class="card mb-4">
+        <h3>🔍 평가질문 1: 기능 동작 검증</h3>
+        <ul class="checklist" id="evalChecklist">
+          <li><span class="checkbox" onclick="toggleCheck(this)"></span><div>업무 과업 1개가 문서에 명확히 정의됨 (타겟 사용자/입력/출력 규격 포함)</div></li>
+          <li><span class="checkbox" onclick="toggleCheck(this)"></span><div>입력 템플릿 1개 이상 제시 + 복사 가능한 재사용 형태</div></li>
+          <li><span class="checkbox" onclick="toggleCheck(this)"></span><div>3종 이상 모델 비교 결과 → 표 형식 (평가 축 4개+ / 점수 / 근거 포함)</div></li>
+          <li><span class="checkbox" onclick="toggleCheck(this)"></span><div>Few-shot 예시 3개+ (1개는 "모호한 입력→되묻기" 포함)</div></li>
+          <li><span class="checkbox" onclick="toggleCheck(this)"></span><div>환할 검증 5문제+ / Pass-Fail 판정 결과 포함</div></li>
+          <li><span class="checkbox" onclick="toggleCheck(this)"></span><div>10턴 이상 대화 로그 / 중간 조건 변경 반영 확인 가능</div></li>
+        </ul>
+      </div>
+
+      <div class="card mb-4">
+        <h3>🔍 평가질문 2: 동작 구조 및 설계</h3>
+        <ul class="checklist">
+          <li><span class="checkbox" onclick="toggleCheck(this)"></span><div>시스템 프롬프트 / 유저 프롬프트 / 입력 템플릿이 명확히 분리되어 있음</div></li>
+          <li><span class="checkbox" onclick="toggleCheck(this)"></span><div>프롬프트 버전(v1→v2) 개선 과정 존재</div></li>
+          <li><span class="checkbox" onclick="toggleCheck(this)"></span><div>모델 비교는 주관적 인상평이 아니라 평가 축 기반 구조화</div></li>
+        </ul>
+        <div class="hint-box">
+          <div class="hint-title">📋 핵심 체크 포인트</div>
+          <div>• 시스템 프롬프트는 "역할/목표/출력 규칙/안전장치/사실 처리 규칙"을 모두 포함해야 합니다.<br>
+          • Few-shot 예시는 "좋은 입력 → 좋은 출력"을 보여야 하며, 모호한 입력 예시는 AI가 되물어야 하는 지점을 보여야 합니다.<br>
+          • v1→v2 개선은 "일반 지시" → "단계적 추론 유도"로의 전환을 보여야 합니다.</div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <h3>🔍 평가질문 3: 핵심 기술 원리 적용</h3>
+        <div class="grid grid-2">
+          <div>
+            <div class="font-bold mb-2">환할(Hallucination) 이해도</div>
+            <ul class="checklist">
+              <li><span class="checkbox" onclick="toggleCheck(this)"></span><div>환할을 "사실 오류"로 정의하고 창의적 생성과 구분함</div></li>
+              <li><span class="checkbox" onclick="toggleCheck(this)"></span><div>Pass 기준(A/B)과 Fail 기준을 설명함</div></li>
+            </ul>
+          </div>
+          <div>
+            <div class="font-bold mb-2">심층 인터뷰 대비</div>
+            <ul class="checklist">
+              <li><span class="checkbox" onclick="toggleCheck(this)"></span><div>무료 모델만 쓸 때 품질 유지 전략 설명 가능</div></li>
+              <li><span class="checkbox" onclick="toggleCheck(this)"></span><div>자주 바뀌는 정책으로 환할 억제 운영 전략 설명</div></li>
+              <li><span class="checkbox" onclick="toggleCheck(this)"></span><div>10턴 문맥 끊김 문제 대응 프롬프트 구조</div></li>
+            </ul>
+          </div>
+        </div>
+        <div class="hint-box mt-4">
+          <div class="hint-title">💡 심층 인터뷰 질문 예시</div>
+          <div>
+            <div class="mb-2">Q1: "비용 제약으로 무료 모델만 써야 한다면?"</div>
+            <div class="collapsible-text" id="hint1">
+              • 프롬프트를 더 구체적으로 작성해 모델의 추측을 억제<br>
+              • 핵심 정보를 미리 정리해 두어 입력 데이터 축소<br>
+              • Claude 3.5 Sonnet의 무료 티어(20슬롯) 활용<br>
+              • 모델 간 결과를 비교해 불일치 부분을 사람이 보정
+            </div>
+            <div class="toggle-hint" onclick="toggleHint(this)">▶ 더보기</div>
+
+            <div class="mb-2 mt-2">Q2: "업무 정책이 자주 바뀐다면?"</div>
+            <div class="collapsible-text" id="hint2">
+              • 시스템 프롬프트에 "최신 정책은 [출처]에서 확인하세요" 규칙 추가<br>
+              • 정책 변경 시 프롬프트 버전을 따로 관리 (v1.0 → v1.1)<br>
+              • FAQ 형식으로 최근 변경사항을 프롬프트에 주입<br>
+              • "확인 필요" 응답을 자동으로 추적해 정책 업데이트 알림
+            </div>
+            <div class="toggle-hint" onclick="toggleHint(this)">▶ 더보기</div>
+
+            <div class="mb-2 mt-2">Q3: "10턴 이상 문맥이 끊기면?"</div>
+            <div class="collapsible-text" id="hint3">
+              • 핵심 컨텍스트를 요약해 두는 "컨텍스트 블랙박스" 사용<br>
+              • 프롬프트 앞부분에 "이전 대화 요약" 섹션 추가<br>
+              • 턴 수를 리셋하는 "세션 단위"로 대화 구조화<br>
+              • 모델의 컨텍스트 윈도우 크기(200K 토큰) 확인
+            </div>
+            <div class="toggle-hint" onclick="toggleHint(this)">▶ 더보기</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🔍 평가질문 4: 심층 인터뷰 진행 도우미</h3>
+        <div class="timer">
+          <label>인터뷰 타이머 (분): </label>
+          <input type="number" id="timerInput" value="15" min="1" max="120">
+          <button class="btn btn-primary btn-sm" onclick="startTimer()">시작</button>
+          <button class="btn btn-outline btn-sm" onclick="pauseTimer()">일시정지</button>
+          <button class="btn btn-outline btn-sm" onclick="resetTimer()">초기화</button>
+          <div class="timer-display" id="timerDisplay">15:00</div>
+        </div>
+        <div class="action-log" id="actionLog">
+          <div class="entry"><span class="time">[대기 중]</span> <span class="check">인터뷰 시작을 기다리고 있습니다.</span></div>
+        </div>
+        <button class="btn btn-outline btn-sm mt-2" onclick="logAction('pass', '✓ 질문 완료')"></button>
+      </div>
+    </div>
+
+    <!-- ============ FACILITATION TAB ============ -->
+    <div id="facilitation" class="tab-panel">
+      <div class="card mb-4">
+        <h3>🎓 세션 진행 흐름 (5시간 커리컬럼)</h3>
+        <table>
+          <thead>
+            <tr><th>시간</th><th>활동</th><th> facilitator 역할</th><th>팁</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>0:00-0:15</td><td>오리엔테이션</td><td>미션 소개, 결과물 안내, Q&A</td><td>핵심: "왜 프롬프트가 중요한지" 스토리로 전달</td></tr>
+            <tr><td>0:15-1:15</td><td>모델 비교 실습</td><td>학습자 모델 선택 지도, 평가 축 안내</td><td>GPT-4o, Claude 3.5, Gemini 비교 권장</td></tr>
+            <tr><td>1:15-1:45</td><td>업무 과업 정의</td><td>타겟 사용자/입력/출력 명확히 안내</td><td>실제 업무 예시(회의록 요약) 제시</td></tr>
+            <tr><td>1:45-2:25</td><td>페르소나·프롬프트 설계</td><td>안전장치 강조, 시스템 프롬프트 예시 공유</td><td>환할 억제 키워드: "확실하지 않다면..." 강조</td></tr>
+            <tr><td>2:25-3:00</td><td>Few-shot + v1→v2</td><td>단계적 추론 유도 예시 시연</td><td>v1(간단) vs v2(단계적) 차이 시연</td></tr>
+            <tr><td>3:00-3:40</td><td>환할 검증</td><td>Pass/Fail 기준 설명, 검증 질문 예시 제공</td><td>창의적 글쓰기 vs 사실 검증 구분 강조</td></tr>
+            <tr><td>3:40-4:30</td><td>10턴 대화 로그</td><td>조건 변경 시나리오 안내, 문맥 유지 체크포인트</td><td>턴 5, 7, 10에 조건 변경 삽입 권장</td></tr>
+            <tr><td>4:30-5:00</td><td>결과물 정리·제출</td><td>체크리스트로 최종 검토, Q&A</td><td>결과물 템플릿 배포</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid grid-2 mb-4">
+        <div class="card">
+          <h3>💬 학습자 돕기</h3>
+          <div class="accordion">
+            <div class="accordion-header" onclick="toggleAccordion(this)">GAP 질문 (어려워하는 학습자용)</div>
+            <div class="accordion-content">
+              <div class="content-inner">
+                <ul class="checklist">
+                  <li><span class="checkbox"></span><div>"왜 3종 모델을 다 입력해야 하나요?" → 평가 축 기반 선택의 중요성 설명</div></li>
+                  <li><span class="checkbox"></span><div>"시스템 프롬프트가 뭔가요?" → AI의 '성격/지시사항'으로 설명 (페르소나)</div></li>
+                  <li><span class="checkbox"></span><div>"환할이 뭐에요?" → "사실인데 아닌 척 하는" AI 현상, 사례 제시</div></li>
+                  <li><span class="checkbox"></span><div>"Few-shot이 뭐에요?" → '몇 개의 예시'를 보여주어 학습 유도</div></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>⚠️ 흔한 실수</h3>
+          <ul class="checklist">
+            <li><span class="checkbox" onclick="toggleCheck(this)"></span><div><div class="font-bold">모델 비교 → 감이 아닌 점수</div><div class="text-xs" style="color: var(--danger);">✗ "이 모델이 더 좋은 것 같아요"</div><div class="text-xs" style="color: var(--success);">✓ "정확성 축에서 4점: 사실 오류 1건 발생"</div></div></li>
+            <li><span class="checkbox" onclick="toggleCheck(this)"></span><div><div class="font-bold">Few-shot → 출력 예시만 나열</div><div class="text-xs" style="color: var(--danger);">✗ "이렇게 나오면 좋겠어" (입력 없음)</div><div class="text-xs" style="color: var(--success);">✓ "입력: ... → 출력: ..." 쌍으로 제시</div></div></li>
+            <li><span class="checkbox" onclick="toggleCheck(this)"></span><div><div class="font-bold">환할 검증 → 창의적 글쓰기 포함</div><div class="text-xs" style="color: var(--danger);">✗ "소설 아이디어 맞추기" (창의적)</div><div class="text-xs" style="color: var(--success);">✓ "국가 국가코드는?" (사실 검증)</div></div></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>💡 보너스 과제 안내</h3>
+        <div class="grid grid-2">
+          <div>
+            <div class="font-bold mb-2">보너스 1: 봇 배포</div>
+            <p class="text-sm" style="color: var(--text-light);">커스텀 인스트럭션이나 GPTs로 최종 프롬프트 재사용 가능하게 배포</p>
+            <div class="badge badge-bonus mt-2">선택 과제</div>
+          </div>
+          <div>
+            <div class="font-bold mb-2">보너스 2: 멀티모달 확장</div>
+            <p class="text-sm" style="color: var(--text-light);">이미지 생성 AI로 결과물 시각화 (1장 이상)</p>
+            <div class="badge badge-bonus mt-2">선택 과제</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ RUBRIC TAB ============ -->
+    <div id="rubric" class="tab-panel">
+      <div class="card mb-4">
+        <h3>⚖️ 채점 루브릭 (총 100점)</h3>
+        <table>
+          <thead>
+            <tr><th>영역</th><th>배점</th><th>우수 (9-10점)</th><th>보통 (6-8점)</th><th>미흡 (0-5점)</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>모델 비교 보고서</td>
+              <td>20점</td>
+              <td>3종 이상 비교, 6개 축 평가, 근거 명확, 결론 3줄 이상</td>
+              <td>3종 비교, 4개 축 평가, 근거 일부 불분명</td>
+              <td>2종 이하, 4개 미만 축, 감으로만 평가</td>
+            </tr>
+            <tr>
+              <td>업무 과업 정의</td>
+              <td>15점</td>
+              <td>타겟/입력/출력 명확, 템플릿 재사용 가능</td>
+              <td>3가지 요소 중 2가지 정의됨</td>
+              <td>타겟/입력/출력 불분명, 템플릿 없음</td>
+            </tr>
+            <tr>
+              <td>페르소나 + 시스템 프롬프트</td>
+              <td>15점</td>
+              <td>개념적 정의 + 실제 프롬프트, 안전장치·사실 규칙 포함</td>
+              <td>프롬프트 1~2가지 요소 누락</td>
+              <td>페르소나 불분명, 안전장치 없음</td>
+            </tr>
+            <tr>
+              <td>Few-shot + v1→v2</td>
+              <td>15점</td>
+              <td>3개 예시(1개 모호 입력), v2가 단계적 추론 유도</td>
+              <td>3개 예시, 모호 입력 없음</td>
+              <td>2개 미만, v2 개선 미미</td>
+            </tr>
+            <tr>
+              <td>환할 검증</td>
+              <td>15점</td>
+              <td>5문제+ Pass/Fail 기준(A/B), 출처 명시</td>
+              <td>5문제, 판정 기준 불명확</td>
+              <td>3문제 미만, 판정 기준 없음</td>
+            </tr>
+            <tr>
+              <td>10턴 대화 로그</td>
+              <td>20점</td>
+              <td>10턴+, 조건 변경 반영, 문맥 유지, 문제 지점 요약</td>
+              <td>10턴 이상, 문맥 유지 일부 불안정</td>
+              <td>7~9턴, 문맥 끊김, 문제 지점 미기술</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="score-summary mt-4">
+          <div class="score-box pass">
+            <div class="value">90~100</div>
+            <div class="label">우수 (A)</div>
+          </div>
+          <div class="score-box warn">
+            <div class="value">70~89</div>
+            <div class="label">보통 (B)</div>
+          </div>
+          <div class="score-box fail">
+            <div class="value">0~69</div>
+            <div class="label">재도전 (C)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📋 실시간 채점 도구</h3>
+        <p class="text-sm mb-2" style="color: var(--text-light);">각 영역별 점수를 클릭하여 누적 점수를 확인하세요.</p>
+        <div class="score-summary" id="scoreInputs">
+          <div class="score-box">
+            <div class="value">0</div>
+            <div class="label">모델 비교 (20)</div>
+            <input type="number" min="0" max="20" value="0" style="width: 60px; text-align: center;">
+          </div>
+          <div class="score-box">
+            <div class="value">0</div>
+            <div class="label">업무 정의 (15)</div>
+            <input type="number" min="0" max="15" value="0" style="width: 60px; text-align: center;">
+          </div>
+          <div class="score-box">
+            <div class="value">0</div>
+            <div class="label">프롬프트 (15)</div>
+            <input type="number" min="0" max="15" value="0" style="width: 60px; text-align: center;">
+          </div>
+          <div class="score-box">
+            <div class="value">0</div>
+            <div class="label">Few-shot (15)</div>
+            <input type="number" min="0" max="15" value="0" style="width: 60px; text-align: center;">
+          </div>
+          <div class="score-box">
+            <div class="value">0</div>
+            <div class="label">환할 (15)</div>
+            <input type="number" min="0" max="15" value="0" style="width: 60px; text-align: center;">
+          </div>
+          <div class="score-box">
+            <div class="value">0</div>
+            <div class="label">10턴 로그 (20)</div>
+            <input type="number" min="0" max="20" value="0" style="width: 60px; text-align: center;">
+          </div>
+        </div>
+        <div class="flex-center mt-4">
+          <div class="score-box" style="flex: 1;">
+            <div class="value" id="totalScore" style="font-size: 36px;">0</div>
+            <div class="label">총점 (100)</div>
+          </div>
+        </div>
+        <button class="btn btn-outline mt-2" onclick="resetScores()">점수 초기화</button>
+      </div>
+    </div>
+
+    <!-- ============ TROUBLESHOOTING TAB ============ -->
+    <div id="troubleshooting" class="tab-panel">
+      <div class="card mb-4">
+        <h3>🔧 문제 해결 가이드 (FAQ)</h3>
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            Q1. 모델 비교를 못 해서 어떡하죠? (무료 모델만 있어요)
+          </div>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div class="callout">
+                <div class="title">✅ 해결방법</div>
+                <div>
+                  • <div class="font-bold">Claude 3.5 Sonnet (무료 tier: 약 20문자 메시지)</div>
+                  • <div class="font-bold">GPT-4o (ChatGPT 무료 플랜: GPT-4o 우선 접근)</div>
+                  • <div class="font-bold">Gemini 1.5 Pro (무료 티어로 충분한 토큰)</div>
+                  <div class="text-xs mt-2" style="color: var(--text-light);">무료 모델은 토큰 제한이 있으므로, 짧은 테스트 문장(50~100단어)으로 비교하세요.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            Q2. 프롬프트가 너무 길어집니다. 어떻게 하죠?
+          </div>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div class="callout warning">
+                <div class="title">💡 팁</div>
+                <div>
+                  시스템 프롬프트는 100~200단어 이내로 유지하세요. 핵심은 <span class="font-bold">간결함</span>입니다.<br>
+                  <div class="mt-2">예시 구조:</div>
+                  <div class="hint-box mt-2">
+                    <div class="text-xs" style="color: var(--text-light);">역할: OOO 코치 | 목표: 회의록 요약 | 규칙: 템플릿 준수, 사실 확인, 모르면 질문 | 출력: bullet 형식</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            Q3. 10턴 로그를 어떻게 작성하나요?
+          </div>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div class="callout success">
+                <div class="title">✅ 전략</div>
+                <div>
+                  1. <div class="font-bold">시나리오 설정</div>: "팀 회의록 요약"으로 시작<br>
+                  2. <div class="font-bold">조건 변경 삽입</div>: 5턴, 8턴에 톤/대상 변경 요청<br>
+                  3. <div class="font-bold">추가 정보</div>: 7턴에 새로운 항목(리스크) 추가<br>
+                  4. <div class="font-bold">문맥 유지 검증</div>: 3~4턴 결정사항이 10턴에도 유지되는지 체크<br>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="accordion">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            Q4. 환할 검증 질문을 어떻게 만들어요?
+          </div>
+          <div class="accordion-content">
+            <div class="content-inner">
+              <div class="callout">
+                <div class="title">📋 검증 질문 카테고리</div>
+                <table>
+                  <thead><tr><th>카테고리</th><th>예시 질문</th></tr></thead>
+                  <tbody>
+                    <tr><td>계산/수치</td><td>2024년 10월 물가 상승률은?</td></tr>
+                    <tr><td>정책/법령</td><td>연차 휴가 기본 일수는?</td></tr>
+                    <tr><td>사실/날짜</td><td>한국 개발절 날짜는?</td></tr>
+                    <tr><td>회사/기관</td><td>네이버 창업자는 누구야?</td></tr>
+                    <tr><td>지출/예산</td><td>AI 툴 월 구독료 평균은?</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📢 실시간 알림창</h3>
+        <div class="action-log" id="sessionLog" style="max-height: 250px;">
+          <div class="entry"><span class="time">[시스템]</span> 퍼실리테이션 가이드가 준비되었습니다.</div>
+        </div>
+        <div class="flex-gap mt-2">
+          <input type="text" id="logInput" placeholder="학습자 질문이나 메모를 입력하세요..." style="flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px;">
+          <button class="btn btn-primary btn-sm" onclick="addLog('info', document.getElementById('logInput').value)">추가</button>
+        </div>
+        <button class="btn btn-outline btn-sm mt-2" onclick="clearLog()">🧹 로그 지우기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-(async () => {
-  const n = 5;
-  const parts = [];
-  for (let i = 0; i < n; i++) {
-    const r = await fetch('/guides/b1-1.b64.' + i + '.txt');
-    if (!r.ok) throw new Error('part ' + i + ' HTTP ' + r.status);
-    parts.push(await r.text());
+let timerInterval = null;
+let timeLeft = 0;
+let isRunning = false;
+
+function switchTab(tabId) {
+  const panels = document.querySelectorAll('.tab-panel');
+  const buttons = document.querySelectorAll('.tab-btn');
+  panels.forEach(p => { p.classList.remove('active'); });
+  buttons.forEach(b => { b.classList.remove('active'); });
+  document.getElementById(tabId).classList.add('active');
+  event.currentTarget.classList.add('active');
+  updateProgress();
+}
+
+function updateProgress() {
+  const activeIndex = Array.from(document.querySelectorAll('.tab-panel')).findIndex(p => p.classList.contains('active'));
+  const progress = ((activeIndex + 1) / 6) * 100;
+  document.getElementById('headerProgress').style.width = progress + '%';
+}
+
+function toggleCheck(cb) {
+  cb.classList.toggle('checked');
+  updateCheckCount();
+}
+
+function toggleAccordion(header) {
+  header.classList.toggle('active');
+  const content = header.nextElementSibling;
+  if (content.style.maxHeight) {
+    content.style.maxHeight = null;
+  } else {
+    content.style.maxHeight = content.scrollHeight + 'px';
   }
-  const b64 = parts.join('').replace(/\s/g, '');
-  const bin = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-  const ds = new DecompressionStream('gzip');
-  const stream = new Blob([bin]).stream().pipeThrough(ds);
-  const ab = await new Response(stream).arrayBuffer();
-  const html = new TextDecoder().decode(ab);
-  document.open();
-  document.write(html);
-  document.close();
-})().catch(e => {
-  const el = document.getElementById('loading');
-  el.style.color = '#ef4444';
-  el.textContent = '로드 실패: ' + e;
-});
+}
+
+function toggleHint(btn) {
+  const text = btn.previousElementSibling;
+  text.classList.toggle('show');
+}
+
+function updateCheckCount() {
+  const checked = document.querySelectorAll('.checkbox.checked, .checkbox:checked').length;
+  document.getElementById('checkedCount').textContent = checked;
+}
+
+function resetChecklist() {
+  const checkboxes = document.querySelectorAll('.checkbox');
+  checkboxes.forEach(cb => cb.classList.remove('checked'));
+  const inputs = document.querySelectorAll('#scoreInputs input');
+  inputs.forEach(inp => { inp.value = 0; inp.dispatchEvent(new Event('input')); });
+  document.getElementById('totalScore').textContent = '0';
+  document.getElementById('totalScore').className = '';
+}
+
+function startTimer() {
+  if (isRunning) return;
+  const minutes = parseInt(document.getElementById('timerInput').value) || 15;
+  timeLeft = minutes * 60;
+  isRunning = true;
+  addLog('info', '⏱️ 인터뷰 타이머 시작 (' + minutes + '분)');
+  timerInterval = setInterval(function() {
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    document.getElementById('timerDisplay').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      isRunning = false;
+      addLog('warning', '⏰ 시간 종료!');
+      flashTimer();
+    }
+    timeLeft--;
+  }, 1000);
+}
+
+function pauseTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    isRunning = false;
+  }
+}
+
+function resetTimer() {
+  pauseTimer();
+  timeLeft = parseInt(document.getElementById('timerInput').value) * 60 || 900;
+  document.getElementById('timerDisplay').textContent = formatTime(timeLeft);
+}
+
+function formatTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function flashTimer() {
+  const display = document.getElementById('timerDisplay');
+  display.style.color = '#ef4444';
+  display.style.animation = 'pulse 0.5s infinite';
+}
+
+function addScoreListener() {
+  const inputs = document.querySelectorAll('#scoreInputs input');
+  inputs.forEach(inp => {
+    inp.parentElement.querySelector('.value').textContent = inp.value;
+    inp.addEventListener('input', function() {
+      this.parentElement.querySelector('.value').textContent = this.value;
+      updateTotalScore();
+    });
+  });
+}
+
+function updateTotalScore() {
+  const inputs = document.querySelectorAll('#scoreInputs input');
+  let total = 0;
+  inputs.forEach(inp => { total += parseInt(inp.value) || 0; });
+  const el = document.getElementById('totalScore');
+  el.textContent = total;
+  el.className = '';
+  if (total >= 90) { el.classList.add('pass'); }
+  else if (total >= 70) { el.classList.add('warn'); }
+  else { el.classList.add('fail'); }
+}
+
+function resetScores() {
+  const inputs = document.querySelectorAll('#scoreInputs input');
+  inputs.forEach(inp => {
+    inp.value = 0;
+    inp.parentElement.querySelector('.value').textContent = '0';
+  });
+  document.getElementById('totalScore').textContent = '0';
+  document.getElementById('totalScore').className = '';
+}
+
+function addLog(type, message) {
+  const log = document.getElementById('sessionLog');
+  const now = new Date();
+  const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+  const entry = document.createElement('div');
+  entry.className = 'entry';
+  const colorMap = { info: '#3b82f6', warning: '#f59e0b', success: '#10b981', fail: '#ef4444' };
+  entry.innerHTML = '<span class="time">[' + time + ']</span> <span style="color:' + colorMap[type] + '">' + message + '</span>';
+  log.prepend(entry);
+}
+
+function logAction(type, message) {
+  addLog(type, message);
+  document.getElementById('logInput').value = '';
+}
+
+function clearLog() {
+  document.getElementById('sessionLog').innerHTML = '<div class="entry"><span class="time">[시스템]</span> 로그가 초기화되었습니다.</div>';
+}
+
+window.onload = function() {
+  addScoreListener();
+  resetTimer();
+  document.getElementById('logInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') addLog('info', this.value);
+  });
+};
 </script>
 </body>
 </html>
