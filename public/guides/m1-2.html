@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I1-2 나만의 AI 비서 만들기 - 퍼실리테이션 가이드</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --secondary: #7c3aed;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --bg: #f0f2f5;
+    --card-bg: #ffffff;
+    --text: #1f2937;
+    --text-light: #6b7280;
+    --border: #e5e7eb;
+    --border-radius: 10px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+  header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 30px;
+    border-radius: var(--border-radius);
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+  header h1 { font-size: 24px; margin-bottom: 8px; }
+  header p { font-size: 14px; opacity: 0.9; }
+  .progress-bar {
+    height: 8px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    margin-top: 16px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: white;
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 0;
+    background: var(--card-bg);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 14px 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-light);
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { background: var(--bg); color: var(--primary); }
+  .tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: var(--bg);
+  }
+  .tab-panel {
+    display: none;
+    background: var(--card-bg);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+  }
+  .tab-panel.active { display: block; }
+  .accordion { margin-bottom: 12px; border: 1px solid var(--border); border-radius: var(--border-radius); overflow: hidden; }
+  .accordion-header {
+    width: 100%;
+    background: var(--bg);
+    border: 0;
+    padding: 14px 18px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+  }
+  .accordion-header:hover { background: #e5e7eb; }
+  .accordion-header::after { content: '▼'; font-size: 12px; color: var(--text-light); transition: transform 0.2s; }
+  .accordion-header.active::after { transform: rotate(180deg); }
+  .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+  .accordion-content .content-inner { padding: 18px; }
+  .checklist { list-style: none; }
+  .checklist li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checkbox {
+    appearance: none;
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    margin-top: 2px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .checkbox.checked { background: var(--success); border-color: var(--success); color: white; }
+  .checkbox.checked::after { content: '✓'; font-size: 12px; font-weight: bold; }
+  .checkbox:focus-visible, button:focus-visible, input:focus-visible {
+    outline: 3px solid rgba(37,99,235,0.35);
+    outline-offset: 2px;
+  }
+  .btn {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
+  .btn-outline:hover { background: var(--bg); }
+  .btn-sm { padding: 6px 14px; font-size: 12px; }
+  .grid { display: grid; gap: 16px; }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+  .card h3 { margin-bottom: 14px; font-size: 16px; }
+  .card h3::before { content: '📌 '; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .badge-easy { background: #dcfce7; color: #166534; }
+  .badge-mid { background: #fef3c7; color: #92400e; }
+  .badge-hard { background: #fee2e2; color: #991b1b; }
+  .badge-bonus { background: #f3e8ff; color: #7b2cbf; }
+  .callout {
+    padding: 14px 18px;
+    border-radius: var(--border-radius);
+    margin: 12px 0;
+    border-left: 4px solid var(--primary);
+    background: #eff6ff;
+  }
+  .callout.warning { border-left-color: var(--warning); background: #fffbeb; }
+  .callout.danger { border-left-color: var(--danger); background: #fef2f2; }
+  .callout.success { border-left-color: var(--success); background: #dcfce7; }
+  .callout .title { font-weight: 700; margin-bottom: 4px; font-size: 13px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 13px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: var(--bg); font-weight: 700; }
+  tr:nth-child(even) td { background: #fafafa; }
+  .timer {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px;
+    background: var(--bg);
+    border-radius: var(--border-radius);
+    margin: 16px 0;
+  }
+  .timer input {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    width: 80px;
+  }
+  .timer-display {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+    font-family: monospace;
+  }
+  .step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 700;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  .timeline {
+    position: relative;
+    padding-left: 30px;
+    margin: 20px 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -22px;
+    top: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px var(--border);
+  }
+  .timeline-item:last-child::before { background: var(--success); }
+  .timeline-item .step-label {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .divider {
+    text-align: center;
+    margin: 24px 0;
+    color: var(--text-light);
+    font-size: 12px;
+    position: relative;
+  }
+  .divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border);
+    z-index: 0;
+  }
+  .divider span {
+    background: var(--card-bg);
+    padding: 0 14px;
+    position: relative;
+    z-index: 1;
+  }
+  .action-log {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #0f172a;
+    color: #94a3b8;
+    font-family: monospace;
+    font-size: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+  .action-log .entry {
+    border-bottom: 1px solid #1e293b;
+    padding: 4px 0;
+  }
+  .action-log .entry:last-child { border-bottom: none; }
+  .action-log .entry .time { color: #64748b; }
+  .action-log .entry .check { color: var(--success); }
+  .action-log .entry .fail { color: var(--danger); }
+  .score-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin: 16px 0;
+  }
+  .score-box {
+    text-align: center;
+    padding: 12px 20px;
+    border-radius: 8px;
+    background: var(--bg);
+  }
+  .score-box .value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--primary);
+  }
+  .score-box .label {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 4px;
+  }
+  .score-box.pass .value { color: var(--success); }
+  .score-box.fail .value { color: var(--danger); }
+  .score-box.warn .value { color: var(--warning); }
+  .hint-box {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  .hint-box .hint-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #92400e;
+    font-size: 13px;
+  }
+  .collapsible-text {
+    display: none;
+    margin-top: 8px;
+    padding: 12px 16px;
+    background: var(--bg);
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .collapsible-text.show { display: block; }
+  .hint-box .toggle-hint {
+    cursor: pointer;
+    color: var(--primary);
+    font-size: 12px;
+    text-decoration: underline;
+    background: none;
+    border: 0;
+    padding: 4px 0;
+  }
+  .tab-container { max-width: 1200px; margin: 0 auto; }
+  .flex-between { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .flex-gap { display: flex; gap: 8px; }
+  .text-sm { font-size: 13px; }
+  .text-xs { font-size: 11px; }
+  .mt-4 { margin-top: 16px; }
+  .mt-2 { margin-top: 8px; }
+  .mb-4 { margin-bottom: 16px; }
+  .mb-2 { margin-bottom: 8px; }
+  .font-bold { font-weight: 700; }
+  .flex-center { display: flex; justify-content: center; align-items: center; }
+  .muted { color: var(--text-light); }
+  .table-wrap { overflow-x: auto; }
+  .rubric-score { width: 76px; text-align: center; padding: 6px; border: 1px solid var(--border); border-radius: 6px; }
+  @media(max-width: 768px) {
+    body { padding: 12px; }
+    header { padding: 22px; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .tabs { font-size: 12px; }
+    .tab-btn { padding: 10px 8px; }
+    .tab-panel { padding: 16px; }
+    .card { padding: 16px; }
+    .table-wrap table { min-width: 620px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>I1-2: 내 일정·정보를 기억하는 나만의 AI 비서 만들기</h1>
+    <p>퍼실리테이션 인터랙티브 가이드 | AI Native · AI 응용 | 학습난이도: 3</p>
+    <div class="progress-bar" aria-label="가이드 진행도">
+      <div class="progress-fill" id="headerProgress"></div>
+    </div>
+  </header>
+
+  <div class="tabs" id="tabs" role="tablist" aria-label="가이드 섹션">
+    <button class="tab-btn active" id="tab-overview" role="tab" aria-selected="true" aria-controls="overview" onclick="switchTab('overview', this)">📋 미션 개요</button>
+    <button class="tab-btn" id="tab-deliverables" role="tab" aria-selected="false" aria-controls="deliverables" onclick="switchTab('deliverables', this)">📦 결과물 체크</button>
+    <button class="tab-btn" id="tab-evaluation" role="tab" aria-selected="false" aria-controls="evaluation" onclick="switchTab('evaluation', this)">🔍 평가 가이드</button>
+    <button class="tab-btn" id="tab-facilitation" role="tab" aria-selected="false" aria-controls="facilitation" onclick="switchTab('facilitation', this)">🎓 진행 팁</button>
+    <button class="tab-btn" id="tab-rubric" role="tab" aria-selected="false" aria-controls="rubric" onclick="switchTab('rubric', this)">⚖️ 채점 루브릭</button>
+    <button class="tab-btn" id="tab-troubleshooting" role="tab" aria-selected="false" aria-controls="troubleshooting" onclick="switchTab('troubleshooting', this)">🔧 문제 해결</button>
+  </div>
+
+  <div id="tabContent">
+    <section id="overview" class="tab-panel active" role="tabpanel" aria-labelledby="tab-overview">
+      <div class="card mb-4">
+        <h3>🎯 미션 핵심 목표</h3>
+        <p class="mb-2">학습자의 시계열 데이터를 분석·저장하고, 요약 컨텍스트를 활용해 개인화된 답변을 제공하는 AI 비서를 웹 서비스로 완성합니다.</p>
+        <div class="callout warning">
+          <div class="title">미션 ID 확인</div>
+          <div class="text-sm">요청 경로는 I1-2이며, 폴더 안 미션 문서의 제목 표기는 M1-2입니다. 이 가이드는 해당 폴더의 미션 요구사항을 기준으로 작성했습니다.</div>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="step-label">Step 1: 데이터셋 선택 및 요약 기준 정의</div>
+            <p class="text-sm muted">관심 있는 시계열 데이터 100개 이상을 준비하고, 기간·건수·통계·추세를 계산합니다.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="step-label">Step 2: FastAPI + Firestore 백엔드</div>
+            <p class="text-sm muted">데이터 CRUD, 데이터 요약, 대화 기록 API를 스키마 검증과 함께 구현합니다.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="step-label">Step 3: 컨텍스트 기반 AI 채팅</div>
+            <p class="text-sm muted">요약을 시스템 프롬프트에 주입하고, 응답과 대화를 저장·불러옵니다.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="step-label">Step 4: 바닐라 웹 프론트엔드</div>
+            <p class="text-sm muted">채팅·데이터 관리·요약·대화 기록 화면을 연결하고 작은 화면에서도 확인합니다.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="step-label">Step 5: Render / Vercel 배포 및 README</div>
+            <p class="text-sm muted">배포 URL, Swagger, 환경 변수, 실행 절차, 필수 화면 스크린샷을 문서화합니다.</p>
+          </div>
+          <div class="timeline-item" style="background:#dcfce7;padding:10px 14px;border-radius:8px;">
+            <div class="step-label">완료! 사용자 데이터로 답하고 기록을 다시 여는 서비스</div>
+            <p class="text-sm muted">작동 화면뿐 아니라 데이터 흐름·설계 이유·운영 고려사항을 설명할 수 있어야 합니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-2 mb-4">
+        <div class="card">
+          <h3>📋 최종 결과물</h3>
+          <div class="mb-2">
+            <div class="font-bold">1. 배포된 웹 서비스</div>
+            <p class="text-xs muted">Vercel 프론트엔드 + Render FastAPI + Swagger UI(/docs)</p>
+          </div>
+          <div class="mb-2">
+            <div class="font-bold">2. 데이터 기반 기능</div>
+            <p class="text-xs muted">100개 이상 시계열 데이터, 요약 정보, Firestore CRUD 및 요약 API</p>
+          </div>
+          <div class="mb-2">
+            <div class="font-bold">3. 대화 및 AI 기능</div>
+            <p class="text-xs muted">요약 기반 답변, 로딩 상태, 대화 자동 저장·목록 조회·불러오기</p>
+          </div>
+          <div>
+            <div class="font-bold">4. README와 스크린샷</div>
+            <p class="text-xs muted">기술 스택, URL, 실행·환경 변수 안내, 기능별 동작 캡처</p>
+          </div>
+        </div>
+        <div class="card">
+          <h3>🧭 권장 진행 순서</h3>
+          <p class="text-sm muted mb-2">배포를 마지막에 몰아서 시작하지 말고, 작은 수직 기능 단위로 검증합니다.</p>
+          <table>
+            <tbody>
+              <tr><th>먼저</th><td>데이터 형식·100개 샘플·요약 규칙</td></tr>
+              <tr><th>다음</th><td>로컬 API와 Firestore 연결, /docs 확인</td></tr>
+              <tr><th>이후</th><td>요약 API → 채팅 → 저장·불러오기</td></tr>
+              <tr><th>마무리</th><td>화면 연결 → 배포 → README·검증</td></tr>
+            </tbody>
+          </table>
+          <div class="callout warning">
+            <div class="title">시작 전 준비물</div>
+            <div class="text-sm">Python 3.10+, 가상환경과 FastAPI 관련 패키지, Firebase/Firestore 서비스 계정, OpenAI API 키, Render·Vercel 계정을 준비합니다. 키는 코드에 넣지 말고 환경 변수로 관리하세요.</div>
+          </div>
+          <div class="hint-box">
+            <div class="hint-title">진행 원칙</div>
+            <div>한 번에 전체 서비스를 만들기보다, API 한 개와 화면 한 흐름을 끝까지 연결해 동작을 확인하세요.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🧠 학습자가 설명해야 할 핵심 개념</h3>
+        <div class="grid grid-2">
+          <div>
+            <div class="font-bold mb-2">지식·기술</div>
+            <ul class="checklist">
+              <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>시계열의 기간·건수·통계량·최근 추세를 계산하는 기준</div></li>
+              <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>FastAPI 라우터·서비스·Pydantic 스키마의 역할 분리</div></li>
+              <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>Firestore 컬렉션과 문서의 생성·조회·수정·삭제</div></li>
+              <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>브라우저 상태와 API 요청을 연결하는 바닐라 JavaScript</div></li>
+            </ul>
+          </div>
+          <div>
+            <div class="font-bold mb-2">이해·설계 판단</div>
+            <ul class="checklist">
+              <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>요약을 별도 API로 분리하고 프롬프트에 주입하는 이유와 한계</div></li>
+              <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>대화 저장 시점·메시지 구조·재조회 방식의 선택 근거</div></li>
+              <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>CORS, 콜드스타트, 환경 변수, 키 관리의 운영상 의미</div></li>
+              <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>사용자 입력 검증·비용 제한·데이터 증가 시 변경 지점</div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="deliverables" class="tab-panel" role="tabpanel" aria-labelledby="tab-deliverables">
+      <div class="card mb-4">
+        <div class="flex-between">
+          <div>
+            <h3>📦 결과물 체크리스트</h3>
+            <p class="text-sm muted">학습자와 함께 제출물 및 실제 동작을 확인하세요.</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="resetChecklist()">🔄 체크 초기화</button>
+        </div>
+        <div class="score-summary">
+          <div class="score-box">
+            <div class="value" id="checkedCount">0</div>
+            <div class="label">체크 완료</div>
+          </div>
+          <div class="score-box">
+            <div class="value" id="totalChecks">12</div>
+            <div class="label">전체 항목</div>
+          </div>
+        </div>
+        <ul class="checklist" id="deliverableChecklist">
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div><div class="font-bold">데이터셋과 요약</div><p class="text-sm muted">선정한 주제의 데이터 100개 이상, 기간·건수·평균/최대/최소 등·최근 추세 확인</p></div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div><div class="font-bold">FastAPI 구조 및 Swagger</div><p class="text-sm muted">로컬·배포 앱 실행, 라우터/서비스 분리 근거, /docs에서 API 스키마 확인</p></div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div><div class="font-bold">Firestore 데이터 API</div><p class="text-sm muted">POST/GET/PUT/DELETE /api/data 및 GET /api/data/summary 동작 확인</p></div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div><div class="font-bold">대화 기록 API</div><p class="text-sm muted">저장·목록·삭제 구현, 특정 대화 전체 메시지 조회 또는 목록 응답에 messages 포함을 명시</p></div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div><div class="font-bold">컨텍스트 기반 AI 채팅</div><p class="text-sm muted">요약 조회 → 시스템 프롬프트 주입 → GPT 호출 → 대화 자동 저장 흐름 확인</p></div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div><div class="font-bold">채팅 UX</div><p class="text-sm muted">사용자/AI 메시지 표시, 응답 대기 중 로딩 상태, 실패 시 사용자에게 오류 안내</p></div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div><div class="font-bold">데이터 관리 화면</div><p class="text-sm muted">date/value/memo 입력·목록 및 추가 기능, 수정 또는 삭제 중 최소 1개 확인</p></div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div><div class="font-bold">요약 정보 화면</div><p class="text-sm muted">현재 데이터 기간·개수·트렌드 등 실제 API 요약 표시</p></div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div><div class="font-bold">대화 기록 UX</div><p class="text-sm muted">이전 대화 목록 조회 및 선택 대화의 메시지 불러오기 확인</p></div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div><div class="font-bold">보안·환경 설정</div><p class="text-sm muted">OpenAI/Firebase 키 비밀 관리, API_BASE_URL·ALLOWED_ORIGINS 설정, 코드에 비밀값 없음</p></div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div><div class="font-bold">배포 및 반응형 확인</div><p class="text-sm muted">Render API와 Swagger, Vercel 웹 접속, 작은 화면에서 주요 흐름 사용 가능</p></div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div><div class="font-bold">README와 제출 화면</div><p class="text-sm muted">소개·기술스택·URL·실행·환경 변수 및 채팅/데이터 관리/대화 불러오기 스크린샷</p></div></li>
+        </ul>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>🗂️ 권장 데이터 구조</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>컬렉션</th><th>필드 예시</th><th>설계 포인트</th></tr></thead>
+              <tbody>
+                <tr><td>data</td><td>date, value, memo</td><td>date 형식·value 범위 검증, 요약에 필요한 값 제공</td></tr>
+                <tr><td>conversations</td><td>id, title, messages, created_at, updated_at</td><td>목록/상세 조회 흐름에 맞춰 메시지 저장과 반환 계약 정의</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-xs muted">필드명은 예시입니다. 실제 스키마와 API 응답에서 일관되게 사용하고 README에 기록하세요.</p>
+        </div>
+        <div class="card">
+          <h3>🔌 필수 API 빠른 확인</h3>
+          <table>
+            <thead><tr><th>경로</th><th>검증할 동작</th></tr></thead>
+            <tbody>
+              <tr><td>POST/GET/PUT/DELETE /api/data</td><td>생성·조회·수정·삭제 및 목록 반영</td></tr>
+              <tr><td>GET /api/data/summary</td><td>기간·count·metrics·trend 반환</td></tr>
+              <tr><td>POST/GET/DELETE /api/conversations</td><td>저장·목록·삭제, 선택 대화 messages 불러오기</td></tr>
+              <tr><td>POST /api/chat</td><td>요약 컨텍스트 답변과 대화 자동 저장</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="evaluation" class="tab-panel" role="tabpanel" aria-labelledby="tab-evaluation">
+      <div class="card mb-4">
+        <h3>🔍 평가질문 1: 기능 동작 검증</h3>
+        <ul class="checklist">
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>배포된 웹 서비스 URL로 접속되고 Render의 Swagger UI(/docs)를 확인할 수 있는가?</div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>웹에서 데이터를 추가하면 Firestore에 저장되고 목록에 반영되는가?</div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>/api/data/summary가 정상 응답하고 AI 답변이 실제 요약 내용을 반영하는가?</div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>대화 저장·목록 조회·선택 대화 불러오기가 모두 동작하는가?</div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>채팅 로딩·실패 안내와 모바일/작은 화면의 핵심 흐름을 확인했는가?</div></li>
+        </ul>
+      </div>
+
+      <div class="card mb-4">
+        <h3>🔍 평가질문 2: 구조 및 설계 설명</h3>
+        <ul class="checklist">
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>FastAPI 라우터와 서비스 계층을 어떤 책임 기준으로 나눴는가?</div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>data와 conversations 컬렉션의 문서 구조 및 대화 저장 시점을 왜 그렇게 정했는가?</div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>Pydantic 요청/응답 스키마에 어떤 검증을 적용하고 어느 계층에서 처리했는가?</div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>프론트엔드의 데이터 관리·채팅·대화 불러오기를 어떤 상태 흐름으로 연결했는가?</div></li>
+        </ul>
+      </div>
+
+      <div class="card mb-4">
+        <h3>🔍 평가질문 3: 핵심 원리와 트레이드오프</h3>
+        <div class="grid grid-2">
+          <div>
+            <div class="font-bold mb-2">컨텍스트·요약 설계</div>
+            <ul class="checklist">
+              <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>요약을 시스템 프롬프트에 주입하는 이유, 최신성·토큰 비용·정보 손실 측면의 장단점을 설명하는가?</div></li>
+              <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>/api/data/summary를 별도 엔드포인트로 둔 책임 분리·재사용성 근거가 있는가?</div></li>
+            </ul>
+          </div>
+          <div>
+            <div class="font-bold mb-2">저장·보안·운영</div>
+            <ul class="checklist">
+              <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>대화는 언제 저장하며, 목록과 상세 불러오기를 어떤 형태로 제공하는가?</div></li>
+              <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>환경 변수로 키와 배포 주소를 분리한 이유 및 적용 위치를 설명하는가?</div></li>
+            </ul>
+          </div>
+        </div>
+        <div class="hint-box mt-4">
+          <div class="hint-title">💡 더 깊이 묻기</div>
+          <div class="mb-2">Q1. 데이터가 100개에서 10만 개로 늘면 지금 요약 API는 어떤 문제가 생길까요?</div>
+          <div class="collapsible-text">모든 레코드를 매번 읽어 계산하면 지연·읽기 비용이 커질 수 있습니다. 날짜 범위 필터, 집계 저장/캐시, 페이지네이션 등을 검토하고, 정확성과 최신성 사이의 기준을 설명하도록 유도합니다.</div>
+          <button class="toggle-hint" onclick="toggleHint(this)">▶ 질문 힌트 보기</button>
+          <div class="mb-2 mt-4">Q2. 요약을 프롬프트에 넣는 방식이 항상 충분할까요?</div>
+          <div class="collapsible-text">요약은 빠르고 단순하지만 상세 레코드 근거가 사라질 수 있습니다. 구체적 질의에 상세 조회가 필요한 경우 도구 호출/검색으로 확장하거나 요약 범위를 조정하는 판단을 토론합니다.</div>
+          <button class="toggle-hint" onclick="toggleHint(this)">▶ 질문 힌트 보기</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🔍 평가질문 4: 운영·안전 인터뷰</h3>
+        <div class="timer">
+          <label for="timerInput">인터뷰 타이머 (분):</label>
+          <input type="number" id="timerInput" value="15" min="1" max="120">
+          <button class="btn btn-primary btn-sm" onclick="startTimer()">시작/재개</button>
+          <button class="btn btn-outline btn-sm" onclick="pauseTimer()">일시정지</button>
+          <button class="btn btn-outline btn-sm" onclick="resetTimer()">초기화</button>
+          <div class="timer-display" id="timerDisplay" role="timer" aria-live="polite">15:00</div>
+        </div>
+        <ul class="checklist">
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>Render 무료 티어의 콜드스타트 지연을 사용자에게 어떻게 알리고 대응했는가?</div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>배포 도메인 기준으로 CORS 허용 오리진을 어떻게 정하고 확인했는가?</div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>사용자 입력의 데이터 오염·악성 지시·과도한 비용 위험을 어떻게 줄였는가?</div></li>
+          <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>최근 30일만 요약하는 등 기준이 바뀌면 어느 계층과 테스트를 수정해야 하는가?</div></li>
+        </ul>
+        <div class="action-log" id="interviewLog" aria-live="polite">
+          <div class="entry"><span class="time">[대기 중]</span> <span class="check">인터뷰 타이머를 시작할 수 있습니다.</span></div>
+        </div>
+        <div class="flex-gap mt-2">
+          <button class="btn btn-outline btn-sm" onclick="logAction('success', '✓ 답변 근거 확인')">✓ 근거 확인</button>
+          <button class="btn btn-outline btn-sm" onclick="logAction('warning', '↻ 추가 질문 필요')">↻ 추가 질문</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="facilitation" class="tab-panel" role="tabpanel" aria-labelledby="tab-facilitation">
+      <div class="card mb-4">
+        <h3>🎓 세션 진행 흐름 (권장 2회차 운영안)</h3>
+        <p class="text-sm muted">프로젝트 전체 구현과 외부 배포가 포함되므로, 학습자 수준에 맞게 시간을 늘리거나 과제를 분산하세요.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>회차/단계</th><th>활동</th><th>퍼실리테이터 역할</th><th>완료 확인</th></tr></thead>
+            <tbody>
+              <tr><td>1회차 1</td><td>미션·데이터 계획</td><td>관심 주제와 데이터 출처, date/value/memo 구조를 구체화하도록 질문</td><td>100개 이상 데이터와 요약 지표 정의</td></tr>
+              <tr><td>1회차 2</td><td>FastAPI·Firestore</td><td>작은 엔드포인트부터 만들고 Swagger로 계약을 확인하게 안내</td><td>데이터 CRUD와 summary API 확인</td></tr>
+              <tr><td>1회차 3</td><td>대화·AI API</td><td>요약 주입과 저장 시점을 데이터 흐름도로 설명하게 유도</td><td>chat 응답과 대화 저장·조회 확인</td></tr>
+              <tr><td>2회차 1</td><td>바닐라 웹 UI</td><td>화면별 상태와 요청/오류/로딩 흐름을 먼저 스케치</td><td>채팅·데이터·기록·요약 화면 동작</td></tr>
+              <tr><td>2회차 2</td><td>배포·운영 설정</td><td>키 비밀 관리와 CORS·콜드스타트 안내 점검</td><td>Render·Vercel URL과 /docs 접속</td></tr>
+              <tr><td>2회차 3</td><td>검증·발표</td><td>체크리스트와 인터뷰 질문으로 증거 기반 리뷰</td><td>README·스크린샷·설계 설명 완료</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grid grid-2 mb-4">
+        <div class="card">
+          <h3>💬 학습자 돕기: 단계형 질문</h3>
+          <div class="accordion">
+            <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">막막해하는 학습자에게</button>
+            <div class="accordion-content"><div class="content-inner">
+              <ul class="checklist">
+                <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>“어떤 데이터를 써야 할지 모르겠어요.” → “매일/매주 쌓이는 기록 중 직접 설명하고 싶은 것은 무엇인가요?”</div></li>
+                <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>“요약 API가 왜 따로 있나요?” → “채팅 외에 어디서 같은 통계가 필요할까요?”</div></li>
+                <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>“Firestore 문서 구조를 어떻게 정하죠?” → “한 건의 기록과 한 대화 목록을 각각 어떻게 조회할까요?”</div></li>
+                <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div>“AI가 데이터 기반으로 답하는지 모르겠어요.” → “요약의 숫자를 질문에 넣고 답변 근거와 대조해볼까요?”</div></li>
+              </ul>
+            </div></div>
+          </div>
+          <div class="accordion">
+            <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">경험 많은 학습자에게</button>
+            <div class="accordion-content"><div class="content-inner">
+              <ul>
+                <li>요약의 시간 범위를 바꾸면 기존 API 계약과 프론트 표시에는 어떤 영향이 있나요?</li>
+                <li>대화 기록 저장 실패와 GPT 응답 성공이 엇갈리면 사용자에게 어떤 상태를 보여줄까요?</li>
+                <li>데이터 변경 후 기존 요약 캐시가 있다면 어떻게 무효화할까요?</li>
+                <li>배포 URL이 바뀌거나 프리뷰 도메인이 추가될 때 CORS를 어떻게 운영할까요?</li>
+              </ul>
+            </div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>⚠️ 흔한 실수와 코칭</h3>
+          <ul class="checklist">
+            <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div><div class="font-bold">요약 계산을 화면에만 둠</div><div class="text-xs" style="color:var(--danger)">✗ 브라우저에서만 계산해 채팅 API가 같은 요약을 쓰지 않음</div><div class="text-xs" style="color:var(--success)">✓ 백엔드 summary를 단일 기준으로 두고 화면/채팅이 재사용</div></div></li>
+            <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div><div class="font-bold">키를 프론트 코드에 저장</div><div class="text-xs" style="color:var(--danger)">✗ API 키 또는 서비스 계정 JSON을 저장소·브라우저에 포함</div><div class="text-xs" style="color:var(--success)">✓ 서버 환경 변수/비밀 설정으로 보관하고 샘플 파일은 값 제거</div></div></li>
+            <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div><div class="font-bold">채팅은 되지만 대화를 못 불러옴</div><div class="text-xs" style="color:var(--danger)">✗ 대화 목록만 만들고 메시지 상세 응답 계약은 빠짐</div><div class="text-xs" style="color:var(--success)">✓ GET 상세 endpoint 또는 목록 내 messages 포함을 정하고 UI까지 검증</div></div></li>
+            <li><span class="checkbox" role="checkbox" tabindex="0" aria-checked="false" onclick="toggleCheck(this)" onkeydown="checkboxKeydown(event,this)"></span><div><div class="font-bold">배포 후 처음으로 통합 테스트</div><div class="text-xs" style="color:var(--danger)">✗ 로컬 통합과 환경 변수/CORS를 확인하지 않고 한 번에 배포</div><div class="text-xs" style="color:var(--success)">✓ 로컬 API → 프론트 연결 → 배포 환경 순으로 짧게 검증</div></div></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>✨ 선택 심화 과제</h3>
+        <div class="grid grid-2">
+          <div>
+            <div class="font-bold mb-2">Function Calling + MCP 또는 GPT Actions</div>
+            <p class="text-sm muted">모델이 데이터 요약·대화 조회 도구를 선택해 호출하도록 만들고, 어떤 근거로 호출했는지 README에 흐름으로 기록합니다.</p>
+            <span class="badge badge-bonus mt-2">선택 과제</span>
+          </div>
+          <div>
+            <div class="font-bold mb-2">인사이트·UX 확장</div>
+            <p class="text-sm muted">추가 통계 지표, 데이터 추세 그래프, CSV/JSON 내보내기, 다크 모드 중 필요한 기능을 확장합니다.</p>
+            <span class="badge badge-bonus mt-2">선택 과제</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="rubric" class="tab-panel" role="tabpanel" aria-labelledby="tab-rubric">
+      <div class="card mb-4">
+        <h3>⚖️ 채점 루브릭 (총 100점)</h3>
+        <p class="text-sm muted">세부 기준은 미션 결과물에 맞춘 운영용 제안입니다. 점수보다 실제 동작 근거와 설명을 함께 확인하세요.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>영역</th><th>배점</th><th>우수</th><th>보통</th><th>보완 필요</th></tr></thead>
+            <tbody>
+              <tr><td>데이터 준비·요약</td><td>15</td><td>100개 이상, 요약 지표와 추세 기준 명확</td><td>데이터는 있으나 요약/추세 근거 일부 부족</td><td>데이터 규모·요약 기준이 불명확</td></tr>
+              <tr><td>백엔드·Firestore API</td><td>25</td><td>요구 CRUD·summary·conversation API가 검증과 함께 동작</td><td>핵심 API 동작, 일부 예외/계약 미흡</td><td>API 일부 누락 또는 Firestore 반영 확인 불가</td></tr>
+              <tr><td>AI 채팅·대화 흐름</td><td>20</td><td>요약 주입·응답·저장·목록·불러오기 일관</td><td>답변은 되나 저장/불러오기 일부 미흡</td><td>실제 데이터 맥락 또는 대화 기록 기능 부족</td></tr>
+              <tr><td>프론트엔드 UX</td><td>15</td><td>필수 화면과 로딩/오류 상태, 작은 화면 대응</td><td>주요 화면 동작, 상태 안내나 반응형 일부 미흡</td><td>핵심 사용자 흐름을 끝까지 확인할 수 없음</td></tr>
+              <tr><td>배포·문서·비밀 관리</td><td>15</td><td>Render/Vercel/Swagger 접근, README와 스크린샷, 키 보호</td><td>배포 또는 문서의 일부 정보 누락</td><td>배포 접근 불가, 키 노출 또는 실행 안내 부족</td></tr>
+              <tr><td>설계 설명·검증</td><td>10</td><td>계층/스키마/컨텍스트/운영 트레이드오프를 근거로 설명</td><td>기본 구조는 설명하나 일부 선택 근거가 약함</td><td>구현 선택이나 동작 원리를 설명하기 어려움</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="score-summary mt-4">
+          <div class="score-box pass"><div class="value">90–100</div><div class="label">우수</div></div>
+          <div class="score-box warn"><div class="value">70–89</div><div class="label">기본 충족</div></div>
+          <div class="score-box fail"><div class="value">0–69</div><div class="label">보완 후 재검토</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📋 실시간 채점 도구</h3>
+        <p class="text-sm muted mb-2">각 영역 점수를 입력하면 합계가 자동 계산됩니다.</p>
+        <div class="score-summary" id="scoreInputs">
+          <div class="score-box"><div class="value">0</div><div class="label">데이터 (15)</div><input class="rubric-score" type="number" min="0" max="15" value="0" aria-label="데이터 점수, 15점 만점"></div>
+          <div class="score-box"><div class="value">0</div><div class="label">백엔드 (25)</div><input class="rubric-score" type="number" min="0" max="25" value="0" aria-label="백엔드 점수, 25점 만점"></div>
+          <div class="score-box"><div class="value">0</div><div class="label">AI·대화 (20)</div><input class="rubric-score" type="number" min="0" max="20" value="0" aria-label="AI 채팅 점수, 20점 만점"></div>
+          <div class="score-box"><div class="value">0</div><div class="label">프론트 (15)</div><input class="rubric-score" type="number" min="0" max="15" value="0" aria-label="프론트엔드 점수, 15점 만점"></div>
+          <div class="score-box"><div class="value">0</div><div class="label">배포·문서 (15)</div><input class="rubric-score" type="number" min="0" max="15" value="0" aria-label="배포 및 문서 점수, 15점 만점"></div>
+          <div class="score-box"><div class="value">0</div><div class="label">설명·검증 (10)</div><input class="rubric-score" type="number" min="0" max="10" value="0" aria-label="설명과 검증 점수, 10점 만점"></div>
+        </div>
+        <div class="flex-center mt-4">
+          <div class="score-box" style="flex:1">
+            <div class="value" id="totalScore" style="font-size:36px">0</div>
+            <div class="label">총점 (100)</div>
+          </div>
+        </div>
+        <button class="btn btn-outline mt-2" onclick="resetScores()">점수 초기화</button>
+      </div>
+    </section>
+
+    <section id="troubleshooting" class="tab-panel" role="tabpanel" aria-labelledby="tab-troubleshooting">
+      <div class="card mb-4">
+        <h3>🔧 문제 해결 가이드</h3>
+        <div class="accordion">
+          <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">Q1. CORS 오류로 프론트에서 API를 호출할 수 없어요.</button>
+          <div class="accordion-content"><div class="content-inner">
+            <div class="callout">
+              <div class="title">확인 순서</div>
+              <div>브라우저 요청의 Origin과 백엔드 ALLOWED_ORIGINS를 비교합니다. 로컬 개발 주소와 실제 Vercel 도메인을 필요한 범위만 허용하고, 배포 후 API 재배포 및 네트워크 요청을 확인하세요. 자격 증명 사용 시 와일드카드(*) 설정은 피합니다.</div>
+            </div>
+          </div></div>
+        </div>
+        <div class="accordion">
+          <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">Q2. 첫 요청이 너무 오래 걸려요.</button>
+          <div class="accordion-content"><div class="content-inner">
+            <div class="callout warning">
+              <div class="title">콜드스타트 안내</div>
+              <div>Render 무료 서비스는 유휴 후 첫 요청에 지연이 생길 수 있습니다. 화면에 “서버를 깨우는 중일 수 있어 잠시 기다려 주세요”를 표시하고, 로딩 상태를 유지하며 재시도 안내를 제공합니다. 반복 호출이나 무한 재시도는 피하세요.</div>
+            </div>
+          </div></div>
+        </div>
+        <div class="accordion">
+          <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">Q3. Firestore 인증 또는 저장이 실패합니다.</button>
+          <div class="accordion-content"><div class="content-inner">
+            <div class="callout">
+              <div class="title">키·프로젝트 설정 확인</div>
+              <div>Render 환경 변수의 Firebase 서비스 계정 JSON/파일 경로, 프로젝트 ID, Firestore 활성화 여부를 확인합니다. 키 값은 로그·README·브라우저 응답에 출력하지 말고 오류 응답에는 안전한 설명만 제공합니다.</div>
+            </div>
+          </div></div>
+        </div>
+        <div class="accordion">
+          <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">Q4. 대화가 저장되지만 목록에서 다시 열 수 없어요.</button>
+          <div class="accordion-content"><div class="content-inner">
+            <div class="callout success">
+              <div class="title">API 계약을 확인하세요</div>
+              <div>대화 목록이 id를 반환하는지, 선택 시 상세 조회가 messages 전체를 돌려주는지 확인합니다. 상세 GET endpoint를 구현하거나 목록 API 응답에 messages 포함을 분명히 정의하고, 프론트가 동일한 필드명을 사용하는지 확인하세요.</div>
+            </div>
+          </div></div>
+        </div>
+        <div class="accordion">
+          <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">Q5. AI 답변이 요약 수치와 다르거나 근거 없이 말해요.</button>
+          <div class="accordion-content"><div class="content-inner">
+            <div class="callout warning">
+              <div class="title">요약·프롬프트·검증 흐름 점검</div>
+              <div>summary 응답을 직접 확인하고, 시스템 프롬프트에 최신 요약이 실제로 전달되는지 점검합니다. 데이터가 없을 때 추측하지 말고 부족함을 알리게 하며, 핵심 숫자를 포함한 질문으로 답변을 검증하세요. 프롬프트만으로 정확성을 보장할 수 없다는 점도 설명합니다.</div>
+            </div>
+          </div></div>
+        </div>
+        <div class="accordion">
+          <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">Q6. API 키 과금과 사용자 입력은 어떻게 관리하나요?</button>
+          <div class="accordion-content"><div class="content-inner">
+            <div class="callout danger">
+              <div class="title">최소 운영 안전장치</div>
+              <div>키는 서버 환경 변수로만 관리하고 요청 길이·호출 횟수·모델 토큰 한도를 제한합니다. 입력 스키마와 길이를 검증하고, 프롬프트 입력을 신뢰할 수 없는 데이터로 다룹니다. 개인·민감 정보는 샘플 데이터에 사용하지 말고, 오류 응답에 비밀값이나 원문 전체를 포함하지 않습니다.</div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📝 세션 메모</h3>
+        <p class="text-sm muted">학습자의 질문, 막힌 지점, 다음 액션을 기록하세요. 메모는 이 페이지가 열려 있는 동안만 유지됩니다.</p>
+        <div class="action-log" id="sessionLog" style="max-height:250px" aria-live="polite">
+          <div class="entry"><span class="time">[시스템]</span> 퍼실리테이션 메모를 시작할 수 있습니다.</div>
+        </div>
+        <div class="flex-gap mt-2">
+          <input type="text" id="logInput" aria-label="세션 메모 입력" placeholder="학습자 질문이나 다음 액션..." style="flex:1;min-width:180px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px">
+          <button class="btn btn-primary btn-sm" onclick="submitLog()">추가</button>
+          <button class="btn btn-outline btn-sm" onclick="clearLog()">🧹 지우기</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+let timerInterval = null;
+let timeLeft = 0;
+let isRunning = false;
+
+function switchTab(tabId, button) {
+  document.querySelectorAll('.tab-panel').forEach(panel => {
+    panel.classList.toggle('active', panel.id === tabId);
+  });
+  document.querySelectorAll('.tab-btn').forEach(tab => {
+    const isActive = tab === button;
+    tab.classList.toggle('active', isActive);
+    tab.setAttribute('aria-selected', String(isActive));
+  });
+  updateProgress();
+}
+
+function updateProgress() {
+  const panels = Array.from(document.querySelectorAll('.tab-panel'));
+  const activeIndex = panels.findIndex(panel => panel.classList.contains('active'));
+  document.getElementById('headerProgress').style.width = ((activeIndex + 1) / panels.length * 100) + '%';
+}
+
+function toggleCheck(checkbox) {
+  const checked = checkbox.classList.toggle('checked');
+  checkbox.setAttribute('aria-checked', String(checked));
+  updateCheckCount();
+}
+
+function checkboxKeydown(event, checkbox) {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    toggleCheck(checkbox);
+  }
+}
+
+function toggleAccordion(button) {
+  const isOpen = button.classList.toggle('active');
+  button.setAttribute('aria-expanded', String(isOpen));
+  const content = button.nextElementSibling;
+  content.style.maxHeight = isOpen ? content.scrollHeight + 'px' : null;
+}
+
+function toggleHint(button) {
+  const text = button.previousElementSibling;
+  const isOpen = text.classList.toggle('show');
+  button.textContent = isOpen ? '▼ 질문 힌트 닫기' : '▶ 질문 힌트 보기';
+}
+
+function updateCheckCount() {
+  const checkboxes = document.querySelectorAll('#deliverableChecklist .checkbox[role="checkbox"]');
+  const checked = document.querySelectorAll('#deliverableChecklist .checkbox[role="checkbox"].checked').length;
+  document.getElementById('checkedCount').textContent = checked;
+  document.getElementById('totalChecks').textContent = checkboxes.length;
+}
+
+function resetChecklist() {
+  document.querySelectorAll('.checkbox[role="checkbox"]').forEach(checkbox => {
+    checkbox.classList.remove('checked');
+    checkbox.setAttribute('aria-checked', 'false');
+  });
+  updateCheckCount();
+}
+
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remainder = seconds % 60;
+  return minutes + ':' + String(remainder).padStart(2, '0');
+}
+
+function startTimer() {
+  if (isRunning) return;
+  if (timeLeft <= 0) {
+    const minutes = Number(document.getElementById('timerInput').value);
+    if (!Number.isFinite(minutes) || minutes < 1 || minutes > 120) {
+      addLog('warning', '타이머는 1~120분 사이로 설정하세요.');
+      return;
+    }
+    timeLeft = Math.floor(minutes * 60);
+  }
+  isRunning = true;
+  document.getElementById('timerDisplay').style.color = '';
+  addLog('info', '⏱️ 인터뷰 타이머 시작 (' + formatTime(timeLeft) + ')');
+  renderTimer();
+  timerInterval = setInterval(() => {
+    timeLeft -= 1;
+    renderTimer();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      isRunning = false;
+      document.getElementById('timerDisplay').style.color = 'var(--danger)';
+      addLog('warning', '⏰ 인터뷰 시간이 종료되었습니다.');
+    }
+  }, 1000);
+}
+
+function renderTimer() {
+  document.getElementById('timerDisplay').textContent = formatTime(Math.max(timeLeft, 0));
+}
+
+function pauseTimer() {
+  if (!timerInterval) return;
+  clearInterval(timerInterval);
+  timerInterval = null;
+  isRunning = false;
+  addLog('info', '⏸️ 타이머를 일시정지했습니다.');
+}
+
+function resetTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+  isRunning = false;
+  const minutes = Number(document.getElementById('timerInput').value);
+  timeLeft = Number.isFinite(minutes) && minutes >= 1 && minutes <= 120 ? Math.floor(minutes * 60) : 900;
+  document.getElementById('timerDisplay').style.color = '';
+  renderTimer();
+}
+
+function updateTotalScore() {
+  let total = 0;
+  document.querySelectorAll('#scoreInputs input').forEach(input => {
+    const max = Number(input.max);
+    const score = Math.min(Math.max(Number(input.value) || 0, 0), max);
+    input.value = String(score);
+    input.parentElement.querySelector('.value').textContent = String(score);
+    total += score;
+  });
+  const totalElement = document.getElementById('totalScore');
+  totalElement.textContent = String(total);
+  totalElement.className = 'value';
+  if (total >= 90) totalElement.classList.add('pass');
+  else if (total >= 70) totalElement.classList.add('warn');
+  else totalElement.classList.add('fail');
+}
+
+function resetScores() {
+  document.querySelectorAll('#scoreInputs input').forEach(input => { input.value = '0'; });
+  updateTotalScore();
+}
+
+function addLog(type, message) {
+  const log = document.getElementById('sessionLog');
+  const entry = document.createElement('div');
+  const now = new Date();
+  const time = new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }).format(now);
+  const colorClass = type === 'success' ? 'check' : type === 'fail' || type === 'warning' ? 'fail' : '';
+  const timeElement = document.createElement('span');
+  timeElement.className = 'time';
+  timeElement.textContent = '[' + time + '] ';
+  const messageElement = document.createElement('span');
+  messageElement.className = colorClass;
+  messageElement.textContent = message;
+  entry.className = 'entry';
+  entry.append(timeElement, messageElement);
+  log.prepend(entry);
+}
+
+function logAction(type, message) {
+  const log = document.getElementById('interviewLog');
+  const entry = document.createElement('div');
+  const now = new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
+  const timeElement = document.createElement('span');
+  timeElement.className = 'time';
+  timeElement.textContent = '[' + now + '] ';
+  const messageElement = document.createElement('span');
+  messageElement.className = type === 'success' ? 'check' : 'fail';
+  messageElement.textContent = message;
+  entry.className = 'entry';
+  entry.append(timeElement, messageElement);
+  log.prepend(entry);
+}
+
+function submitLog() {
+  const input = document.getElementById('logInput');
+  const message = input.value.trim();
+  if (!message) {
+    input.focus();
+    return;
+  }
+  addLog('info', message);
+  input.value = '';
+  input.focus();
+}
+
+function clearLog() {
+  const log = document.getElementById('sessionLog');
+  log.replaceChildren();
+  addLog('info', '세션 메모를 초기화했습니다.');
+}
+
+document.querySelectorAll('#scoreInputs input').forEach(input => input.addEventListener('input', updateTotalScore));
+document.getElementById('logInput').addEventListener('keydown', event => {
+  if (event.key === 'Enter') submitLog();
+});
+document.getElementById('timerInput').addEventListener('change', resetTimer);
+updateCheckCount();
+updateProgress();
+resetTimer();
+</script>
+</body>
+</html>

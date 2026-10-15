@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A1-3 AI 웹 서비스 만들기 - 퍼실리테이션 가이드</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --secondary: #7c3aed;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --bg: #f0f2f5;
+    --card-bg: #ffffff;
+    --text: #1f2937;
+    --text-light: #6b7280;
+    --border: #e5e7eb;
+    --border-radius: 10px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+  header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 30px;
+    border-radius: var(--border-radius);
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+  header h1 { font-size: 24px; margin-bottom: 8px; }
+  header p { font-size: 14px; opacity: 0.9; }
+  .progress-bar {
+    height: 8px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    margin-top: 16px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: white;
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--card-bg);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 14px 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-light);
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { background: var(--bg); color: var(--primary); }
+  .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--bg); }
+  .tab-btn:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+  }
+  .tab-panel {
+    display: none;
+    background: var(--card-bg);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+  }
+  .tab-panel.active { display: block; }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+  .card h3 { margin-bottom: 14px; font-size: 16px; }
+  .card h3::before { content: '📌 '; }
+  .grid { display: grid; gap: 16px; }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .mb-4 { margin-bottom: 16px; }
+  .mb-2 { margin-bottom: 8px; }
+  .mt-4 { margin-top: 16px; }
+  .mt-2 { margin-top: 8px; }
+  .font-bold { font-weight: 700; }
+  .text-sm { font-size: 13px; }
+  .text-xs { font-size: 11px; }
+  .muted { color: var(--text-light); }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  .badge-bonus { background: #f3e8ff; color: #7b2cbf; }
+  .callout {
+    padding: 14px 18px;
+    border-radius: var(--border-radius);
+    margin: 12px 0;
+    border-left: 4px solid var(--primary);
+    background: #eff6ff;
+  }
+  .callout.warning { border-left-color: var(--warning); background: #fffbeb; }
+  .callout.danger { border-left-color: var(--danger); background: #fef2f2; }
+  .callout.success { border-left-color: var(--success); background: #dcfce7; }
+  .callout .title { font-weight: 700; margin-bottom: 4px; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+  th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--bg); font-weight: 700; }
+  tr:nth-child(even) td { background: #fafafa; }
+  .timeline { position: relative; padding-left: 30px; margin: 20px 0; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .timeline-item { position: relative; margin-bottom: 16px; padding-bottom: 8px; }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -22px;
+    top: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px var(--border);
+  }
+  .timeline-item:last-child::before { background: var(--success); }
+  .step-label { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .checklist { list-style: none; }
+  .checklist li {
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+    accent-color: var(--success);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .accordion { margin-bottom: 12px; border: 1px solid var(--border); border-radius: var(--border-radius); overflow: hidden; }
+  .accordion-header {
+    width: 100%;
+    background: var(--bg);
+    padding: 14px 18px;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .accordion-header:hover { background: #e5e7eb; }
+  .accordion-header::after { content: '▼'; font-size: 12px; color: var(--text-light); transition: transform 0.2s; }
+  .accordion-header[aria-expanded="true"]::after { transform: rotate(180deg); }
+  .accordion-content { display: none; padding: 18px; }
+  .accordion-content.open { display: block; }
+  .btn {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
+  .btn-outline:hover { background: var(--bg); }
+  .btn-sm { padding: 6px 14px; font-size: 12px; }
+  .progress-summary { display: flex; gap: 12px; align-items: center; margin: 12px 0; }
+  .progress-track { height: 10px; flex: 1; background: var(--bg); border-radius: 8px; overflow: hidden; }
+  .progress-track span { display: block; width: 0; height: 100%; background: var(--success); transition: width 0.3s; }
+  .timer {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px;
+    background: var(--bg);
+    border-radius: var(--border-radius);
+    margin: 16px 0;
+  }
+  .timer input {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    width: 78px;
+  }
+  .timer-display { font-size: 18px; font-weight: 700; color: var(--primary); font-family: monospace; }
+  .note-input {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font: inherit;
+    resize: vertical;
+  }
+  .session-log {
+    max-height: 190px;
+    overflow-y: auto;
+    background: #0f172a;
+    color: #cbd5e1;
+    font-family: monospace;
+    font-size: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+  .session-log p { padding: 4px 0; border-bottom: 1px solid #1e293b; }
+  .session-log p:last-child { border-bottom: none; }
+  .question { padding: 12px 14px; background: #f8fafc; border-radius: 8px; margin: 8px 0; }
+  @media(max-width: 768px) {
+    body { padding: 12px; }
+    header { padding: 22px; }
+    header h1 { font-size: 21px; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .tab-btn { padding: 10px 8px; font-size: 12px; }
+    .tab-panel { padding: 16px; }
+    .card { padding: 16px; }
+    table { display: block; overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>A1-3: AI 도움을 받아 내 아이디어를 실제 웹사이트로 만들기</h1>
+    <p>퍼실리테이션 인터랙티브 가이드 | AI 활용 미션 | 학습난이도: 3</p>
+    <div class="progress-bar" role="progressbar" aria-label="필수 결과물 체크 진행률" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0">
+      <div class="progress-fill" id="headerProgress"></div>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="가이드 메뉴" role="tablist">
+    <button class="tab-btn active" id="tab-overview" role="tab" aria-selected="true" aria-controls="overview" onclick="switchTab('overview', this)">📋 미션 개요</button>
+    <button class="tab-btn" id="tab-design" role="tab" aria-selected="false" aria-controls="design" onclick="switchTab('design', this)">💡 기획·구조</button>
+    <button class="tab-btn" id="tab-deliverables" role="tab" aria-selected="false" aria-controls="deliverables" onclick="switchTab('deliverables', this)">📦 결과물 체크</button>
+    <button class="tab-btn" id="tab-facilitation" role="tab" aria-selected="false" aria-controls="facilitation" onclick="switchTab('facilitation', this)">🎓 진행 팁</button>
+    <button class="tab-btn" id="tab-evaluation" role="tab" aria-selected="false" aria-controls="evaluation" onclick="switchTab('evaluation', this)">🔍 평가·성찰</button>
+    <button class="tab-btn" id="tab-troubleshooting" role="tab" aria-selected="false" aria-controls="troubleshooting" onclick="switchTab('troubleshooting', this)">🔧 문제 해결</button>
+  </nav>
+
+  <main id="tabContent">
+    <section id="overview" class="tab-panel active" role="tabpanel" aria-labelledby="tab-overview">
+      <div class="card mb-4">
+        <h3>🎯 미션의 핵심</h3>
+        <p>학습자 자신의 아이디어를 바닐라 HTML/CSS/JavaScript와 Python 서버리스 함수로 구현하고, AI 기능을 연결해 Vercel URL로 공개합니다. AI 코딩 도구는 구현을 돕지만, 결과를 이해하고 오류를 진단하는 책임은 학습자에게 있습니다.</p>
+        <div class="callout mt-4">
+          <div class="title">퍼실리테이터 관점의 성공 기준</div>
+          기능을 많이 만드는 것보다, <strong>사용자 문제 → 작동하는 최소 기능 → 검증 → 설명</strong>의 흐름을 학습자가 자기 말로 설명하도록 돕습니다.
+        </div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="step-label">1. 문제와 사용자 정의</div>
+            <p class="text-sm muted">누구의 어떤 불편을 해결하는지, 서비스가 제공할 가치를 좁힙니다.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="step-label">2. 페이지와 AI 기능 설계</div>
+            <p class="text-sm muted">메뉴 이동이 가능한 페이지/섹션 3개 이상, AI 입력·출력·실패 기준을 정합니다.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="step-label">3. 프론트엔드와 백엔드 구현</div>
+            <p class="text-sm muted">브라우저 화면과 Python API를 구분하고 fetch 요청·응답을 연결합니다.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="step-label">4. 검증·배포·개선</div>
+            <p class="text-sm muted">로컬 및 배포 환경에서 기능을 확인하고, 문제를 고쳐 재배포합니다.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="step-label">5. 문서화와 설명</div>
+            <p class="text-sm muted">필수 제출 패키지를 갖추고 코드·보안·오류 해결 과정을 설명합니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-2 mb-4">
+        <div class="card">
+          <h3>🧠 학습 목표 3가지</h3>
+          <ul class="checklist">
+            <li><span class="badge">지식</span><div><strong>웹의 역할 분담</strong><p class="text-sm muted">HTML 구조, CSS 표현, JavaScript 동작, Python API 역할을 구분한다.</p></div></li>
+            <li><span class="badge">기술</span><div><strong>요청부터 배포까지 구현</strong><p class="text-sm muted">사용자 입력을 fetch로 전달하고, 응답·오류를 화면에 보여주며 Vercel에 배포한다.</p></div></li>
+            <li><span class="badge">이해</span><div><strong>AI 코드의 검토자 되기</strong><p class="text-sm muted">생성 코드를 설명하고, 키 보호·테스트·디버깅이 필요한 이유를 말한다.</p></div></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>🧭 퍼실리테이션 원칙</h3>
+          <p class="mb-2"><strong>먼저 작게:</strong> 하나의 사용자와 한 가지 핵심 과업으로 MVP를 정합니다.</p>
+          <p class="mb-2"><strong>한 번에 한 변화:</strong> AI에게 작은 작업을 요청하고 변경 결과를 실행해 확인합니다.</p>
+          <p class="mb-2"><strong>근거를 남기기:</strong> 오류 메시지, 재현 단계, 수정 내용을 기록하게 합니다.</p>
+          <p><strong>비밀정보 보호:</strong> API 키는 환경 변수에 두며 코드·저장소·캡처에 노출하지 않습니다.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>⚠️ 반드시 지킬 제약</h3>
+        <div class="callout danger">
+          <div class="title">프레임워크 및 API 키</div>
+          프론트엔드는 순수 HTML/CSS/JavaScript로 구현합니다(React/Vue 등 사용 금지). AI API 키를 브라우저 코드에 넣지 말고, Python 서버리스 함수에서 환경 변수로 사용합니다.
+        </div>
+        <p class="text-sm muted">배포 URL은 동료가 접근해 핵심 흐름을 재현할 수 있어야 합니다. 템플릿·예시는 복제하지 말고 학습자 아이디어에 맞게 바꿉니다.</p>
+      </div>
+    </section>
+
+    <section id="design" class="tab-panel" role="tabpanel" aria-labelledby="tab-design" hidden>
+      <div class="card mb-4">
+        <h3>💡 기획을 구체화하는 질문</h3>
+        <div class="question"><strong>사용자:</strong> 이 서비스를 가장 먼저 써볼 한 사람은 누구인가요? 그 사람의 현재 불편은 무엇인가요?</div>
+        <div class="question"><strong>핵심 가치:</strong> 사용자가 입력한 뒤 어떤 판단·행동이 더 쉬워지나요?</div>
+        <div class="question"><strong>범위:</strong> 지금 반드시 필요한 기능 하나와 나중으로 미룰 기능은 무엇인가요?</div>
+        <div class="question"><strong>검증:</strong> 성공·빈 입력·API 오류 중 어떤 상황을 동료가 직접 확인할 수 있나요?</div>
+      </div>
+
+      <div class="card mb-4">
+        <h3>🧩 기획서에 채울 최소 항목</h3>
+        <table>
+          <thead><tr><th>항목</th><th>학습자 산출물</th><th>퍼실리테이터 확인</th></tr></thead>
+          <tbody>
+            <tr><td>서비스 목적·타겟</td><td>사용자, 해결할 문제, 제공 가치</td><td>기능 목록만 있고 사용자·문제가 빠지지 않았는가?</td></tr>
+            <tr><td>페이지 구성</td><td>메뉴 이동 가능한 페이지/섹션 3개 이상</td><td>각 메뉴가 실제 콘텐츠로 이동하는가?</td></tr>
+            <tr><td>AI 기능</td><td>사용자 입력 → AI 처리 → 출력 화면</td><td>입력 예시, 결과 형태, 유용성이 구체적인가?</td></tr>
+            <tr><td>실패 처리</td><td>빈 값·API 오류·지연 중 안내 기준 최소 1개</td><td>사용자가 다음 행동을 알 수 있는 메시지인가?</td></tr>
+            <tr><td>기술 구조</td><td>프론트, api/, 환경 변수, 배포 흐름</td><td>비밀 키가 클라이언트에 노출되지 않는가?</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>🗂️ 권장 프로젝트 구조</h3>
+          <pre class="text-sm" style="white-space:pre-wrap; background:#f8fafc; padding:14px; border-radius:8px;">프로젝트/
+├── index.html
+├── css/
+├── js/
+├── api/                 # Python 서버리스 함수
+├── images/
+├── requirements.txt
+└── README.md</pre>
+          <p class="text-xs muted mt-2">예시 구조입니다. 핵심은 프론트 파일과 백엔드 함수의 책임을 분리하는 것입니다.</p>
+        </div>
+        <div class="card">
+          <h3>🔄 데이터 흐름을 말로 그리기</h3>
+          <p class="mb-2"><strong>브라우저</strong> 입력 폼 → JavaScript가 fetch 요청 생성</p>
+          <p class="mb-2"><strong>/api</strong> Python 함수가 입력을 확인하고 환경 변수의 키로 AI API 호출</p>
+          <p class="mb-2"><strong>응답</strong> 서버가 정해진 형식의 결과 또는 오류를 반환</p>
+          <p><strong>화면</strong> JavaScript가 로딩·성공·실패 상태를 사용자에게 표시</p>
+          <div class="callout warning">
+            <div class="title">확인 질문</div>
+            “키를 프론트에 두면 어떤 사용자가 볼 수 있나요?” 학습자가 브라우저와 서버의 경계를 설명하도록 기다립니다.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="deliverables" class="tab-panel" role="tabpanel" aria-labelledby="tab-deliverables" hidden>
+      <div class="card mb-4">
+        <h3>📦 제출 패키지 체크리스트</h3>
+        <p class="text-sm muted">항목을 체크하면 진행률이 갱신되고, 체크 상태는 이 브라우저에 저장됩니다.</p>
+        <div class="progress-summary">
+          <strong><span id="checkedCount">0</span> / 10</strong>
+          <div class="progress-track" aria-hidden="true"><span id="checkProgress"></span></div>
+          <span id="checkPercent">0%</span>
+        </div>
+        <ul class="checklist" id="deliverableChecklist">
+          <li><input class="deliverable-check" type="checkbox" id="check-plan"><label for="check-plan"><strong>서비스 기획서</strong><span class="text-sm muted"> 목적·타겟·페이지 구성·AI 입력/출력/실패 처리가 정리되어 있음</span></label></li>
+          <li><input class="deliverable-check" type="checkbox" id="check-url"><label for="check-url"><strong>배포된 Vercel 서비스 URL</strong><span class="text-sm muted"> 공개 URL 접속 및 주요 기능 재현 가능</span></label></li>
+          <li><input class="deliverable-check" type="checkbox" id="check-pages"><label for="check-pages"><strong>메뉴 이동 가능한 페이지/섹션 3개 이상</strong><span class="text-sm muted"> 링크가 실제 해당 화면으로 연결됨</span></label></li>
+          <li><input class="deliverable-check" type="checkbox" id="check-responsive"><label for="check-responsive"><strong>반응형 확인</strong><span class="text-sm muted"> 모바일·태블릿·데스크톱에서 확인하고, 최소 2개 화면 크기 검증</span></label></li>
+          <li><input class="deliverable-check" type="checkbox" id="check-ai"><label for="check-ai"><strong>AI 기능 입력 → 결과 표시</strong><span class="text-sm muted"> 사용자 입력이 AI API 처리 후 화면에 표시됨</span></label></li>
+          <li><input class="deliverable-check" type="checkbox" id="check-errors"><label for="check-errors"><strong>실패 안내 메시지</strong><span class="text-sm muted"> 빈 입력·API 오류·지연 중 최소 한 상황을 안내</span></label></li>
+          <li><input class="deliverable-check" type="checkbox" id="check-repo"><label for="check-repo"><strong>GitHub 저장소와 코드</strong><span class="text-sm muted"> 프론트와 api/ 구조가 구분되고 커밋 이력이 있음</span></label></li>
+          <li><input class="deliverable-check" type="checkbox" id="check-readme"><label for="check-readme"><strong>README.md</strong><span class="text-sm muted"> 서비스 소개·기술 스택·실행/배포 방법·배포 URL 포함</span></label></li>
+          <li><input class="deliverable-check" type="checkbox" id="check-env"><label for="check-env"><strong>환경 변수 설정 안내</strong><span class="text-sm muted"> 키 설정 방법은 설명하되 실제 키 값은 어디에도 노출하지 않음</span></label></li>
+          <li><input class="deliverable-check" type="checkbox" id="check-evidence"><label for="check-evidence"><strong>증빙 자료</strong><span class="text-sm muted"> 데스크톱·모바일·AI 동작 스크린샷과 AI 코딩 도구 사용 증빙</span></label></li>
+        </ul>
+        <button class="btn btn-outline btn-sm mt-4" type="button" onclick="resetChecklist()">체크 초기화</button>
+      </div>
+
+      <div class="card">
+        <h3>✅ 배포 URL에서 직접 재현할 테스트</h3>
+        <table>
+          <thead><tr><th>시나리오</th><th>확인 기대값</th><th>관찰할 것</th></tr></thead>
+          <tbody>
+            <tr><td>정상 입력</td><td>AI 결과가 화면에 표시됨</td><td>로딩 상태, 응답 형식, 중복 제출 방지</td></tr>
+            <tr><td>빈 입력</td><td>필수 입력 안내가 보임</td><td>불필요한 API 호출이 발생하지 않음</td></tr>
+            <tr><td>긴 입력 또는 오류 상황</td><td>정상 응답 또는 이해 가능한 실패 안내</td><td>화면이 멈추지 않고 다시 시도할 수 있음</td></tr>
+            <tr><td>화면 크기 변경</td><td>레이아웃과 메뉴를 계속 사용할 수 있음</td><td>가로 넘침, 가려진 버튼, 읽기 어려운 텍스트</td></tr>
+          </tbody>
+        </table>
+        <div class="callout warning"><div class="title">키 노출 재확인</div>브라우저 개발자 도구, GitHub 코드, 커밋 이력, 스크린샷에 실제 키가 없는지 제출 전에 확인합니다.</div>
+      </div>
+    </section>
+
+    <section id="facilitation" class="tab-panel" role="tabpanel" aria-labelledby="tab-facilitation" hidden>
+      <div class="card mb-4">
+        <h3>🎓 진행 단계와 퍼실리테이터 개입</h3>
+        <table>
+          <thead><tr><th>단계</th><th>학습자 활동</th><th>퍼실리테이터 질문·개입</th><th>완료 증거</th></tr></thead>
+          <tbody>
+            <tr><td>1. 미션 해석</td><td>필수 요건과 금지 사항을 자기 말로 요약</td><td>“제출물 다섯 종류와 반드시 지켜야 할 보안 조건은?”</td><td>요건·제약 메모</td></tr>
+            <tr><td>2. 아이디어 좁히기</td><td>사용자, 문제, 핵심 기능 하나 선택</td><td>“가장 먼저 이 문제를 겪는 사람은 누구고, 어떤 입력을 할까요?”</td><td>서비스 기획 초안</td></tr>
+            <tr><td>3. 화면·흐름 설계</td><td>3개 이상 메뉴/섹션과 AI 입출력 계획</td><td>“결과가 없거나 요청에 실패하면 화면은 무엇을 보여주나요?”</td><td>페이지 목록·간단한 흐름도</td></tr>
+            <tr><td>4. 작은 단위로 구현</td><td>정적 화면 → 입력 UI → API 연동 순으로 구현</td><td>AI에게 한 번에 하나의 파일/변경을 요청하고 매 단계 실행하게 안내</td><td>로컬에서 동작하는 최소 기능</td></tr>
+            <tr><td>5. 오류 진단</td><td>오류 재현, 로그 확인, 원인 가설, 수정·재시험</td><td>정답 코드를 바로 주기보다 “어디까지 됐고 어떤 응답을 받았나요?” 질문</td><td>오류와 해결 기록</td></tr>
+            <tr><td>6. 배포·검증</td><td>GitHub/Vercel 연동 후 공개 URL 테스트</td><td>“로컬과 배포 환경에서 다른 설정은 무엇인가요?”</td><td>배포 URL·테스트 결과</td></tr>
+            <tr><td>7. 정리·성찰</td><td>README·기획서·증빙 정리 및 구조 설명</td><td>평가 질문으로 이해도를 확인하고 다음 개선 하나를 정하게 함</td><td>필수 제출 패키지</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid grid-2 mb-4">
+        <div class="card">
+          <h3>💬 막힐 때 쓰는 질문</h3>
+          <div class="accordion">
+            <button class="accordion-header" type="button" aria-expanded="false" onclick="toggleAccordion(this)">아이디어가 너무 커요</button>
+            <div class="accordion-content"><p>“한 명의 사용자가 한 번 방문해 한 가지 결과를 얻는 흐름만 남기면 무엇인가요?”</p><p class="text-sm muted mt-2">핵심 흐름이 작동한 다음에 부가 기능을 더하도록 돕습니다.</p></div>
+          </div>
+          <div class="accordion">
+            <button class="accordion-header" type="button" aria-expanded="false" onclick="toggleAccordion(this)">AI가 만든 코드를 이해하기 어려워요</button>
+            <div class="accordion-content"><p>“이 변경에서 바뀐 파일은 무엇이고, 사용자가 누르는 동작과 연결된 함수는 어디인가요?”</p><p class="text-sm muted mt-2">AI에게 변경 요약·호출 흐름·주의점을 요청하고, 한 부분씩 직접 확인하게 합니다.</p></div>
+          </div>
+          <div class="accordion">
+            <button class="accordion-header" type="button" aria-expanded="false" onclick="toggleAccordion(this)">오류가 나는데 어디부터 볼까요?</button>
+            <div class="accordion-content"><p>“문제를 다시 재현할 수 있나요? 브라우저 콘솔, 네트워크 응답, 서버 로그 중 어디에서 첫 오류가 보이나요?”</p><p class="text-sm muted mt-2">증상을 구분하고 오류 메시지를 그대로 기록한 뒤 가설 하나씩 검증합니다.</p></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>🚧 자주 생기는 학습 함정</h3>
+          <ul class="checklist">
+            <li><span class="badge">주의</span><div><strong>기획보다 코드부터 생성</strong><p class="text-sm muted">먼저 사용자·입출력·완료 조건을 한 문장으로 정의하게 합니다.</p></div></li>
+            <li><span class="badge">주의</span><div><strong>AI 응답 성공만 확인</strong><p class="text-sm muted">빈 값, API 오류, 지연 중 최소 한 실패 안내를 실제로 재현합니다.</p></div></li>
+            <li><span class="badge">주의</span><div><strong>로컬에서만 확인하고 제출</strong><p class="text-sm muted">배포 URL과 여러 화면 크기에서 동료가 직접 테스트합니다.</p></div></li>
+            <li><span class="badge">주의</span><div><strong>키를 JS 코드나 저장소에 입력</strong><p class="text-sm muted">키는 서버 환경 변수로 옮기고, 노출됐다면 즉시 폐기·재발급하도록 안내합니다.</p></div></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>⏱️ 체크인 타이머</h3>
+        <p class="text-sm muted">작업 중 짧은 개별 체크인이나 발표 시간을 관리하세요.</p>
+        <div class="timer">
+          <label for="timerInput">시간(분)</label>
+          <input type="number" id="timerInput" value="15" min="1" max="120">
+          <button class="btn btn-primary btn-sm" type="button" onclick="startTimer()">시작</button>
+          <button class="btn btn-outline btn-sm" type="button" onclick="pauseTimer()">일시정지</button>
+          <button class="btn btn-outline btn-sm" type="button" onclick="resetTimer()">초기화</button>
+          <output class="timer-display" id="timerDisplay" aria-live="polite">15:00</output>
+        </div>
+        <p class="text-xs muted">추천 체크인: 지금 만든 것 / 막힌 지점 / 다음 15분의 작은 목표</p>
+      </div>
+    </section>
+
+    <section id="evaluation" class="tab-panel" role="tabpanel" aria-labelledby="tab-evaluation" hidden>
+      <div class="card mb-4">
+        <h3>🔍 평가 질문: 결과 확인과 구조 설명</h3>
+        <div class="grid grid-2">
+          <div>
+            <div class="question"><strong>작동성</strong><br>“배포 URL에서 정상 입력과 실패 상황을 직접 재현해 볼 수 있나요?”</div>
+            <div class="question"><strong>요건 충족</strong><br>“3개 이상의 메뉴/섹션, 반응형 화면, AI 입력→결과가 모두 확인되나요?”</div>
+            <div class="question"><strong>제출물</strong><br>“기획서·서비스·저장소·README·증빙이 빠짐없이 있나요?”</div>
+          </div>
+          <div>
+            <div class="question"><strong>구조 설명</strong><br>“HTML/CSS/JavaScript와 Python API를 각각 어디에 사용했나요?”</div>
+            <div class="question"><strong>요청 흐름</strong><br>“사용자 입력은 fetch를 거쳐 어떻게 서버리스 함수에 전달되고 화면에 돌아오나요?”</div>
+            <div class="question"><strong>보안·운영</strong><br>“환경 변수를 쓰는 이유와 키가 유출됐을 때의 첫 조치는 무엇인가요?”</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <h3>🧪 코드와 배포 문제 해결 인터뷰</h3>
+        <div class="question">“로컬에서는 되고 배포에서 안 된다면, 어떤 순서로 브라우저·네트워크·서버 로그와 환경 변수를 확인하나요?”</div>
+        <div class="question">“AI 코딩 도구가 만든 코드에서 오류가 났을 때, 원인을 어떻게 좁히고 수정 결과를 어떻게 검증했나요?”</div>
+        <div class="question">“프론트에서 로딩·성공·실패 상태는 어떤 기준으로 전환되나요?”</div>
+        <div class="question">“입력 검증과 응답 형식을 서버에서 정한 이유는 무엇인가요?”</div>
+      </div>
+
+      <div class="card">
+        <h3>🌱 확장 사고 질문</h3>
+        <div class="accordion">
+          <button class="accordion-header" type="button" aria-expanded="false" onclick="toggleAccordion(this)">응답 지연이 잦다면?</button>
+          <div class="accordion-content">사용자에게 진행 상태를 알리고, 입력 길이·호출 횟수·모델과 비용·쿼터·타임아웃을 점검합니다. 무엇을 먼저 측정할지, 어떤 개선이 비용이나 품질에 미칠지 근거를 말하게 합니다.</div>
+        </div>
+        <div class="accordion">
+          <button class="accordion-header" type="button" aria-expanded="false" onclick="toggleAccordion(this)">AI 기능을 두 개로 늘린다면?</button>
+          <div class="accordion-content">기능별 UI와 API 책임을 어떻게 나눌지, 공통 입력 검증·오류 응답을 어떻게 재사용할지 설명하게 합니다. 현재 구조에서 필요한 최소 변경을 생각합니다.</div>
+        </div>
+        <div class="accordion">
+          <button class="accordion-header" type="button" aria-expanded="false" onclick="toggleAccordion(this)">프레임워크 허용 또는 사용자가 늘어난다면?</button>
+          <div class="accordion-content">현재 미션 제약은 바닐라 프론트엔드임을 확인한 뒤, 가정이 바뀔 때 생기는 장단점·마이그레이션 범위·운영 비용을 분리해 논의합니다. 현 과제에서는 프레임워크를 적용하지 않습니다.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="troubleshooting" class="tab-panel" role="tabpanel" aria-labelledby="tab-troubleshooting" hidden>
+      <div class="card mb-4">
+        <h3>🔧 증상별 진단 가이드</h3>
+        <table>
+          <thead><tr><th>증상</th><th>먼저 확인할 곳</th><th>학습자가 남길 정보</th></tr></thead>
+          <tbody>
+            <tr><td>버튼을 눌러도 반응 없음</td><td>브라우저 콘솔, 이벤트 연결, 입력 선택자</td><td>클릭 재현 단계, 콘솔 첫 오류</td></tr>
+            <tr><td>요청이 실패하거나 결과가 비어 있음</td><td>Network 탭의 요청 URL·상태 코드·응답 형식</td><td>요청 payload 예시(비밀정보 제외), 응답 상태</td></tr>
+            <tr><td>서버에서 AI API 오류</td><td>Vercel 함수 로그, 환경 변수 이름·설정 여부, 패키지</td><td>시간, 오류 메시지, 최근 변경점(키 값은 기록 금지)</td></tr>
+            <tr><td>로컬은 되지만 배포가 실패</td><td>빌드/함수 로그, 배포 환경 변수, 경로와 설정 차이</td><td>로컬/배포 차이, 배포 로그의 첫 오류</td></tr>
+            <tr><td>모바일에서 화면이 잘림</td><td>viewport 설정, 고정 너비, 긴 텍스트/표</td><td>화면 크기와 잘리는 요소 스크린샷</td></tr>
+            <tr><td>응답이 오래 걸림</td><td>로딩 상태, 함수 실행 제한, 외부 API 응답·쿼터</td><td>대기 시간, 입력 크기, 재현 여부</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid grid-2 mb-4">
+        <div class="card">
+          <h3>🪜 디버깅 순서</h3>
+          <ol style="padding-left:22px">
+            <li>문제를 재현하고 기대 동작과 실제 동작을 적습니다.</li>
+            <li>브라우저 콘솔·Network·Vercel 로그에서 첫 오류를 찾습니다.</li>
+            <li>프론트 요청과 API 응답 중 어느 경계에서 실패하는지 구분합니다.</li>
+            <li>AI에게 오류 전문과 관련 코드만 공유하고, 원인 가설을 설명하게 합니다.</li>
+            <li>작은 수정 하나를 적용하고 같은 시나리오로 다시 시험합니다.</li>
+            <li>로컬 및 배포 URL에서 회귀 확인 후 해결 과정을 기록합니다.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>🔐 키 유출 의심 시</h3>
+          <ol style="padding-left:22px">
+            <li>노출된 키를 즉시 폐기하고 새 키를 발급합니다.</li>
+            <li>서버/배포 환경 변수에 새 키를 설정하고 재배포합니다.</li>
+            <li>코드·로그·스크린샷에 새 키를 다시 노출하지 않았는지 확인합니다.</li>
+            <li>필요하면 저장소 이력과 제공자의 사용량을 점검합니다.</li>
+          </ol>
+          <div class="callout danger"><div class="title">중요</div>실제 키를 채팅, 퍼실리테이션 메모, 증빙 화면에 붙여넣지 않습니다.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📝 세션 메모</h3>
+        <p class="text-sm muted">학습자 질문이나 다음 확인 사항을 기록하세요. 메모는 현재 브라우저에만 저장됩니다.</p>
+        <textarea class="note-input" id="sessionNote" placeholder="예: 배포 환경에서 API 함수 500 응답 — 환경 변수 설정과 로그 확인하기" aria-label="세션 메모"></textarea>
+        <div class="mt-2">
+          <button class="btn btn-primary btn-sm" type="button" onclick="saveNote()">메모 저장</button>
+          <button class="btn btn-outline btn-sm" type="button" onclick="clearNote()">메모 지우기</button>
+          <span class="text-xs muted" id="noteStatus" aria-live="polite"></span>
+        </div>
+        <div class="session-log" id="sessionLog" aria-live="polite"><p>가이드 준비 완료. 관찰 내용과 후속 조치를 기록하세요.</p></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const checklistStorageKey = 'a1-3-guide-checklist';
+const noteStorageKey = 'a1-3-guide-note';
+let timerInterval = null;
+let timeLeft = 15 * 60;
+let isRunning = false;
+let timerInitialized = false;
+
+function switchTab(tabId, button) {
+  document.querySelectorAll('.tab-panel').forEach(panel => {
+    const isActive = panel.id === tabId;
+    panel.classList.toggle('active', isActive);
+    panel.hidden = !isActive;
+  });
+  document.querySelectorAll('.tab-btn').forEach(tab => {
+    const isActive = tab === button;
+    tab.classList.toggle('active', isActive);
+    tab.setAttribute('aria-selected', String(isActive));
+  });
+}
+
+function updateChecklist() {
+  const checks = Array.from(document.querySelectorAll('.deliverable-check'));
+  const checked = checks.filter(check => check.checked).length;
+  const percent = Math.round((checked / checks.length) * 100);
+  document.getElementById('checkedCount').textContent = checked;
+  document.getElementById('checkPercent').textContent = percent + '%';
+  document.getElementById('checkProgress').style.width = percent + '%';
+  const progress = document.querySelector('[role="progressbar"]');
+  progress.setAttribute('aria-valuenow', checked);
+  document.getElementById('headerProgress').style.width = percent + '%';
+  try {
+    localStorage.setItem(checklistStorageKey, JSON.stringify(checks.map(check => check.checked)));
+  } catch (error) {
+    console.warn('체크리스트를 브라우저에 저장하지 못했습니다.', error);
+  }
+}
+
+function restoreChecklist() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(checklistStorageKey) || '[]');
+    document.querySelectorAll('.deliverable-check').forEach((check, index) => {
+      check.checked = saved[index] === true;
+      check.addEventListener('change', updateChecklist);
+    });
+  } catch (error) {
+    console.warn('저장된 체크리스트를 불러오지 못했습니다.', error);
+  }
+  updateChecklist();
+}
+
+function resetChecklist() {
+  document.querySelectorAll('.deliverable-check').forEach(check => { check.checked = false; });
+  updateChecklist();
+}
+
+function toggleAccordion(button) {
+  const isExpanded = button.getAttribute('aria-expanded') === 'true';
+  button.setAttribute('aria-expanded', String(!isExpanded));
+  button.nextElementSibling.classList.toggle('open', !isExpanded);
+}
+
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return minutes + ':' + String(remainingSeconds).padStart(2, '0');
+}
+
+function startTimer() {
+  if (isRunning) return;
+  const input = document.getElementById('timerInput');
+  const minutes = Number(input.value);
+  if (!Number.isInteger(minutes) || minutes < 1 || minutes > 120) {
+    input.focus();
+    return;
+  }
+  if (!timerInitialized || timeLeft <= 0) timeLeft = minutes * 60;
+  timerInitialized = true;
+  isRunning = true;
+  document.getElementById('timerDisplay').textContent = formatTime(timeLeft);
+  timerInterval = window.setInterval(() => {
+    timeLeft -= 1;
+    document.getElementById('timerDisplay').textContent = formatTime(timeLeft);
+    if (timeLeft <= 0) {
+      pauseTimer();
+      document.getElementById('timerDisplay').textContent = '시간 종료';
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  if (timerInterval !== null) window.clearInterval(timerInterval);
+  timerInterval = null;
+  isRunning = false;
+}
+
+function resetTimer() {
+  pauseTimer();
+  const minutes = Number(document.getElementById('timerInput').value) || 15;
+  timeLeft = minutes * 60;
+  timerInitialized = true;
+  document.getElementById('timerDisplay').textContent = formatTime(timeLeft);
+}
+
+function saveNote() {
+  const note = document.getElementById('sessionNote').value;
+  try {
+    localStorage.setItem(noteStorageKey, note);
+    document.getElementById('noteStatus').textContent = ' 저장했습니다.';
+    if (note.trim()) {
+      const entry = document.createElement('p');
+      const time = new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit' }).format(new Date());
+      entry.textContent = '[' + time + '] ' + note.trim();
+      document.getElementById('sessionLog').prepend(entry);
+    }
+  } catch (error) {
+    document.getElementById('noteStatus').textContent = ' 브라우저에 저장하지 못했습니다.';
+    console.error('세션 메모 저장 실패:', error);
+  }
+}
+
+function clearNote() {
+  document.getElementById('sessionNote').value = '';
+  document.getElementById('noteStatus').textContent = '';
+  try {
+    localStorage.removeItem(noteStorageKey);
+  } catch (error) {
+    console.warn('저장된 세션 메모를 지우지 못했습니다.', error);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  restoreChecklist();
+  try {
+    document.getElementById('sessionNote').value = localStorage.getItem(noteStorageKey) || '';
+  } catch (error) {
+    console.warn('저장된 세션 메모를 불러오지 못했습니다.', error);
+  }
+  document.getElementById('timerInput').addEventListener('change', resetTimer);
+  resetTimer();
+});
+</script>
+</body>
+</html>

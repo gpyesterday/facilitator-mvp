@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I1-1 숫자 데이터에서 흐름과 패턴 찾기 - 퍼실리테이션 가이드</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --secondary: #7c3aed;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --bg: #f0f2f5;
+    --card-bg: #ffffff;
+    --text: #1f2937;
+    --text-light: #6b7280;
+    --border: #e5e7eb;
+    --border-radius: 10px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+  header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 30px;
+    border-radius: var(--border-radius);
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+  header h1 { font-size: 24px; margin-bottom: 8px; }
+  header p { font-size: 14px; opacity: 0.9; }
+  .progress-bar {
+    height: 8px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    margin-top: 16px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: white;
+    border-radius: 4px;
+    width: 16.67%;
+    transition: width 0.4s ease;
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--card-bg);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 14px 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-light);
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { background: var(--bg); color: var(--primary); }
+  .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--bg); }
+  .tab-btn:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+  .tab-panel {
+    display: none;
+    background: var(--card-bg);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+  }
+  .tab-panel.active { display: block; }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+  .card h3 { margin-bottom: 14px; font-size: 16px; }
+  .card h3::before { content: '📌 '; }
+  .grid { display: grid; gap: 16px; }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .mb-4 { margin-bottom: 16px; }
+  .mb-2 { margin-bottom: 8px; }
+  .mt-4 { margin-top: 16px; }
+  .mt-2 { margin-top: 8px; }
+  .text-sm { font-size: 13px; }
+  .text-xs { font-size: 11px; }
+  .font-bold { font-weight: 700; }
+  .muted { color: var(--text-light); }
+  .timeline { position: relative; padding-left: 30px; margin: 20px 0; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .timeline-item { position: relative; margin-bottom: 16px; padding-bottom: 8px; }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -22px;
+    top: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px var(--border);
+  }
+  .timeline-item:last-child::before { background: var(--success); }
+  .step-label { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .callout {
+    padding: 14px 18px;
+    border-radius: var(--border-radius);
+    margin: 12px 0;
+    border-left: 4px solid var(--primary);
+    background: #eff6ff;
+  }
+  .callout.warning { border-left-color: var(--warning); background: #fffbeb; }
+  .callout.danger { border-left-color: var(--danger); background: #fef2f2; }
+  .callout.success { border-left-color: var(--success); background: #dcfce7; }
+  .callout .title { font-weight: 700; margin-bottom: 4px; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+  th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--bg); font-weight: 700; }
+  tr:nth-child(even) td { background: #fafafa; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .badge-easy { background: #dcfce7; color: #166534; }
+  .badge-mid { background: #fef3c7; color: #92400e; }
+  .badge-bonus { background: #f3e8ff; color: #7b2cbf; }
+  .accordion { margin-bottom: 12px; border: 1px solid var(--border); border-radius: var(--border-radius); overflow: hidden; }
+  .accordion-header {
+    width: 100%;
+    background: var(--bg);
+    padding: 14px 18px;
+    border: 0;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .accordion-header:hover { background: #e5e7eb; }
+  .accordion-header::after { content: '▼'; font-size: 12px; color: var(--text-light); transition: transform 0.2s; }
+  .accordion-header.active::after { transform: rotate(180deg); }
+  .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+  .content-inner { padding: 18px; }
+  .checklist { list-style: none; }
+  .checklist li { padding: 9px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 10px; }
+  .checklist li:last-child { border-bottom: none; }
+  .checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    margin-top: 2px;
+    cursor: pointer;
+    flex-shrink: 0;
+    appearance: none;
+    background: white;
+  }
+  .checkbox:checked { background: var(--success); border-color: var(--success); }
+  .checkbox:checked::after { content: '✓'; display: block; color: white; text-align: center; font-size: 12px; font-weight: bold; line-height: 14px; }
+  .btn { padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
+  .btn-outline:hover { background: var(--bg); }
+  .btn-sm { padding: 6px 14px; font-size: 12px; }
+  .score-summary { display: flex; gap: 20px; justify-content: center; margin: 16px 0; }
+  .score-box { text-align: center; padding: 12px 20px; border-radius: 8px; background: var(--bg); }
+  .score-box .value { font-size: 28px; font-weight: 800; color: var(--primary); }
+  .score-box .label { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+  .timer { display: flex; align-items: center; gap: 10px; padding: 14px; background: var(--bg); border-radius: var(--border-radius); margin: 16px 0; flex-wrap: wrap; }
+  .timer input { padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; width: 76px; }
+  .timer-display { font-size: 18px; font-weight: 700; color: var(--primary); font-family: monospace; min-width: 58px; }
+  .hint-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; margin: 12px 0; font-size: 13px; }
+  .hint-title { font-weight: 700; margin-bottom: 6px; color: #92400e; font-size: 13px; }
+  .action-log { max-height: 200px; overflow-y: auto; background: #0f172a; color: #cbd5e1; font-size: 13px; padding: 12px; border-radius: 8px; margin-top: 10px; }
+  .action-log .entry { border-bottom: 1px solid #1e293b; padding: 5px 0; }
+  .action-log .entry:last-child { border-bottom: none; }
+  .flex-gap { display: flex; gap: 8px; }
+  .full-input { flex: 1; min-width: 120px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; }
+  @media(max-width: 768px) {
+    body { padding: 10px; }
+    header { padding: 22px; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .tab-btn { padding: 10px 8px; font-size: 12px; }
+    .tab-panel { padding: 16px; }
+    table { display: block; overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>I1-1: 숫자 데이터를 AI와 같이 보며 흐름과 패턴 찾기</h1>
+    <p>퍼실리테이션 인터랙티브 가이드 | AI Native · 시계열 데이터 분석 | 학습난이도: 3</p>
+    <div class="progress-bar" aria-label="현재 탭 진행 위치">
+      <div class="progress-fill" id="headerProgress"></div>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="가이드 메뉴">
+    <button class="tab-btn active" id="tab-overview" role="tab" aria-selected="true" aria-controls="overview" onclick="switchTab('overview', this)">📋 미션 개요</button>
+    <button class="tab-btn" id="tab-deliverables" role="tab" aria-selected="false" aria-controls="deliverables" onclick="switchTab('deliverables', this)">📦 결과물 체크</button>
+    <button class="tab-btn" id="tab-evaluation" role="tab" aria-selected="false" aria-controls="evaluation" onclick="switchTab('evaluation', this)">🔍 평가 가이드</button>
+    <button class="tab-btn" id="tab-facilitation" role="tab" aria-selected="false" aria-controls="facilitation" onclick="switchTab('facilitation', this)">🎓 진행 팁</button>
+    <button class="tab-btn" id="tab-rubric" role="tab" aria-selected="false" aria-controls="rubric" onclick="switchTab('rubric', this)">⚖️ 채점 루브릭</button>
+    <button class="tab-btn" id="tab-troubleshooting" role="tab" aria-selected="false" aria-controls="troubleshooting" onclick="switchTab('troubleshooting', this)">🔧 문제 해결</button>
+  </div>
+
+  <div id="tabContent">
+    <section id="overview" class="tab-panel active" role="tabpanel" aria-labelledby="tab-overview">
+      <div class="card mb-4">
+        <h3>🎯 미션 핵심 목표</h3>
+        <p class="mb-2">시간에 따라 변하는 데이터를 정제하고 시각화한 뒤, 그래프에서 확인한 사실과 가능한 해석을 구분하여 근거 기반 인사이트로 설명합니다. AI는 분석을 돕지만 최종 판단과 검증은 학습자가 수행합니다.</p>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="step-label">Step 1: 분석 주제·시계열 데이터 선정</div>
+            <p class="text-sm muted">관심 질문과 연결된 데이터를 고르고, 출처·기간·단위·관측 수(100개 이상)를 확인합니다.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="step-label">Step 2: 분석 질문 3개 이상 정의</div>
+            <p class="text-sm muted">추세, 급격한 변화, 기간·요일별 차이 등 데이터로 답을 확인할 수 있는 질문을 만듭니다.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="step-label">Step 3: 데이터 점검·정제·분석</div>
+            <p class="text-sm muted">기간, 컬럼, 결측·이상치를 확인하고 이동평균·변화율·구간 통계 등 기법을 2가지 이상 적용합니다.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="step-label">Step 4: 시각화·인사이트 도출</div>
+            <p class="text-sm muted">그래프 2개 이상(권장 3개 이상)을 만들고, 수치·구간 근거가 있는 인사이트를 3개 이상 정리합니다.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="step-label">Step 5: 리포트·코드·재현 방법 제출</div>
+            <p class="text-sm muted">REPORT.md, Python 코드/노트북, 데이터 출처·실행 방법·AI 사용 로그를 저장소에 정리합니다.</p>
+          </div>
+          <div class="timeline-item" style="background:#dcfce7;padding:10px 14px;border-radius:8px;">
+            <div class="step-label">완료! 패턴을 자기 말로 설명</div>
+            <p class="text-sm muted">관찰(Fact) → 원인 가설(Why) → 행동(Action), 반례와 한계까지 설명할 수 있습니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-2 mb-4">
+        <div class="card">
+          <h3>📦 최종 결과물</h3>
+          <p class="mb-2"><span class="font-bold">1. 분석 리포트 (REPORT.md)</span><br><span class="text-xs muted">주제·질문·데이터 설명·시각화·인사이트·결론/한계·AI 사용 로그</span></p>
+          <p class="mb-2"><span class="font-bold">2. Python 분석 코드</span><br><span class="text-xs muted">Jupyter Notebook(.ipynb) 또는 Python 스크립트(.py)</span></p>
+          <p><span class="font-bold">3. 시각화와 재현 정보</span><br><span class="text-xs muted">그래프 이미지 또는 노트북 출력, 실행 방법, 라이브러리·데이터 출처 정보</span></p>
+          <div class="callout warning text-sm"><div class="title">필수 조건</div>100개 이상 시계열 관측값 · 분석 질문 3개 이상 · 분석 기법 2가지 이상 · 그래프 2개 이상 · 근거 있는 인사이트 3개 이상</div>
+        </div>
+        <div class="card">
+          <h3>🧭 퍼실리테이터의 초점</h3>
+          <ul class="text-sm" style="padding-left:20px;">
+            <li>먼저 질문을 정하고, 그 질문에 맞는 데이터를 고르게 합니다.</li>
+            <li>그래프에서 직접 확인한 사실과 원인에 대한 추측을 구분하게 합니다.</li>
+            <li>AI 답변을 정답으로 취급하지 않고, 코드 실행·표본 대조·재계산으로 검증하게 합니다.</li>
+            <li>인과관계 단정 대신 대안 가설·반례·추가로 필요한 데이터를 묻습니다.</li>
+          </ul>
+          <div class="hint-box">
+            <div class="hint-title">💬 시작 질문</div>
+            “이 데이터로 어떤 결정을 더 잘하고 싶나요?” “시간의 흐름에서 무엇이 달라졌는지 알고 싶은가요?”
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <h3>📚 학습 목표 분석: 지식 · 기술 · 이해</h3>
+        <div class="grid grid-2">
+          <div>
+            <p class="font-bold">지식: 알아야 할 것</p>
+            <ul class="text-sm" style="padding-left:20px;">
+              <li>시계열 데이터의 시간축·관측 간격, 추세·계절성·노이즈</li>
+              <li>결측치·이상치와 이동평균·변화율·구간 통계의 의미</li>
+              <li>시각화의 축·단위·집계 기준과 Python 분석 흐름</li>
+              <li>데이터 출처, 라이선스, 재현 가능한 실행 정보</li>
+            </ul>
+          </div>
+          <div>
+            <p class="font-bold">기술: 해낼 수 있어야 할 것</p>
+            <ul class="text-sm" style="padding-left:20px;">
+              <li>시계열 데이터 100개 이상을 찾고 분석 질문 3개 이상 정의하기</li>
+              <li>데이터를 점검·정제하고 처리 기준을 설명하기</li>
+              <li>기법 2개 이상과 그래프 2개 이상을 적용해 결과 비교하기</li>
+              <li>관찰 근거가 있는 인사이트를 리포트와 코드로 재현하기</li>
+            </ul>
+          </div>
+          <div>
+            <p class="font-bold">이해: 설명할 수 있어야 할 것</p>
+            <ul class="text-sm" style="padding-left:20px;">
+              <li>그래프가 보여주는 사실과 원인에 대한 가설은 다르다는 점</li>
+              <li>분석 질문·집계 단위에 따라 패턴과 결론이 달라질 수 있다는 점</li>
+              <li>적용한 기법이 무엇을 드러내고 무엇을 놓칠 수 있는지</li>
+              <li>AI 결과는 코드·수치·표본으로 검증하고 최종 해석은 스스로 책임진다는 점</li>
+            </ul>
+          </div>
+          <div class="callout success text-sm">
+            <div class="title">퍼실리테이션 목표</div>
+            각 항목을 대신 설명하기보다, 학습자가 자신의 데이터와 분석 결과를 근거로 설명하도록 질문을 연결합니다.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🧠 분석 사고의 기본 구분</h3>
+        <table>
+          <thead><tr><th>구분</th><th>의미</th><th>학습자 문장 예시</th></tr></thead>
+          <tbody>
+            <tr><td>관찰 (Fact)</td><td>자료나 계산으로 재현 가능한 값·구간</td><td>“7일 이동평균이 3월 둘째 주부터 상승했고, 해당 주 평균은 전주보다 8% 높다.”</td></tr>
+            <tr><td>해석 (Why)</td><td>관찰을 설명하는 가설. 데이터만으로 확정할 수 없는 이유를 표시</td><td>“행사 영향일 수 있지만, 행사 정보가 없어 원인으로 단정할 수 없다.”</td></tr>
+            <tr><td>행동 (Action)</td><td>의사결정 또는 다음 검증 단계</td><td>“행사 일정과 유입 경로 데이터를 추가해 같은 패턴이 반복되는지 확인한다.”</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="deliverables" class="tab-panel" role="tabpanel" aria-labelledby="tab-deliverables">
+      <div class="card mb-4">
+        <h3>📦 결과물 체크리스트 (실시간)</h3>
+        <p class="text-sm muted">학습자의 저장소와 리포트를 함께 보며 확인하세요. 체크 상태는 이 브라우저에 저장됩니다.</p>
+        <div class="score-summary">
+          <div class="score-box"><div class="value" id="checkedCount">0</div><div class="label">체크 완료</div></div>
+          <div class="score-box"><div class="value" id="totalCount">8</div><div class="label">전체 항목</div></div>
+        </div>
+        <ul class="checklist" id="deliverableChecklist">
+          <li><input class="checkbox" type="checkbox" aria-label="시계열 데이터 확인"><div><div class="font-bold">시계열 데이터와 출처</div><p class="text-sm muted">시간 기준으로 정렬된 100개 이상 관측값, 데이터 기간·단위·출처(가능하면 라이선스/수집 방법 포함)</p></div></li>
+          <li><input class="checkbox" type="checkbox" aria-label="분석 질문 확인"><div><div class="font-bold">분석 질문 3개 이상</div><p class="text-sm muted">질문이 명확하며, 분석 결과나 그래프에서 답을 확인할 수 있음</p></div></li>
+          <li><input class="checkbox" type="checkbox" aria-label="정제 과정 확인"><div><div class="font-bold">데이터 점검·정제 기준</div><p class="text-sm muted">기간·컬럼·결측치·이상치 확인, 처리 여부와 그 이유가 설명됨</p></div></li>
+          <li><input class="checkbox" type="checkbox" aria-label="분석 기법 확인"><div><div class="font-bold">시계열 분석 기법 2가지 이상</div><p class="text-sm muted">예: 이동평균, 변화율, 구간별 통계, 변동성/표준편차, 요일·월별 집계</p></div></li>
+          <li><input class="checkbox" type="checkbox" aria-label="시각화 확인"><div><div class="font-bold">시각화 2개 이상 (권장 3개 이상)</div><p class="text-sm muted">리포트에서 이미지/출력 링크가 정상 동작하고 시간축·집계 단위가 분명함</p></div></li>
+          <li><input class="checkbox" type="checkbox" aria-label="인사이트 확인"><div><div class="font-bold">인사이트 3개 이상</div><p class="text-sm muted">각 인사이트에 그래프에서 확인한 수치·기간 등 구체적인 관찰 근거가 있음</p></div></li>
+          <li><input class="checkbox" type="checkbox" aria-label="코드와 재현성 확인"><div><div class="font-bold">코드와 재현 방법</div><p class="text-sm muted">.ipynb 또는 .py, 필요한 라이브러리/버전, 실행 순서나 명령, 데이터 확보 방법 제공</p></div></li>
+          <li><input class="checkbox" type="checkbox" aria-label="AI 로그와 한계 확인"><div><div class="font-bold">결론·한계·AI 사용 로그</div><p class="text-sm muted">한계와 다음에 검증할 데이터, AI 사용 작업·이유·검증 방법을 기재</p></div></li>
+        </ul>
+        <button class="btn btn-outline mt-4" onclick="resetChecklist()">🔄 체크 초기화</button>
+      </div>
+
+      <div class="card">
+        <h3>📝 리포트 구성 예시</h3>
+        <div class="accordion">
+          <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">REPORT.md에 담을 내용</button>
+          <div class="accordion-content"><div class="content-inner">
+            <ol style="padding-left:20px;">
+              <li><b>주제와 선정 이유</b> — 무엇을 알고 싶은지</li>
+              <li><b>분석 질문</b> — 최소 3개, 데이터에서 확인 가능한 형태</li>
+              <li><b>데이터 설명</b> — 출처, 기간, 관측 수, 컬럼과 단위, 결측/이상치</li>
+              <li><b>분석 방법</b> — 적용 기법 2개 이상과 선택 이유</li>
+              <li><b>결과 및 시각화</b> — 그래프 최소 2개, 각 그래프의 핵심 관찰</li>
+              <li><b>인사이트</b> — Fact → Why(가설) → Action 형식으로 3개 이상</li>
+              <li><b>결론과 한계</b> — 다른 기간·집계 단위·외부 요인 등 반례 포함</li>
+              <li><b>AI 사용 로그</b> — 사용 작업, 사용 이유, 검증 방법</li>
+            </ol>
+            <div class="callout success"><div class="title">좋은 인사이트 문장 틀</div>“관찰: [기간/수치]가 [비교 기준]보다 [차이]였다. 해석: [가능한 이유]일 수 있으나 [미확인 변수] 때문에 단정할 수 없다. 행동: [추가 데이터/실험/결정]을 확인한다.”</div>
+          </div></div>
+        </div>
+        <div class="accordion">
+          <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">예시 데이터·시각화 아이디어</button>
+          <div class="accordion-content"><div class="content-inner">
+            <table>
+              <thead><tr><th>주제</th><th>가능한 질문</th><th>분석·시각화 예</th></tr></thead>
+              <tbody>
+                <tr><td>일별 기온</td><td>기온 추세와 계절 변화가 보이는가?</td><td>시계열 선 그래프, 이동평균, 월별 분포</td></tr>
+                <tr><td>일별 판매량</td><td>요일별 차이나 급격한 변동이 있는가?</td><td>일별 추이, 요일별 평균, 변화율</td></tr>
+                <tr><td>주가·환율</td><td>관찰 기간 중 추세와 변동성이 어떻게 달라졌는가?</td><td>종가와 이동평균, 수익률·변동성</td></tr>
+                <tr><td>조회수·이용량</td><td>특정 구간에 변화가 집중되는가?</td><td>원자료와 구간 집계, 급변 구간 주석</td></tr>
+              </tbody>
+            </table>
+            <div class="callout warning text-sm"><div class="title">데이터 적합성 확인</div>제공된 부산 방문동향 표는 국가별 누계 순위 형태입니다. 시간별 관측값 100개 이상을 확보할 수 있는지 먼저 확인하고, 현재 표만으로 조건을 충족한다고 간주하지 마세요.</div>
+          </div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="evaluation" class="tab-panel" role="tabpanel" aria-labelledby="tab-evaluation">
+      <div class="card mb-4">
+        <h3>🔍 구두 평가 질문</h3>
+        <p class="text-sm muted">완성된 결과를 대신 설명하지 말고, 학습자가 근거와 선택 이유를 스스로 말하도록 기다립니다.</p>
+        <div class="accordion">
+          <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">1. 결과물·데이터 품질</button>
+          <div class="accordion-content"><div class="content-inner">
+            <ul style="padding-left:20px;">
+              <li>이 시계열은 100개 이상의 데이터 포인트를 포함하나요? 기간과 관측 단위는 무엇인가요?</li>
+              <li>분석 질문을 3개 이상 제시하고, 각 질문에 답한 결과를 가리킬 수 있나요?</li>
+              <li>기법 2가지 이상과 시각화 필수 2개(권장 3개 이상)가 결과물에 포함되어 있나요?</li>
+              <li>인사이트가 3개 이상이며, 각 주장에 수치나 관찰 구간이 있나요?</li>
+              <li>GitHub 저장소에서 코드, 리포트, 데이터 또는 출처·실행 방법을 확인할 수 있나요?</li>
+            </ul>
+          </div></div>
+        </div>
+        <div class="accordion">
+          <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">2. 분석 절차와 선택 이유</button>
+          <div class="accordion-content"><div class="content-inner">
+            <ul style="padding-left:20px;">
+              <li>데이터 로딩 → 정제 → 분석 → 시각화 흐름을 단계적으로 설명해보세요.</li>
+              <li>결측치나 이상치를 어떤 기준으로 처리했나요? 제외/대체하지 않았다면 왜인가요?</li>
+              <li>일·주·월 등 집계 단위는 무엇이고, 그 단위가 질문에 적절한 이유는 무엇인가요?</li>
+              <li>이동평균이나 변화율을 적용해 무엇을 더 잘 보려고 했나요?</li>
+            </ul>
+          </div></div>
+        </div>
+        <div class="accordion">
+          <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">3. 패턴 해석·AI 검증·한계</button>
+          <div class="accordion-content"><div class="content-inner">
+            <ul style="padding-left:20px;">
+              <li>추세·계절성·노이즈 중 하나를 그래프에서 어떻게 구분했나요?</li>
+              <li>AI가 만든 코드나 해석을 어떻게 검증했나요? 직접 확인한 한 가지 사례는 무엇인가요?</li>
+              <li>인사이트 하나를 관찰(Fact) → 원인(Why) → 행동(Action) 순서로 설명해주세요.</li>
+              <li>다른 기간이나 집계 단위, 외부 변수를 고려하면 결론이 달라질 수 있나요?</li>
+              <li>현재 분석의 한계와 다음에 수집·검증할 데이터를 제안해주세요.</li>
+              <li>AI 사용 이유·검증 기록을 근거로, 핵심 결론을 본인 말로 다시 설명해보세요.</li>
+            </ul>
+          </div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>🗣️ 퍼실리테이터 후속 질문</h3>
+        <table>
+          <thead><tr><th>학습자 답변</th><th>이어 물을 질문</th></tr></thead>
+          <tbody>
+            <tr><td>“그래프가 올라가요.”</td><td>“어느 구간에서 얼마나 올랐나요? 비교 기준은 무엇인가요?”</td></tr>
+            <tr><td>“이벤트 때문에 오른 것 같아요.”</td><td>“그래프가 직접 보여주는 사실은 무엇이고, 이벤트 설명을 검증할 자료는 무엇인가요?”</td></tr>
+            <tr><td>“AI가 그렇게 분석했어요.”</td><td>“어떤 값이나 코드로 확인했나요? 직접 재현하거나 반례를 확인할 수 있나요?”</td></tr>
+            <tr><td>“이상치라서 삭제했어요.”</td><td>“이상치라고 판단한 기준은 무엇인가요? 삭제 전후 결과가 어떻게 달라지나요?”</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="facilitation" class="tab-panel" role="tabpanel" aria-labelledby="tab-facilitation">
+      <div class="grid grid-2 mb-4">
+        <div class="card">
+          <h3>🎓 권장 진행 흐름</h3>
+          <p class="text-sm muted">시간은 데이터 확보 난이도와 학습자 수준에 맞게 조정하세요. 각 단계의 완료 기준에 도달했는지 확인한 뒤 다음 단계로 이동합니다.</p>
+          <table>
+            <thead><tr><th>단계</th><th>진행 초점</th><th>완료 기준</th></tr></thead>
+            <tbody>
+              <tr><td>1. 질문·데이터</td><td>주제, 분석 질문, 출처·관측 수</td><td>질문 3개와 100개 이상 시간 관측값</td></tr>
+              <tr><td>2. 점검·정제</td><td>기간, 결측·이상치, 정렬·단위</td><td>처리 기준과 이유를 기록</td></tr>
+              <tr><td>3. 분석·시각화</td><td>기법과 차트 선택</td><td>기법 2개와 그래프 2개 이상</td></tr>
+              <tr><td>4. 해석·리포트</td><td>근거와 가설을 구분</td><td>근거 있는 인사이트 3개, 한계·AI 로그</td></tr>
+              <tr><td>5. 발표·회고</td><td>재현·반례·다음 행동</td><td>핵심 결론을 자신의 언어로 설명</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3>⏱️ 퍼실리테이터 타이머</h3>
+          <p class="text-sm muted">짧은 집중 작업이나 학습자 발표에 활용하세요.</p>
+          <div class="timer">
+            <label for="timerInput" class="text-sm">분</label>
+            <input type="number" id="timerInput" value="15" min="1" max="180">
+            <span class="timer-display" id="timerDisplay" aria-live="polite">15:00</span>
+            <button class="btn btn-primary btn-sm" onclick="startTimer()">시작</button>
+            <button class="btn btn-outline btn-sm" onclick="pauseTimer()">일시정지</button>
+            <button class="btn btn-outline btn-sm" onclick="resetTimer()">초기화</button>
+          </div>
+          <div class="hint-box"><div class="hint-title">⏳ 막혔을 때 3분 개입</div>문제를 바로 해결해주기보다, “현재 확인한 사실은?”, “다음으로 검증할 가장 작은 단계는?”을 묻고 학습자가 다음 행동을 선택하게 합니다.</div>
+        </div>
+      </div>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>💬 단계별 코칭 질문</h3>
+          <div class="accordion">
+            <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">주제·질문 설정</button>
+            <div class="accordion-content"><div class="content-inner">“누가 이 분석 결과를 사용할까요?” “질문에 답하려면 어떤 열과 시간 범위가 필요할까요?” “질문을 그래프에서 확인할 수 있는 형태로 좁혀볼까요?”</div></div>
+          </div>
+          <div class="accordion">
+            <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">데이터 정제·분석</button>
+            <div class="accordion-content"><div class="content-inner">“날짜 순서가 맞나요?” “빠진 날짜와 실제 0은 어떻게 구별하나요?” “이상치 처리 전후 결론이 같은가요?” “이 기법은 어떤 패턴을 보려는 건가요?”</div></div>
+          </div>
+          <div class="accordion">
+            <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">인사이트·검증</button>
+            <div class="accordion-content"><div class="content-inner">“이 문장에서 데이터로 직접 증명되는 부분은 어디까지인가요?” “다른 원인도 가능할까요?” “코드나 계산 결과를 독립적으로 확인한 방법은 무엇인가요?”</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>✅ 코칭 원칙</h3>
+          <ul class="text-sm" style="padding-left:20px;">
+            <li><b>정답보다 과정:</b> 수치가 맞는지뿐 아니라 선택한 기준과 이유를 듣습니다.</li>
+            <li><b>사실과 가설:</b> 인과를 단정하면 데이터가 보여주는 범위를 다시 묻습니다.</li>
+            <li><b>검증 가능한 AI 사용:</b> 생성 코드 실행, 소량 표본 대조, 수작업 재계산을 권합니다.</li>
+            <li><b>재현성:</b> 다른 사람이 저장소에서 데이터 출처와 실행 단계를 찾을 수 있는지 확인합니다.</li>
+            <li><b>학습자 주도:</b> 해결책을 대신 제시하기보다 선택지와 점검 질문으로 다음 행동을 돕습니다.</li>
+          </ul>
+          <div class="callout success text-sm"><div class="title">마무리 회고</div>“가장 확신하는 발견과 그 근거는 무엇인가요?” “무엇을 더 알면 해석이 달라질까요?”</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="rubric" class="tab-panel" role="tabpanel" aria-labelledby="tab-rubric">
+      <div class="card mb-4">
+        <h3>⚖️ 권장 채점 루브릭 (100점)</h3>
+        <p class="text-sm muted">미션 필수 요건을 중심으로 평가하고, 실제 분석 질문과 데이터 특성을 함께 고려해 피드백하세요. 권장 항목은 필수 조건과 구분합니다.</p>
+        <table>
+          <thead><tr><th>평가 축</th><th>배점</th><th>충족 기준</th><th>부분 충족 시 확인</th></tr></thead>
+          <tbody>
+            <tr><td>데이터·질문 설계</td><td>20</td><td>시계열 100개 이상, 출처·기간 명시, 분석 질문 3개 이상</td><td>관측 단위가 시간 흐름을 나타내는가? 질문이 답변 가능한가?</td></tr>
+            <tr><td>정제·방법 선택</td><td>20</td><td>결측·이상치 점검 및 기준 설명, 목적에 맞는 시계열 기법 2개 이상</td><td>기법으로 무엇을 보려는지, 왜 해당 집계 단위인지 설명하는가?</td></tr>
+            <tr><td>시각화·분석 결과</td><td>20</td><td>그래프 2개 이상, 축·단위·기간 명확, 결과가 질문과 연결됨</td><td>권장 그래프 3개 이상, 그래프 해석과 관찰 근거가 정확한가?</td></tr>
+            <tr><td>인사이트·비판적 해석</td><td>20</td><td>근거 있는 인사이트 3개 이상, Fact와 Why 구분, 한계·반례 제시</td><td>Fact → Why → Action이 논리적이고 인과를 과장하지 않는가?</td></tr>
+            <tr><td>코드·재현성·AI 투명성</td><td>20</td><td>코드와 실행/출처 정보, AI 사용 작업·이유·검증 방법 제공</td><td>코드가 재현 가능하고 학습자가 결론을 자기 말로 설명하는가?</td></tr>
+          </tbody>
+        </table>
+        <div class="callout warning text-sm"><div class="title">채점 유의</div>특정 라이브러리나 복잡한 모델 사용 여부를 점수의 대리 지표로 삼지 않습니다. 질문에 맞는 분석, 타당한 기준, 검증과 설명을 평가합니다.</div>
+      </div>
+      <div class="card">
+        <h3>📊 성취 수준 가이드</h3>
+        <table>
+          <thead><tr><th>수준</th><th>특징</th><th>피드백 방향</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge badge-easy">탄탄</span></td><td>모든 필수 조건 충족, 수치 근거와 재현 절차가 분명하고 해석의 한계도 설명함</td><td>반례 데이터나 다른 집계 단위에서 결론이 유지되는지 확장 검증을 제안</td></tr>
+            <tr><td><span class="badge badge-mid">진행 중</span></td><td>분석은 진행됐지만 일부 질문·그래프·인사이트의 연결이나 처리 기준이 모호함</td><td>주요 질문 하나를 골라 근거 수치와 시각화를 보강하도록 안내</td></tr>
+            <tr><td><span class="badge badge-bonus">확장</span></td><td>선택 과제로 대시보드, 시계열 분해 또는 간단한 베이스라인 예측을 추가하고 가정을 설명함</td><td>예측 정확도뿐 아니라 기준선·오차·적용 한계 설명을 점검</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="troubleshooting" class="tab-panel" role="tabpanel" aria-labelledby="tab-troubleshooting">
+      <div class="card mb-4">
+        <h3>🔧 문제 해결 가이드 (FAQ)</h3>
+        <div class="accordion">
+          <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">Q1. 데이터가 100개보다 적거나 시계열인지 애매해요.</button>
+          <div class="accordion-content"><div class="content-inner">
+            <div class="callout"><div class="title">✅ 점검 순서</div>먼저 날짜/시간 열과 관측 단위를 확인합니다. 기간을 넓히거나 더 세밀한 공개 데이터로 바꾸되, 중복 행을 늘려 조건을 맞추지는 않습니다. 집계된 단면 표만 있다면 시계열 원자료를 추가로 찾도록 안내합니다.</div>
+          </div></div>
+        </div>
+        <div class="accordion">
+          <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">Q2. 결측치와 이상치가 발견됐어요.</button>
+          <div class="accordion-content"><div class="content-inner">
+            <div class="callout warning"><div class="title">💡 판단을 기록하기</div>결측이 데이터 수집 누락인지 실제 0인지 확인합니다. 이상치는 오류인지 실제 급변인지 원자료와 맥락을 확인하세요. 삭제·대체가 결론에 미치는 영향을 가능하면 전후 비교하고, 처리하지 않은 경우에도 이유를 명시합니다.</div>
+          </div></div>
+        </div>
+        <div class="accordion">
+          <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">Q3. 그래프는 있지만 인사이트가 나오지 않아요.</button>
+          <div class="accordion-content"><div class="content-inner">
+            <div class="callout success"><div class="title">✅ 관찰에서 시작</div>“전체적으로 어떤가요?” 대신 시작·끝 값, 최대/최소 구간, 전후 차이, 이동평균·변화율을 수치로 묻습니다. 관찰을 먼저 문장으로 쓴 다음 가능한 원인과 추가로 확인할 자료를 구분하게 합니다.</div>
+          </div></div>
+        </div>
+        <div class="accordion">
+          <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">Q4. AI가 만든 분석 코드나 설명을 검증하기 어렵습니다.</button>
+          <div class="accordion-content"><div class="content-inner">
+            <div class="callout"><div class="title">📋 검증 전략</div>코드 블록을 단계별로 실행하고, 작은 표본에서 원자료를 직접 계산해 결과를 비교합니다. 날짜 정렬, 분모·이동 창 크기, 결측 처리와 그래프 축을 점검하세요. AI에게 작성한 가정·수식 설명을 요청하되, 최종 근거는 코드와 데이터에서 재확인합니다.</div>
+          </div></div>
+        </div>
+        <div class="accordion">
+          <button class="accordion-header" aria-expanded="false" onclick="toggleAccordion(this)">Q5. 분석 결과를 원인으로 단정하거나 예측을 확정적으로 말해요.</button>
+          <div class="accordion-content"><div class="content-inner">
+            <div class="callout warning"><div class="title">💡 대안 가설과 한계</div>시간적 동행만으로 인과가 증명되지는 않습니다. 외부 변수, 다른 기간, 다른 집계 단위에서 같은 패턴이 보이는지 질문합니다. 예측 과제는 보너스이며, 단순 기준선·가정·오차·한계를 함께 설명하도록 합니다.</div>
+          </div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>📢 세션 메모</h3>
+        <p class="text-sm muted">학습자 질문, 다음 점검 항목, 후속 약속을 기록합니다. 메모는 현재 페이지에만 남으며 새로고침하면 초기화됩니다.</p>
+        <div class="action-log" id="sessionLog" aria-live="polite"><div class="entry">[시스템] I1-1 퍼실리테이션 가이드가 준비되었습니다.</div></div>
+        <div class="flex-gap mt-2">
+          <input type="text" id="logInput" class="full-input" placeholder="학습자 질문이나 다음 행동을 입력하세요..." onkeydown="if(event.key==='Enter') addLog()">
+          <button class="btn btn-primary btn-sm" onclick="addLog()">추가</button>
+        </div>
+        <button class="btn btn-outline btn-sm mt-2" onclick="clearLog()">🧹 메모 지우기</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+const tabIds = ['overview', 'deliverables', 'evaluation', 'facilitation', 'rubric', 'troubleshooting'];
+let timerInterval = null;
+let timeLeft = 15 * 60;
+let isRunning = false;
+
+function switchTab(tabId, button) {
+  document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.toggle('active', panel.id === tabId));
+  document.querySelectorAll('.tab-btn').forEach(tab => {
+    const isActive = tab === button;
+    tab.classList.toggle('active', isActive);
+    tab.setAttribute('aria-selected', String(isActive));
+  });
+  document.getElementById('headerProgress').style.width = ((tabIds.indexOf(tabId) + 1) / tabIds.length * 100) + '%';
+}
+
+function toggleAccordion(button) {
+  const content = button.nextElementSibling;
+  const willOpen = !button.classList.contains('active');
+  button.classList.toggle('active', willOpen);
+  button.setAttribute('aria-expanded', String(willOpen));
+  content.style.maxHeight = willOpen ? content.scrollHeight + 'px' : null;
+}
+
+function updateCheckCount() {
+  const checks = Array.from(document.querySelectorAll('#deliverableChecklist .checkbox'));
+  const checked = checks.filter(input => input.checked).length;
+  document.getElementById('checkedCount').textContent = checked;
+  try {
+    localStorage.setItem('i1-1-guide-checklist', JSON.stringify(checks.map(input => input.checked)));
+  } catch (error) {
+    console.warn('체크리스트 상태를 브라우저에 저장하지 못했습니다.', error);
+  }
+}
+
+function restoreChecklist() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('i1-1-guide-checklist') || '[]');
+    document.querySelectorAll('#deliverableChecklist .checkbox').forEach((input, index) => {
+      input.checked = saved[index] === true;
+      input.addEventListener('change', updateCheckCount);
+    });
+  } catch (error) {
+    console.warn('저장된 체크리스트 상태를 불러오지 못했습니다.', error);
+  }
+  updateCheckCount();
+}
+
+function resetChecklist() {
+  document.querySelectorAll('#deliverableChecklist .checkbox').forEach(input => { input.checked = false; });
+  updateCheckCount();
+}
+
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remaining = seconds % 60;
+  return minutes + ':' + String(remaining).padStart(2, '0');
+}
+
+function renderTimer() {
+  document.getElementById('timerDisplay').textContent = formatTime(timeLeft);
+}
+
+function startTimer() {
+  if (isRunning) return;
+  if (timeLeft <= 0) resetTimer();
+  isRunning = true;
+  timerInterval = setInterval(() => {
+    timeLeft -= 1;
+    renderTimer();
+    if (timeLeft <= 0) {
+      pauseTimer();
+      addLog('⏰ 타이머 종료');
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  if (timerInterval !== null) clearInterval(timerInterval);
+  timerInterval = null;
+  isRunning = false;
+}
+
+function resetTimer() {
+  pauseTimer();
+  const minutes = Math.min(180, Math.max(1, Number.parseInt(document.getElementById('timerInput').value, 10) || 15));
+  document.getElementById('timerInput').value = minutes;
+  timeLeft = minutes * 60;
+  renderTimer();
+}
+
+function addLog(message) {
+  const input = document.getElementById('logInput');
+  const text = (message || input.value).trim();
+  if (!text) {
+    input.focus();
+    return;
+  }
+  const entry = document.createElement('div');
+  entry.className = 'entry';
+  entry.textContent = '[' + new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) + '] ' + text;
+  const log = document.getElementById('sessionLog');
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+  input.value = '';
+}
+
+function clearLog() {
+  const log = document.getElementById('sessionLog');
+  log.replaceChildren();
+  const entry = document.createElement('div');
+  entry.className = 'entry';
+  entry.textContent = '[시스템] 메모를 지웠습니다.';
+  log.appendChild(entry);
+}
+
+restoreChecklist();
+renderTimer();
+</script>
+</body>
+</html>
