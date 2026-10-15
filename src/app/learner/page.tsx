@@ -8,7 +8,6 @@ import {
   getGroupById,
   syncStagesFromMock,
 } from "@/lib/store";
-import { SubmitButton } from "@/components/SubmitButton";
 
 interface Props {
   searchParams: { userId?: string };
@@ -240,9 +239,6 @@ export default async function LearnerPage({ searchParams }: Props) {
             <h2 className="text-xl font-bold text-emerald-900 mb-2">
               축하합니다! 모든 단계를 수료했습니다.
             </h2>
-            <p className="text-emerald-700">
-              수고하셨습니다. 담당 퍼실리테이터에게 최종 피드백을 받아보세요.
-            </p>
           </section>
         ) : currentStage ? (
           <section className="bg-white rounded-2xl border border-slate-200 p-6">
@@ -264,21 +260,10 @@ export default async function LearnerPage({ searchParams }: Props) {
               </p>
             </div>
 
-            {progress.status === "in_progress" && progress.note && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-800 text-sm mb-4">
-                이전 제출이 반려되었습니다. 피드백을 반영한 뒤 다시 제출해 주세요.
-                <p className="mt-2 font-medium">피드백: {progress.note}</p>
-              </div>
-            )}
-
-            {progress.status === "in_progress" && (
-              <SubmitButton learnerId={userId} />
-            )}
-
             {progress.status === "submitted" && (
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-amber-800 text-sm">
-                제출이 완료되었습니다. 담당 퍼실리테이터(
-                {facilitator?.name ?? "미배정"})의 승인을 기다리고 있습니다.
+                담당 퍼실리테이터(
+                {facilitator?.name ?? "미배정"})가 현재 단계를 검토 중입니다.
               </div>
             )}
           </section>

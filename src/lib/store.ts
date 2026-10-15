@@ -266,28 +266,6 @@ export async function getProgress(learnerId: string) {
   return rows[0] ? mapProgress(rows[0]) : null;
 }
 
-export async function submitStage(learnerId: string): Promise<boolean> {
-  await ensureReady();
-  const sql = getSql();
-
-  const rows = await sql`
-    SELECT * FROM progresses
-    WHERE learner_id = ${learnerId} AND status = 'in_progress'
-    LIMIT 1
-  `;
-  if (!rows[0]) return false;
-
-  await sql`
-    UPDATE progresses
-    SET
-      status = 'submitted',
-      submitted_at = NOW(),
-      note = NULL
-    WHERE learner_id = ${learnerId}
-  `;
-  return true;
-}
-
 export async function reviewStage(
   learnerId: string,
   reviewerId: string,
