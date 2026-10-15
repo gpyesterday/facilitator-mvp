@@ -5,7 +5,6 @@ export default async function HomePage() {
   const data = await getData();
 
   const facilitators = data.users.filter((u) => u.role === "facilitator");
-  const learners = data.users.filter((u) => u.role === "learner");
   const admins = data.users.filter((u) => u.role === "admin");
 
   return (
@@ -16,7 +15,7 @@ export default async function HomePage() {
             학습자 지원 퍼실리테이터 플랫폼
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            MVP · PoC 버전 (역할 선택으로 로그인)
+            MVP · 퍼실리테이터/관리자 테스트 계정 및 공개 미션 가이드
           </p>
         </div>
       </header>
@@ -81,23 +80,22 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Learners */}
+        {/* Public mission guides */}
         <section>
           <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-3">
-            학습자
+            미션 가이드
           </h3>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {learners.map((user) => (
-              <Link
-                key={user.id}
-                href={`/learner?userId=${user.id}`}
-                className="block p-4 bg-white border border-slate-200 rounded-xl hover:border-indigo-300 hover:shadow-sm transition"
-              >
-                <div className="font-medium text-slate-900">{user.name}</div>
-                <div className="text-sm text-slate-500">{user.email}</div>
-              </Link>
-            ))}
-          </div>
+          <Link
+            href="/learner"
+            className="block p-4 bg-white border border-slate-200 rounded-xl hover:border-indigo-300 hover:shadow-sm transition"
+          >
+            <div className="font-medium text-slate-900">
+              모든 단계의 미션 가이드 보기
+            </div>
+            <div className="text-sm text-slate-500">
+              학습자 정보 없이 공개된 단계별 안내를 확인할 수 있습니다.
+            </div>
+          </Link>
         </section>
       </main>
     </div>
