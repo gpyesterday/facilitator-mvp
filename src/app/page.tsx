@@ -1,118 +1,13 @@
-import Link from "next/link";
 import { getData } from "@/lib/store";
+import HomePageContent from "@/components/HomePageContent";
 
 export default async function HomePage() {
   const data = await getData();
 
-  const facilitators = data.users.filter((u) => u.role === "facilitator");
-  const admins = data.users.filter((u) => u.role === "admin");
-
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200">
-        <div className="max-w-5xl mx-auto px-6 py-5">
-          <h1 className="text-xl font-bold text-slate-900">
-            학습자 지원 퍼실리테이터 플랫폼
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            MVP · 퍼실리테이터/관리자 테스트 계정 및 공개 미션 가이드
-          </p>
-        </div>
-      </header>
-
-      <main className="max-w-5xl mx-auto px-6 py-10">
-        <div className="mb-10">
-          <h2 className="text-lg font-semibold text-slate-800 mb-2">
-            테스트 계정으로 접속하기
-          </h2>
-          <p className="text-sm text-slate-600">
-            실제 인증 없이 역할을 선택하여 각 화면을 확인할 수 있습니다.
-          </p>
-        </div>
-
-        {/* Admin */}
-        <section className="mb-10">
-          <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-3">
-            관리자
-          </h3>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {admins.map((user) => (
-              <Link
-                key={user.id}
-                href={`/admin?userId=${user.id}`}
-                className="block p-4 bg-white border border-slate-200 rounded-xl hover:border-indigo-300 hover:shadow-sm transition"
-              >
-                <div className="font-medium text-slate-900">{user.name}</div>
-                <div className="text-sm text-slate-500">{user.email}</div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* Facilitators */}
-        <section className="mb-10">
-          <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-3">
-            퍼실리테이터
-          </h3>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {facilitators.map((user) =>
-              user.isActive ? (
-                <Link
-                  key={user.id}
-                  href={`/facilitator?userId=${user.id}`}
-                  className="block p-4 bg-white border border-slate-200 rounded-xl hover:border-indigo-300 hover:shadow-sm transition"
-                >
-                  <div className="font-medium text-slate-900">{user.name}</div>
-                  <div className="text-sm text-slate-500">{user.email}</div>
-                </Link>
-              ) : (
-                <div
-                  key={user.id}
-                  className="block p-4 bg-slate-100 border border-slate-200 rounded-xl opacity-70 cursor-not-allowed"
-                  title="비활성 계정 — 플랫폼 사용 불가"
-                >
-                  <div className="font-medium text-slate-600">{user.name}</div>
-                  <div className="text-sm text-slate-400">{user.email}</div>
-                  <div className="text-xs text-slate-500 mt-1">비활성</div>
-                </div>
-              )
-            )}
-          </div>
-        </section>
-
-        {/* Public mission guides */}
-        <section>
-          <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-3">
-            미션 가이드
-          </h3>
-          <Link
-            href="/learner"
-            className="block p-4 bg-white border border-slate-200 rounded-xl hover:border-indigo-300 hover:shadow-sm transition"
-          >
-            <div className="font-medium text-slate-900">
-              모든 단계의 미션 가이드 보기
-            </div>
-            <div className="text-sm text-slate-500">
-              학습자 정보 없이 공개된 단계별 안내를 확인할 수 있습니다.
-            </div>
-          </Link>
-        </section>
-
-        <section className="mt-10">
-          <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-3">
-            실습 가이드
-          </h3>
-          <a
-            href="/guides/file-extensions.html"
-            className="block p-4 bg-white border border-slate-200 rounded-xl hover:border-indigo-300 hover:shadow-sm transition"
-          >
-            <div className="font-medium text-slate-900">파일 확장자</div>
-            <div className="text-sm text-slate-500">
-              Markdown, HTML, ZIP, 이미지 파일의 특징과 사용 방법을 확인합니다.
-            </div>
-          </a>
-        </section>
-      </main>
-    </div>
+    <HomePageContent
+      facilitators={data.users.filter((user) => user.role === "facilitator")}
+      admins={data.users.filter((user) => user.role === "admin")}
+    />
   );
 }
