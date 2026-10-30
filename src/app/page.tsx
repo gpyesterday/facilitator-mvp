@@ -97,6 +97,21 @@ export default async function HomePage() {
             </div>
           </Link>
         </section>
+
+        <section className="mt-10">
+          <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wide mb-3">
+            실습 가이드
+          </h3>
+          <a
+            href="/guides/file-extensions.html"
+            className="block p-4 bg-white border border-slate-200 rounded-xl hover:border-indigo-300 hover:shadow-sm transition"
+          >
+            <div className="font-medium text-slate-900">파일 확장자</div>
+            <div className="text-sm text-slate-500">
+              Markdown, HTML, ZIP, 이미지 파일의 특징과 사용 방법을 확인합니다.
+            </div>
+          </a>
+        </section>
       </main>
     </div>
   );
