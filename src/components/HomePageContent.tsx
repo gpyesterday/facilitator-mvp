@@ -141,6 +141,17 @@ export default function HomePageContent({
               학습자 정보 없이 공개된 단계별 안내를 확인할 수 있습니다.
             </div>
           </Link>
+          <a
+            href="/guides/pre-mission.html"
+            className="mt-3 block p-4 bg-white border border-slate-200 rounded-xl hover:border-indigo-300 hover:shadow-sm transition"
+          >
+            <div className="font-medium text-slate-900">
+              입학연수 과제 안내 (미션 &amp; 세미나)
+            </div>
+            <div className="text-sm text-slate-500">
+              입학연수 미션과 세미나의 진행 방법 및 제출물을 확인합니다.
+            </div>
+          </a>
         </section>
 
         <section className="mt-10">
