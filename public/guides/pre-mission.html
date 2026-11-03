@@ -5,73 +5,56 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>입학연수 과제 안내 (미션 & 세미나)</title>
 <style>
-  :root {
-    --primary: #2563eb;
-    --primary-dark: #1d4ed8;
-    --secondary: #7c3aed;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --bg: #f0f2f5;
-    --card-bg: #fff;
-    --text: #1f2937;
-    --text-light: #6b7280;
-    --border: #e5e7eb;
-    --border-radius: 10px;
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: var(--text); background: var(--bg); padding: 20px; }
-  .container { max-width: 1000px; margin: 0 auto; }
-  header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; padding: 30px; border-radius: var(--border-radius); margin-bottom: 24px; box-shadow: var(--shadow); }
-  header h1 { font-size: 24px; margin-bottom: 8px; }
-  header p { font-size: 14px; opacity: 0.9; }
-  .tabs { display: flex; gap: 4px; background: var(--card-bg); border-radius: var(--border-radius) var(--border-radius) 0 0; box-shadow: var(--shadow); overflow-x: auto; }
-  .tab { flex: 1; padding: 14px 12px; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--text-light); transition: all 0.2s; white-space: nowrap; }
-  .tab:hover, .tab:focus-visible { background: var(--bg); color: var(--primary); }
-  .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--bg); }
-  .tab-content { display: none; background: var(--card-bg); border-radius: 0 0 var(--border-radius) var(--border-radius); box-shadow: var(--shadow); padding: 24px; }
+  body { font-family: 'Malgun Gothic', 'Nanum Gothic', sans-serif; line-height: 1.6; color: #1f2937; background: #f8fafc; padding: 0 16px 40px; }
+  .container { max-width: 900px; margin: 0 auto; }
+  header { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; padding: 32px 24px; border-radius: 16px; margin-bottom: 32px; text-align: center; }
+  header h1 { font-size: 28px; margin-bottom: 8px; }
+  header p { font-size: 16px; opacity: 0.95; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; overflow-x: auto; }
+  .tab { padding: 10px 18px; border: 1px solid #e2e8f0; background: #fff; border-radius: 8px; cursor: pointer; font-size: 14px; color: #475569; transition: all 0.2s; white-space: nowrap; }
+  .tab:hover { background: #eff6ff; border-color: #93c5fd; color: #2563eb; }
+  .tab.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+  .tab-content { display: none; animation: fadeIn 0.3s ease; }
   .tab-content.active { display: block; }
-  h2 { font-size: 18px; margin: 0; color: var(--text); }
-  h3 { font-size: 16px; margin: 20px 0 10px; color: var(--text); }
-  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow); }
-  .tab-content > .card { box-shadow: none; }
-  .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  h2 { font-size: 22px; margin: 24px 0 12px; color: #1e293b; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; }
+  h3 { font-size: 18px; margin: 20px 0 10px; color: #2563eb; }
+  .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #f1f5f9; }
   .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; color: #fff; }
-  .badge.mission { background: var(--primary); }
-  .badge.seminar { background: var(--success); }
+  .badge.mission { background: #2563eb; }
+  .badge.seminar { background: #059669; }
   .card-number { font-size: 20px; font-weight: 800; color: #93c5fd; }
-  p { margin: 8px 0; }
-  ul, ol { margin: 10px 0 10px 24px; }
+  p { margin: 8px 0; color: #334155; }
+  ul, ol { margin: 10px 0 10px 24px; color: #334155; }
   li { margin-bottom: 6px; }
-  .steps { background: var(--bg); border-radius: var(--border-radius); padding: 16px 20px; margin: 12px 0; }
+  .steps { background: #f8fafc; border-radius: 10px; padding: 16px 20px; margin: 12px 0; }
   .step { display: flex; gap: 12px; margin-bottom: 10px; }
-  .step-num { flex-shrink: 0; width: 28px; height: 28px; background: var(--primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; }
+  .step-num { flex-shrink: 0; width: 28px; height: 28px; background: #2563eb; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; }
   .step-text { flex: 1; font-size: 14px; }
-  .step-title { font-weight: 700; color: var(--primary); display: block; margin-bottom: 4px; }
-  .step-desc { color: #4b5563; }
-  .submit-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
-  .submit-table th, .submit-table td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
-  .submit-table th { background: var(--bg); font-weight: 700; }
-  .submit-table tr:nth-child(even) td { background: #fafafa; }
-  .prereq { background: #eff6ff; border-left: 4px solid var(--primary); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 14px; }
-  .prereq b { color: var(--primary-dark); }
-  .note { background: #fffbeb; border-left: 4px solid var(--warning); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 14px; color: #92400e; }
-  .progress { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 20px; margin-bottom: 24px; }
-  .progress h3 { margin-top: 0; color: var(--primary); }
+  .step-title { font-weight: 700; color: #2563eb; display: block; margin-bottom: 4px; }
+  .step-desc { color: #475569; }
+  .submit-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+  .submit-table th, .submit-table td { border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; }
+  .submit-table th { background: #f1f5f9; color: #1e293b; }
+  .prereq { background: #eff6ff; border-left: 4px solid #2563eb; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 14px; }
+  .prereq b { color: #1d4ed8; }
+  .note { background: #fef3c7; border-left: 4px solid #d97706; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 14px; color: #92400e; }
+  .layout-example { border: 2px dashed #2563eb; border-radius: 8px; padding: 16px; margin: 12px 0; background: #f8fafc; font-size: 14px; color: #334155; }
+  .layout-box { background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; text-align: center; font-weight: 700; color: #2563eb; }
+  .layout-box.header { background: #eff6ff; }
+  .layout-box.footer { background: #f1f5f9; }
+  .layout-row { display: flex; gap: 12px; margin-top: 12px; }
+  .layout-row > .layout-box { flex: 1; }
+  .progress { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; }
+  .progress h3 { margin-top: 0; color: #2563eb; }
   .checklist { list-style: none; padding-left: 0; }
-  .checklist li { padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; font-size: 14px; }
+  .checklist li { padding: 8px 0; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px; font-size: 14px; }
   .checklist li:last-child { border-bottom: none; }
   .check-box { width: 20px; height: 20px; border: 2px solid #cbd5e1; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
-  footer { text-align: center; padding: 32px; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border); margin-top: 24px; }
-  @media (max-width: 768px) {
-    body { padding: 12px; }
-    .tab { flex: 0 0 auto; padding: 10px 12px; font-size: 12px; }
-    .tab-content { padding: 16px; }
-    header { padding: 22px; }
-    .card { padding: 16px; }
-    .card-header { flex-wrap: wrap; }
-    .submit-table { display: block; overflow-x: auto; }
-  }
+  footer { text-align: center; padding: 32px; color: #64748b; font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 24px; }
+  @media (max-width: 640px) { body { padding: 0 12px; } .tab { padding: 8px 14px; font-size: 13px; } }
 </style>
 </head>
 <body>
@@ -105,6 +88,11 @@
         <li><span class="check-box">6</span> 세미나 2: 두 AI로 HTML 만들고 테스트하기</li>
         <li><span class="check-box">7</span> 세미나 3: 테스트하며 고치고 사용자 피드백 반영하기</li>
       </ol>
+      <div class="note">
+        <b>안내:</b> <br/>
+        미션 1부터 미션 4까지는 하나의 웹 페이지를 만드는 작업을 작게 나누어 놓은 것입니다. <br/> 
+        따라서 학습자는 모든 작업을 기록해 두길 권장합니다.
+      </div>
     </div>
 
     <div class="card">
@@ -143,8 +131,8 @@
         <h2>공통 제출 및 평가</h2>
       </div>
       <ul>
-        <li>모든 과제는 <b>코디세이 플랫폼</b>에 제출하고, <b>GitHub</b>에도 등록합니다.</li>
-        <li><b>미션:</b> 코랩 세션에서 동료와 1:1 동료평가를 진행합니다. 미션마다 <b>최소 1회 PASS</b>를 받아야 합니다. FAIL(보완요청)을 받으면 고쳐 다시 평가받습니다.</li>
+        <li>모든 과제는 <b>GitHub 저장소(repository)</b>에 저장(push)하고, <b>코디세이 플랫폼에서 동료평가</b>를 받습니다.</li>
+        <li><b>미션:</b> 코랩 세션에서 동료와 1:1 동료평가를 진행합니다. <br/> 미션마다 <b>최소 1회 PASS</b>를 받아야 합니다. FAIL(보완요청)을 받으면 고쳐 다시 평가받습니다.</li>
         <li><b>세미나:</b> 동료 3~5명이 모여 그룹 리뷰를 진행합니다.</li>
         <li>대화 공유 링크 또는 요청·답변이 보이는 화면 캡처를 과제 중에 남겨 두세요.</li>
       </ul>
@@ -167,6 +155,32 @@
         <div class="step"><span class="step-num">4</span><div class="step-text"><span class="step-title">파일로 열어 기획서와 비교합니다.</span><span class="step-desc">영화_A_초안.html로 저장해 브라우저에서 열고, 완성 기준을 하나씩 직접 해 봅니다.</span></div></div>
         <div class="step"><span class="step-num">5</span><div class="step-text"><span class="step-title">다른 AI에도 같은 기획서를 줘 봅니다.</span><span class="step-desc">회사가 다른 AI 모델의 새 대화창에 같은 기획서.md와 요청을 줍니다. 받은 파일은 영화_B_초안.html로 저장합니다.</span></div></div>
         <div class="step"><span class="step-num">6</span><div class="step-text"><span class="step-title">고른 결과물에 문제가 있다면 고칩니다.</span><span class="step-desc">기획서와 다른 부분이 있다면, 해당 파일을 만든 AI에게 수정을 요청합니다.</span></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-number">04</span>
+          <h2>웹 페이지를 만들기 위해 필요한 정보</h2>
+        </div>
+        <ul>
+          <li><b>누가, 왜 만드나요?</b> 페이지를 왜 만들고 누구를 위한 것인지 (예: 영화를 좋아하는 사람에게 영화 순위를 보여 주기)</li>
+          <li><b>무엇을 넣나요?</b> 제목, 글, 사진, 동영상 등 화면에 들어갈 내용</li>
+          <li><b>어디에 무엇을 두나요?</b> 웹 페이지의 위치를 정하는 것 (예시 아래 참고)</li>
+          <li><b>어떻게 보여지나요?</b> 글자 색, 크기, 배경 색 등 디자인</li>
+          <li><b>무엇을 할 수 있나요?</b> 버튼을 누르거나 링크를 클릭하는 기능</li>
+          <li><b>어떻게 만드나요?</b> HTML 파일 하나로 만드는지, 인터넷 주소(도메인)가 필요한지</li>
+        </ul>
+
+        <div class="prereq">
+          <b>예시) 웹 페이지 배치 (어디에 무엇을 두나요?)</b>
+          <div class="layout-example">
+            <div class="layout-box header">헤더 (로고, 메뉴)</div>
+            <div class="layout-row">
+              <div class="layout-box sidebar">왼쪽 메뉴</div>
+              <div class="layout-box main">본문 (영화 목록 등)</div>
+            </div>
+            <div class="layout-box footer">푸터 (회사 정보, 연락처)</div>
+          </div>
+        </div>
       </div>
       <h3>제출할 파일</h3>
       <table class="submit-table">
@@ -365,7 +379,7 @@
 
   <footer>
     <p>입학연수 과제 안내 &mdash; 미션 및 세미나</p>
-    <p>모든 과제는 코디세이 플랫폼과 GitHub에 제출하고, 코랩 세션에서 동료평가를 받습니다.</p>
+    <p>모든 과제는 GitHub 저장소(repository)에 저장(push)하고, 코디세이 플랫폼에서 동료평가를 받습니다.</p>
   </footer>
 </div>
 
