@@ -109,19 +109,19 @@ export const initialData: AppData = {
       materials: [
         {
           title: "B1-1 미션 가이드 (인터랙티브)",
-          url: "/guides/b1-1.html",
+          url: "/guides/1-1-beginner-guide.html",
         },
         {
           title: "B1-2 멀티모달 콘텐츠 제작 가이드 (인터랙티브)",
-          url: "/guides/b1-2.html",
+          url: "/guides/2-1-beginner-guide.html",
         },
         {
           title: "B1-3 노코드 자동화 워크플로 설계 가이드 (인터랙티브)",
-          url: "/guides/b1-3.html",
+          url: "/guides/3-1-beginner-guide.html",
         },
       ],
       passCondition:
-        "B1-1·B1-2·B1-3 결과물 제출 후 담당 퍼실리테이터 승인을 받으면 통과합니다.",
+        "B1-1·B2-1·B3-1 결과물 제출 후 담당 퍼실리테이터 승인을 받으면 통과합니다.",
     },
     {
       id: 2,
