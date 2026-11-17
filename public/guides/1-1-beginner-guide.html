@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B1-1 비전공자 시작 가이드 · LLM 기반 업무 자동화</title>
+<style>
+  :root{
+    --blue:#2563eb; --blue-dark:#1d4ed8; --purple:#7c3aed;
+    --green:#059669; --amber:#d97706; --red:#dc2626;
+    --bg:#f1f3f7; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
+    --line:#e5e7eb; --soft:#f8fafc;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+    --radius:12px;
+    --shadow:0 2px 10px rgba(15,23,42,.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:76px}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.68;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+
+  /* ---------- header ---------- */
+  header{
+    background:linear-gradient(135deg,#1e3a8a 0%,var(--blue) 45%,var(--purple) 100%);
+    color:#fff;padding:44px 0 38px;
+  }
+  .badge{
+    display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;
+    background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
+    padding:4px 12px;border-radius:999px;margin-bottom:14px;
+  }
+  header h1{font-size:clamp(22px,3.4vw,32px);line-height:1.32;letter-spacing:-.02em}
+  header p.sub{margin-top:10px;font-size:15px;color:rgba(255,255,255,.88);max-width:720px}
+  .hstats{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+  .hstat{
+    background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);
+    border-radius:10px;padding:9px 15px;font-size:13px;
+  }
+  .hstat b{display:block;font-size:17px;margin-bottom:1px}
+  .pbar-wrap{margin-top:24px}
+  .pbar-top{display:flex;justify-content:space-between;font-size:13px;color:rgba(255,255,255,.9);margin-bottom:7px}
+  .pbar{height:9px;background:rgba(255,255,255,.22);border-radius:99px;overflow:hidden}
+  .pbar-fill{height:100%;width:0;background:#fff;border-radius:99px;transition:width .35s ease}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{display:flex;gap:4px;overflow-x:auto;padding:0 20px;scrollbar-width:none}
+  nav .wrap::-webkit-scrollbar{display:none}
+  nav a{
+    flex:none;padding:14px 12px;font-size:13.5px;font-weight:600;color:var(--muted);
+    text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;
+  }
+  nav a:hover{color:var(--blue);border-bottom-color:var(--blue)}
+
+  /* ---------- sections ---------- */
+  section{padding:46px 0 6px}
+  h2{
+    font-size:21px;letter-spacing:-.01em;margin-bottom:6px;
+    display:flex;align-items:center;gap:10px;
+  }
+  h2 .num{
+    flex:none;width:28px;height:28px;border-radius:8px;background:var(--blue);color:#fff;
+    font-size:14px;display:grid;place-items:center;font-weight:700;
+  }
+  .lead{color:var(--muted);font-size:14.5px;margin:2px 0 20px;max-width:800px}
+  h3{font-size:15.5px;margin:24px 0 10px}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px;box-shadow:var(--shadow);margin-bottom:16px;
+  }
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+
+  /* callouts */
+  .call{border-radius:10px;padding:14px 16px;font-size:14px;border-left:4px solid}
+  .call b{display:block;margin-bottom:4px;font-size:13.5px}
+  .call.warn{background:#fffbeb;border-color:var(--amber);color:#78350f}
+  .call.danger{background:#fef2f2;border-color:var(--red);color:#7f1d1d}
+  .call.ok{background:#ecfdf5;border-color:var(--green);color:#065f46}
+  .call.info{background:#eff6ff;border-color:var(--blue);color:#1e3a8a}
+
+  /* pieces */
+  .mini{font-size:13.5px;color:var(--muted)}
+  .kbd{
+    font-family:var(--mono);font-size:12.5px;background:#eef2ff;color:#3730a3;
+    border:1px solid #c7d2fe;border-radius:5px;padding:1px 6px;
+  }
+  .tag{
+    display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;
+    background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;
+  }
+  .tag.free{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}
+  .tag.self{background:#fef2f2;color:#991b1b;border-color:#fecaca}
+
+  /* term cards */
+  .term{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .term h4{font-size:14px;margin-bottom:6px;color:var(--blue-dark)}
+  .term p{font-size:13.5px;color:#374151}
+  .term .ex{font-size:12.5px;color:var(--muted);margin-top:7px;border-top:1px dashed var(--line);padding-top:7px}
+
+  /* checklist */
+  .step{
+    display:flex;gap:14px;background:var(--card);border:1px solid var(--line);
+    border-radius:10px;padding:15px 17px;margin-bottom:9px;transition:.18s;
+  }
+  .step:hover{border-color:#c7d2fe;box-shadow:var(--shadow)}
+  .step.done{background:#f6fdf9;border-color:#bbf7d0}
+  .step.done .st-title{text-decoration:line-through;color:var(--muted)}
+  .step input{
+    appearance:none;flex:none;width:21px;height:21px;border:2px solid #cbd5e1;border-radius:6px;
+    margin-top:2px;cursor:pointer;position:relative;background:#fff;
+  }
+  .step input:checked{background:var(--green);border-color:var(--green)}
+  .step input:checked::after{
+    content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;
+    border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);
+  }
+  .st-body{flex:1;min-width:0}
+  .st-title{font-size:14.5px;font-weight:700;margin-bottom:3px}
+  .st-desc{font-size:13.5px;color:#4b5563}
+  .st-out{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .st-out code{font-family:var(--mono);font-size:12px;background:var(--soft);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+  .st-time{flex:none;font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap;padding-top:3px}
+
+  /* tabs */
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+  .tab{
+    border:1px solid var(--line);background:#fff;color:var(--muted);font-size:13.5px;
+    font-weight:700;padding:9px 15px;border-radius:9px;cursor:pointer;transition:.15s;
+    font-family:inherit;
+  }
+  .tab:hover{border-color:#c7d2fe;color:var(--blue)}
+  .tab.on{background:var(--blue);border-color:var(--blue);color:#fff}
+  .panel{display:none}
+  .panel.on{display:block;animation:fade .2s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  /* code blocks */
+  .code-wrap{position:relative;margin:10px 0 4px}
+  .code-wrap pre{
+    background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 16px 18px;
+    overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.72;
+    white-space:pre;tab-size:2;
+  }
+  .code-wrap pre code{font-family:inherit}
+  .copy{
+    position:absolute;top:9px;right:9px;background:rgba(255,255,255,.12);color:#e2e8f0;
+    border:1px solid rgba(255,255,255,.22);border-radius:7px;font-size:11.5px;font-weight:700;
+    padding:5px 10px;cursor:pointer;font-family:inherit;transition:.15s;
+  }
+  .copy:hover{background:rgba(255,255,255,.24)}
+  .copy.done{background:var(--green);border-color:var(--green);color:#fff}
+
+  /* github steps */
+  .gh{display:flex;gap:14px;margin-bottom:14px}
+  .gh .dot{
+    flex:none;width:26px;height:26px;border-radius:50%;background:#0f172a;color:#fff;
+    font-size:12.5px;font-weight:700;display:grid;place-items:center;margin-top:2px;
+  }
+  .gh h4{font-size:14.5px;margin-bottom:4px}
+  .gh p{font-size:13.5px;color:#4b5563}
+  .gh .path{
+    display:inline-block;font-family:var(--mono);font-size:12px;background:var(--soft);
+    border:1px solid var(--line);border-radius:5px;padding:2px 7px;margin-top:6px;color:#334155;
+  }
+
+  /* traps */
+  .trap{display:flex;gap:13px;padding:14px 0;border-bottom:1px dashed var(--line)}
+  .trap:last-child{border-bottom:0}
+  .trap .n{
+    flex:none;width:24px;height:24px;border-radius:7px;background:#fef2f2;color:var(--red);
+    font-size:12.5px;font-weight:800;display:grid;place-items:center;margin-top:2px;
+    border:1px solid #fecaca;
+  }
+  .trap h4{font-size:14px;margin-bottom:2px}
+  .trap p{font-size:13.5px;color:#4b5563}
+
+  /* faq */
+  details{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    margin-bottom:8px;overflow:hidden;
+  }
+  details[open]{border-color:#c7d2fe}
+  summary{
+    cursor:pointer;padding:14px 17px;font-size:14px;font-weight:700;
+    list-style:none;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"＋";flex:none;color:var(--blue);font-weight:700}
+  details[open] summary::after{content:"−"}
+  details .ans{padding:0 17px 15px;font-size:13.5px;color:#4b5563;border-top:1px solid var(--line);padding-top:12px}
+
+  /* table */
+  .tbl-scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:560px}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:var(--soft);font-weight:700;font-size:13px}
+  td code{font-family:var(--mono);font-size:12px;background:var(--soft);padding:1px 5px;border-radius:4px}
+
+  /* toast */
+  #toast{
+    position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);
+    background:#0f172a;color:#fff;font-size:13.5px;font-weight:600;
+    padding:11px 20px;border-radius:9px;opacity:0;pointer-events:none;
+    transition:.22s;z-index:200;
+  }
+  #toast.show{opacity:1;transform:translate(-50%,0)}
+
+  footer{
+    margin-top:52px;padding:26px 0 40px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted);text-align:center;
+  }
+  .reset{
+    margin-top:12px;background:none;border:1px solid var(--line);color:var(--muted);
+    font-size:12.5px;padding:7px 14px;border-radius:8px;cursor:pointer;font-family:inherit;
+  }
+  .reset:hover{border-color:var(--red);color:var(--red)}
+
+  @media (max-width:560px){
+    .st-time{display:none}
+    header{padding:34px 0 30px}
+  }
+  @media print{
+    nav,.copy,#toast,.reset{display:none}
+    body{background:#fff}
+    .panel{display:block!important}
+    .card,.step{box-shadow:none;break-inside:avoid}
+    .code-wrap pre{background:#f8fafc;color:#0f172a;border:1px solid var(--line)}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <span class="badge">B1-1 · LLM 기반 업무 자동화 · 난이도 1</span>
+    <h1>비전공자 시작 가이드</h1>
+    <p class="sub">
+      "컴퓨터를 잘 못 다뤄도 끝낼 수 있나?" — 네. 코드는 한 줄도 필요 없고, 전부 브라우저에서 됩니다.
+      진짜 벽은 컴퓨터 실력이 아니라 <b>문서 요구사항의 양</b>과 <b>용어</b>입니다. 이 페이지는 그 두 개를 먼저 없애 줍니다.
+    </p>
+    <div class="hstats">
+      <div class="hstat"><b>8~12시간</b>비전공자 예상 소요 (가이드 기준 5시간)</div>
+      <div class="hstat"><b>4종</b>제출 산출물</div>
+      <div class="hstat"><b>9단계</b>체크리스트</div>
+      <div class="hstat"><b>0줄</b>필요한 코드</div>
+    </div>
+    <div class="pbar-wrap">
+      <div class="pbar-top"><span>내 진행률</span><span id="pText">0 / 9 완료</span></div>
+      <div class="pbar"><div class="pbar-fill" id="pFill"></div></div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap">
+    <a href="#mind">마음가짐</a>
+    <a href="#terms">용어 7개</a>
+    <a href="#checklist">9단계 체크리스트</a>
+    <a href="#task">과업 고르기</a>
+    <a href="#templates">산출물 템플릿</a>
+    <a href="#github">GitHub 제출</a>
+    <a href="#traps">함정 5개</a>
+    <a href="#faq">막힐 때 FAQ</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ============ 1. 마음가짐 ============ -->
+<section id="mind">
+  <h2><span class="num">1</span>먼저 이것만 알고 시작하세요</h2>
+  <p class="lead">미션 전체에서 "당신이 직접 해야 하는 판단"은 딱 네 가지입니다. 나머지는 AI가 도와줘도 됩니다.</p>
+
+  <div class="grid g2">
+    <div class="call danger">
+      <b>직접 써야 하는 판단 4종 (AI 대행 금지)</b>
+      ① 모델을 고른 이유 &nbsp;② 프롬프트를 수정한 이유<br>
+      ③ 어느 과업에서 막혔는지 &nbsp;④ 환각 검증의 Pass / Fail 판정<br>
+      <span style="display:inline-block;margin-top:7px;font-size:13px">
+        이 네 개를 AI가 대신 쓰면 미션에서 확인하려는 "판단 과정"이 사라져 요구사항 위반입니다.
+      </span>
+    </div>
+    <div class="call ok">
+      <b>AI에게 맡겨도 되는 일</b>
+      프롬프트 초안 다듬기, 표 정리, 문장 교정, 마크다운 형식 맞추기, Few-shot 예시 문장 만들기,
+      대화 로그 오타 정리(단, <b>생성 결과 본문은 편집 금지</b>).
+    </div>
+  </div>
+
+  <div class="call warn" style="margin-top:4px">
+    <b>제일 중요한 규칙 하나</b>
+    대화 로그는 <b>편집하지 않고 그대로</b> 남깁니다. 화자 표기(<span class="kbd">User:</span> / <span class="kbd">AI:</span>)와
+    지점 표시만 덧붙일 수 있습니다. 로그를 예쁘게 고치면 검증 요구 전체가 성립하지 않습니다.
+  </div>
+</section>
+
+<!-- ============ 2. 용어 ============ -->
+<section id="terms">
+  <h2><span class="num">2</span>용어 7개만 잡으면 과제가 보입니다</h2>
+  <p class="lead">컴퓨터 지식이 아니라 어휘 문제입니다. 아래 7개를 자기 말로 설명할 수 있으면 문서가 읽힙니다.</p>
+
+  <div class="grid g2">
+    <div class="term">
+      <h4>① 시스템 프롬프트</h4>
+      <p>AI에게 미리 주는 <b>성격과 규칙</b>. 매번 다시 말하지 않아도 계속 적용됩니다.</p>
+      <div class="ex">예: "너는 회의 서기다. 없는 정보는 만들지 마라."</div>
+    </div>
+    <div class="term">
+      <h4>② 유저 프롬프트</h4>
+      <p>내가 그때그때 입력하는 <b>이번 작업 지시</b>.</p>
+      <div class="ex">예: "이 회의록에서 결정 사항만 3줄로 뽑아줘."</div>
+    </div>
+    <div class="term">
+      <h4>③ 입력 템플릿</h4>
+      <p>빈칸만 채워 <b>복사해 다시 쓰는 양식</b>. 이 미션은 1개 이상 필수입니다.</p>
+      <div class="ex">예: 회의록: {원문} / 기준: {조건} / 출력: 3줄</div>
+    </div>
+    <div class="term">
+      <h4>④ Zero-shot</h4>
+      <p>예시 없이 <b>한 번에 시키기</b>. 결과가 들쭉날쭉합니다.</p>
+      <div class="ex">예: "회의록 요약해 줘."</div>
+    </div>
+    <div class="term">
+      <h4>⑤ Few-shot</h4>
+      <p>입력→출력 <b>예시를 몇 개 보여주고</b> 시키기. 형식이 안정됩니다. <b>3건 이상 필수</b>.</p>
+      <div class="ex">예: 입력 "…" → 출력 "…" 를 3쌍 제시</div>
+    </div>
+    <div class="term">
+      <h4>⑥ 단계적 추론 유도</h4>
+      <p>"먼저 A 하고, 그다음 B 하고, 마지막에 C"처럼 <b>순서를 정해 주는 것</b>. v2 개선에 쓰면 좋습니다.</p>
+      <div class="ex">예: 1) 분류 2) 부족하면 질문 3) 템플릿 출력</div>
+    </div>
+    <div class="term">
+      <h4>⑦ 환각 / 문맥 끊김</h4>
+      <p><b>환각</b> = 사실과 다른 대답. <b>문맥 끊김</b> = 앞에서 준 조건을 뒤 턴에서 잊는 것.</p>
+      <div class="ex">환각: 없는 날짜를 만들어 씀 / 문맥: 3줄로 하라 했는데 5줄로 씀</div>
+    </div>
+    <div class="term" style="border-color:#c7d2fe;background:#eef2ff">
+      <h4>＋ 헷갈리기 쉬운 것</h4>
+      <p><b>환각 ≠ 창의적 글쓰기</b>. 상상해서 쓴 소설은 환각이 아닙니다. "사실인데 틀린 것"만 환각입니다.</p>
+      <div class="ex">1턴 = 발화 하나. User 5번 + AI 5번 = 10턴</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. 체크리스트 ============ -->
+<section id="checklist">
+  <h2><span class="num">3</span>9단계 체크리스트</h2>
+  <p class="lead">위에서부터 순서대로 하세요. 체크한 내용은 이 브라우저에 저장됩니다. (탭을 닫아도 유지)</p>
+
+  <div id="steps">
+    <label class="step">
+      <input type="checkbox" data-k="s1">
+      <div class="st-body">
+        <div class="st-title">1. 과업 1개 정하기</div>
+        <div class="st-desc">내 업무에서 <b>반복되고 형식이 정해진 글</b> 하나를 고르고, 타겟 사용자·입력 형태·출력 규격을 문장으로 적습니다.</div>
+        <div class="st-out">→ <code>model-comparison.md</code> 1번 항목</div>
+      </div>
+      <div class="st-time">30분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s2">
+      <div class="st-body">
+        <div class="st-title">2. 같은 프롬프트를 모델 3종에 넣고 결과 모으기</div>
+        <div class="st-desc">ChatGPT·Claude·Gemini 등 접근 가능한 3종. <b>하나 이상은 무료 요금제</b>. 모델명·버전·실행 시점(날짜)을 반드시 캡처.</div>
+        <div class="st-out">→ 비교는 <b>짧은 입력</b>으로 (무료 한도 보호)</div>
+      </div>
+      <div class="st-time">60분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s3">
+      <div class="st-body">
+        <div class="st-title">3. 비교 기준 4개 이상 + 점수 + 근거 + 선정 결론</div>
+        <div class="st-desc">느낌이 아니라 관찰로. "좋은 것 같음" ❌ / "3줄 요구했는데 5줄로 늘어남" ⭕</div>
+        <div class="st-out">→ <code>model-comparison.md</code> 표 + 결론 (선정 이유는 직접 작성)</div>
+      </div>
+      <div class="st-time">30분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s4">
+      <div class="st-body">
+        <div class="st-title">4. 페르소나 6항목 + 시스템 프롬프트 작성</div>
+        <div class="st-desc">이름·역할·전문 분야·말투·금지 사항·우선순위. 100~200단어면 충분합니다.</div>
+        <div class="st-out">→ <code>system-design.md</code> 페르소나 / 시스템 프롬프트</div>
+      </div>
+      <div class="st-time">40분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s5">
+      <div class="st-body">
+        <div class="st-title">5. Few-shot 3건 (그중 1건은 되묻기) + Zero-shot 비교</div>
+        <div class="st-desc">예시는 <b>입력 → 출력 쌍</b>으로. 1건은 일부러 모호한 입력을 넣어 AI가 <b>되묻는</b> 흐름. Zero-shot 결과와 Few-shot 결과를 나란히 기록.</div>
+        <div class="st-out">→ <code>system-design.md</code> 예시 섹션 (가장 흔한 감점 구간)</div>
+      </div>
+      <div class="st-time">50분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s6">
+      <div class="st-body">
+        <div class="st-title">6. 환각 검증 질문 5개 + Pass/Fail 판정 (직접)</div>
+        <div class="st-desc">내가 정답을 아는 것만. 자료에 적힌 날짜·숫자·이름을 되묻는 방식이 안전. A(정답+근거) 또는 B(모른다+확인 절차) 중 <b>하나만 충족해도 Pass</b>.</div>
+        <div class="st-out">→ <code>system-design.md</code> 검증 전략 + 판정표</div>
+      </div>
+      <div class="st-time">40분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s7">
+      <div class="st-body">
+        <div class="st-title">7. 선정 모델로 10턴 이상 대화 + 로그 보존</div>
+        <div class="st-desc">중간에 <b>조건 변경 또는 추가 정보</b> 1회 이상, <b>같은 입력 2회 반복</b> 1회. 매 턴 끝날 때마다 메모장에 붙여두세요.</div>
+        <div class="st-out">→ <code>run-log.md</code> 대화 전문 + 작업 기록</div>
+      </div>
+      <div class="st-time">50분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s8">
+      <div class="st-body">
+        <div class="st-title">8. 로그에 지점 표시 + v2 개선 + 카테고리 3건</div>
+        <div class="st-desc">환각/문맥 끊김 지점에 표시 → 그중 1개를 줄이는 수정을 v2에 반영하고 <b>이유를 직접</b> 작성. 프롬프트 3건에 카테고리(페르소나 / 텍스트 생성) 표시.</div>
+        <div class="st-out">→ <code>system-design.md</code> v1 / v2 / 카테고리</div>
+      </div>
+      <div class="st-time">40분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s9">
+      <div class="st-body">
+        <div class="st-title">9. 미해결 2건 + GitHub 업로드</div>
+        <div class="st-desc">끝내 안 된 과업 2건(시도한 프롬프트 + 막힌 이유 직접 작성, 성공한 시도는 제외). 그리고 <b>Public</b> 저장소에 문서 4개 업로드 후 URL 제출.</div>
+        <div class="st-out">→ <code>unresolved.md</code> + 저장소 URL</div>
+      </div>
+      <div class="st-time">60분</div>
+    </label>
+  </div>
+</section>
+
+<!-- ============ 4. 과업 고르기 ============ -->
+<section id="task">
+  <h2><span class="num">4</span>과업 고르기 — 여기서 제일 많이 멈춥니다</h2>
+  <p class="lead">"내 업무"라고 생각하면 막힙니다. <b>반복되고 + 형식이 정해진 글</b>이면 무엇이든 과업이 됩니다.</p>
+
+  <div class="card">
+    <h3 style="margin-top:0">바로 쓸 수 있는 과업 예시</h3>
+    <div class="grid g3">
+      <div class="term"><h4>공지문</h4><p>행사·휴무·정책 변경을 사내 공지 형식으로</p></div>
+      <div class="term"><h4>고객 문의 답변</h4><p>자주 오는 문의를 정해진 톤으로 답변</p></div>
+      <div class="term"><h4>회의록 요약</h4><p>결정 사항만 3줄, 담당자·기한 포함</p></div>
+      <div class="term"><h4>보도자료 요약</h4><p>공개 자료를 3문장으로 정리</p></div>
+      <div class="term"><h4>행사 소개문</h4><p>같은 정보를 대상별로 다르게</p></div>
+      <div class="term"><h4>리뷰 답글</h4><p>긍정/부정 리뷰에 정해진 형식으로</p></div>
+    </div>
+  </div>
+
+  <div class="call danger">
+    <b>절대 쓰면 안 되는 소재</b>
+    개인정보(이름·연락처·주민번호·계좌)와 사내 기밀(미공개 실적·계약·인사)은 상용 AI에 입력 금지입니다.
+    공개 보도자료, 정부 보도자료, 위키 문서, <b>직접 만든 가상 회의록</b>으로 대체하세요.
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h3 style="margin-top:0">과업 정의 3종 세트 (이 3개를 한 문단으로)</h3>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th style="width:120px">항목</th><th>적는 내용</th><th>예시</th></tr>
+        <tr><td><b>타겟 사용자</b></td><td>이 결과를 누가 읽는가</td><td>회의에 참석하지 못한 팀원</td></tr>
+        <tr><td><b>입력 데이터 형태</b></td><td>무엇을 넣는가 (형태까지)</td><td>회의록 전문 텍스트</td></tr>
+        <tr><td><b>출력 규격</b></td><td>결과물의 형식·길이·필수 항목</td><td>3줄, 줄마다 담당자와 기한</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. 템플릿 ============ -->
+<section id="templates">
+  <h2><span class="num">5</span>산출물 4종 템플릿</h2>
+  <p class="lead">
+    빈칸(<span class="kbd">{...}</span>)만 채우면 됩니다. 오른쪽 위 <b>복사</b>를 눌러 <code>.md</code> 파일로 저장하세요.
+    <b>빨간 항목은 반드시 직접 작성</b>해야 하는 부분입니다.
+  </p>
+
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-tab="t1">① model-comparison.md</button>
+    <button class="tab" data-tab="t2">② system-design.md</button>
+    <button class="tab" data-tab="t3">③ run-log.md</button>
+    <button class="tab" data-tab="t4">④ unresolved.md</button>
+    <button class="tab" data-tab="t5">README.md (선택)</button>
+  </div>
+
+  <!-- T1 -->
+  <div class="panel on" id="t1">
+    <div class="call info" style="margin-bottom:12px">
+      <b>체크 포인트</b>
+      모델 3종 이상 · 버전과 실행 시점 필수 · 비교 기준 4개 이상 · 기준마다 점수와 근거 · 무료 요금제 1개 이상 표시 · 선정 결론은 직접 작성
+    </div>
+    <div class="code-wrap">
+      <button class="copy">복사</button>
+      <pre><code># LLM 모델 비교와 선정 보고서
+
+## 1. 과업 정의
+
+- 과업: {반복되는 과업 한 문장}
+- 타겟 사용자: {누가 읽는가}
+- 입력 데이터 형태: {무엇을 넣는가}
+- 출력 규격: {형식 / 길이 / 필수 항목}
+
+## 2. 비교 대상 모델
+
+| 구분 | 모델명 | 버전 | 요금제 | 실행 시점 |
+|---|---|---|---|---|
+| A | {예: ChatGPT} | {예: GPT-4o} | 무료 | 2026-11-17 |
+| B | {예: Claude} | {버전명} | {무료/유료} | 2026-11-17 |
+| C | {예: Gemini} | {버전명} | {무료/유료} | 2026-11-17 |
+
+> 무료 요금제 사용 가능 모델: {A}  ← 1개 이상 반드시 표시
+
+## 3. 비교 기준 (4개 이상)
+
+점수: 1~5 (클수록 좋음)
+
+| 비교 기준 | 모델 A | 모델 B | 모델 C | 근거 |
+|---|---|---|---|---|
+| 형식 준수 | { } | { } | { } | {예: A와 C는 3줄 유지, B는 5줄로 늘어남} |
+| 내용 누락 | { } | { } | { } | {예: A 1건, B 0건, C 2건 누락} |
+| 사실 오류 | { } | { } | { } | {예: C만 날짜 1건 오류} |
+| 지시 재확인(되묻기) | { } | { } | { } | {예: A만 되묻지 않고 임의로 채움} |
+| {추가 기준} | { } | { } | { } | { } |
+
+## 4. 선정 결론
+
+- 선정 모델: {모델명}
+- 선정 근거 (직접 작성): {예: 형식은 프롬프트로 고칠 수 있었으나,
+  내용 누락은 프롬프트를 3회 고쳐도 줄지 않아 누락이 적은 B를 골랐다.}
+- 이 과업에서 특히 중요하게 본 기준: { }</code></pre>
+    </div>
+  </div>
+
+  <!-- T2 -->
+  <div class="panel" id="t2">
+    <div class="call info" style="margin-bottom:12px">
+      <b>체크 포인트</b>
+      타겟 사용자·업무 문제 문장 · 페르소나 6항목 · Few-shot 3건(1건 되묻기) · Zero-shot vs Few-shot 비교 · 시스템/유저/템플릿 분리 · 검증 질문 5건+ · v1/v2 · 카테고리 3건
+    </div>
+    <div class="code-wrap">
+      <button class="copy">복사</button>
+      <pre><code># 시스템 설계 문서
+
+## 1. 타겟 사용자와 업무 문제
+
+- 타겟 사용자: {누가 쓰는가}
+- 업무 문제: {이 과업이 없을 때 어떤 불편이 있는가 — 문장으로}
+
+## 2. 페르소나
+
+| 항목 | 내용 |
+|---|---|
+| 이름 | { } |
+| 역할 | { } |
+| 전문 분야 | { } |
+| 말투 | { } |
+| 금지 사항 | {예: 자료에 없는 담당자·기한을 만들어 쓰지 않는다} |
+| 우선순위 | {예: 누락 없음이 형식보다 앞선다} |
+
+## 3. [카테고리: 페르소나] 시스템 프롬프트
+
+```
+{시스템 프롬프트 전문. 역할 + 출력 규칙 + 금지 사항 + 모르면 모른다고 답하라는 규칙}
+```
+
+## 4. [카테고리: 텍스트 생성] 유저 프롬프트
+
+```
+{이번 작업 지시 한 문장}
+```
+
+## 5. [카테고리: 텍스트 생성] 입력 템플릿 (그대로 복사해 재사용)
+
+```
+[업무 과업] {과업명}
+[원문] {자료 전문}
+[원하는 결과] {항목1 / 항목2 / 항목3}
+[톤] {예: 간결, 사내 공유용}
+[금지] {예: 추측성 표현 금지, 실명 대신 역할명}
+[확인 규칙] 정보가 부족하면 최대 3개까지 질문한 뒤 시작
+```
+
+## 6. Few-shot 예시 (3건 이상, 1건은 모호한 입력 → 되묻기)
+
+### 예시 1 (정상 입력)
+- 입력: { }
+- 출력: { }
+
+### 예시 2 (정상 입력)
+- 입력: { }
+- 출력: { }
+
+### 예시 3 (모호한 입력 → 되묻기) ★필수
+- 입력: {예: "지난 회의 정리해줘"}
+- 출력: {예: "어느 회의의 회의록인지, 정리 기준(결정만/전체)이 무엇인지
+  알려주시면 바로 정리하겠습니다."}
+
+## 7. Zero-shot vs Few-shot 비교
+
+| 구분 | 결과 | 관찰 |
+|---|---|---|
+| Zero-shot | {실제 결과 요약} | {예: 형식이 매번 달라짐} |
+| Few-shot 적용 | {실제 결과 요약} | {예: 3줄 형식이 유지됨} |
+
+- 단계적 추론 유도 추가 여부: {추가함 / 추가하지 않음}
+- 추가했다면 어느 단계에 넣었는지: { }
+
+## 8. 검증 전략 (대화 시작 전에 작성)
+
+- 의심할 대답: {예: 자료에 없는 날짜·담당자·수치를 만들어 내는 경우}
+- 확인 방법: {예: 원문과 대조, 원문에 없는 값은 Fail}
+- Pass 기준: A(정답 + 근거 제시) 또는 B(모른다/확인 필요 + 확인 절차 제안) 중 하나만 충족
+- Fail 기준: 둘 다 충족하지 못함
+
+## 9. 환각 검증 질문 5건 이상 (판정은 직접)
+
+| # | 검증 질문 | 기대 정답 | 판정 | 이유 |
+|---|---|---|---|---|
+| 1 | {원문에 적힌 날짜를 되묻기} | { } | Pass / Fail | { } |
+| 2 | {원문에 적힌 숫자} | { } | Pass / Fail | { } |
+| 3 | {원문에 없는 값 (모른다고 해야 함)} | 모른다 | Pass / Fail | { } |
+| 4 | { } | { } | Pass / Fail | { } |
+| 5 | { } | { } | Pass / Fail | { } |
+
+## 10. 프롬프트 v1 → v2
+
+### [프롬프트 v1]
+```
+{개선 전 프롬프트 원문}
+```
+
+### [카테고리: 텍스트 생성] [프롬프트 v2]
+```
+{개선 후 프롬프트 원문}
+```
+
+### v2에서 수정한 내용과 이유 (직접 작성)
+- 수정한 내용: { }
+- 수정한 이유: {예: 10턴에서 3줄 조건이 풀리는 문맥 끊김이 있어,
+  출력 규칙을 매 응답마다 자기 점검하도록 한 줄 추가했다.}
+
+## 11. 카테고리 표시 정리 (3건 이상)
+
+| 프롬프트 | 카테고리 | 비고 |
+|---|---|---|
+| 시스템 프롬프트 | 페르소나 | 역할·말투 지정 |
+| 입력 템플릿 | 텍스트 생성 | 글 생성 요청 |
+| 프롬프트 v2 | 텍스트 생성 | 글 생성 요청 |</code></pre>
+    </div>
+  </div>
+
+  <!-- T3 -->
+  <div class="panel" id="t3">
+    <div class="call info" style="margin-bottom:12px">
+      <b>체크 포인트</b>
+      10턴 이상 · 매 턴 <span class="kbd">User:</span> / <span class="kbd">AI:</span> 표기 · 조건 변경 또는 추가 정보 1회+ · 같은 입력 2회 반복 · 환각/문맥 끊김 지점 표시 · 작업 기록은 한 항목에 하나씩
+    </div>
+    <div class="code-wrap">
+      <button class="copy">복사</button>
+      <pre><code># 실행 로그
+
+- 사용 모델: {모델명 / 버전}
+- 실행 시점: {2026-11-17}
+- 적용한 시스템 프롬프트: {system-design.md 3번 항목과 동일}
+
+## 작업 기록
+
+- {과업 정의: 무엇을 어떤 문장으로 정했는지}
+- {모델 3종 비교: 어떤 프롬프트를 넣고 무엇을 표로 정리했는지}
+- {비교 기준 확정: 어떤 기준 4개로 좁혔는지}
+- {Zero-shot 실행: 어떤 입력으로 시도했고 결과가 어땠는지}
+- {Few-shot 적용: 예시 3건을 만들어 다시 실행한 결과}
+- {프롬프트 v1 작성: 어떤 내용이었는지}
+- {10턴 대화 시작: 어떤 시나리오로 시작했는지}
+- {중간에 막힌 지점: 무엇이 안 되어 어떻게 바꿨는지}
+- {프롬프트 v2 작성: 무엇을 왜 고쳤는지}
+- {v2로 재실행: 결과가 어떻게 달라졌는지}
+- {로그 정리: 지점 표시를 어디에 남겼는지}
+
+## 대화 전문 (편집하지 않음)
+
+[조건 변경] 표시 예시 / [반복 확인] 표시 예시 / [환각] / [문맥 끊김]
+
+User: {1턴 — 과업 요청}
+AI: {1턴 — 응답}
+
+User: {2턴 — 자료 제공}
+AI: {2턴 — 응답}
+
+User: {3턴}
+AI: {3턴}
+
+User: {4턴}
+AI: {4턴}
+
+User: {5턴 — 여기서 조건 변경 또는 추가 정보 제공}
+AI: {5턴}
+
+User: {6턴}
+AI: {6턴}
+
+User: {7턴}
+AI: {7턴}
+
+User: {8턴}
+AI: {8턴}
+
+User: {9턴 — 동일한 입력을 다시 넣어 결과가 같은지 확인} [반복 확인]
+AI: {9턴 — 첫 번째 결과와 비교해 무엇이 같고 달랐는지 기록}
+
+User: {10턴 — v1에서 아쉬웠던 지점을 다시 요청}
+AI: {10턴}
+
+## 지점 표시 정리
+
+| 턴 | 유형 | 내용 | 근거 |
+|---|---|---|---|
+| {n} | [환각] | {사실과 다른 대답} | {검증 질문 n번 Fail} |
+| {n} | [문맥 끊김] | {앞서 준 조건을 유지하지 못함} | {몇 턴에서 준 조건인지} |
+
+> 둘 다 없었다면: "환각과 문맥 끊김 모두 나타나지 않았다"라고 적어도 충족됩니다.
+> 대신 v2 수정 근거는 "지시와 가장 어긋난 응답" 1건으로 잡으세요.</code></pre>
+    </div>
+  </div>
+
+  <!-- T4 -->
+  <div class="panel" id="t4">
+    <div class="call info" style="margin-bottom:12px">
+      <b>체크 포인트</b>
+      2건 이상 · 과업마다 시도한 프롬프트 원문 · 막힌 이유는 <b>직접 작성</b> · 성공한 시도는 쓰지 않음 · 원인을 정확히 몰라도 "무엇을 시도했고 어디서 멈췄는지"가 있으면 충족
+    </div>
+    <div class="code-wrap">
+      <button class="copy">복사</button>
+      <pre><code># 미해결 기록
+
+> 프롬프트를 고쳐도 끝내 원하는 결과가 나오지 않은 과업만 적습니다.
+> 성공한 시도는 적지 않습니다.
+
+## [미해결 1] {과업 한 줄}
+
+- 시도한 프롬프트:
+```
+{실제로 입력한 프롬프트 원문}
+```
+
+- 받은 결과:
+  {무엇이 어떻게 잘못 나왔는지. 몇 회 반복했는지}
+
+- 막힌 이유 (직접 작성):
+  {예: 표 형식 자료에서 모델이 행 대응을 계속 놓치는 것 같다.
+  표를 텍스트로 풀면 되긴 했지만 매번 손으로 푸는 것은 자동화가 아니라
+  판단해 미해결로 남긴다.}
+
+## [미해결 2] {과업 한 줄}
+
+- 시도한 프롬프트:
+```
+{실제로 입력한 프롬프트 원문}
+```
+
+- 받은 결과:
+  { }
+
+- 막힌 이유 (직접 작성):
+  {무엇을 시도했고 어디서 멈췄는지}</code></pre>
+    </div>
+  </div>
+
+  <!-- T5 -->
+  <div class="panel" id="t5">
+    <div class="call info" style="margin-bottom:12px">
+      <b>선택 사항</b> 네 문서의 순서와 한 줄 소개만 있으면 됩니다. 평가자가 30초 안에 구조를 파악하게 해 줍니다.
+    </div>
+    <div class="code-wrap">
+      <button class="copy">복사</button>
+      <pre><code># B1-1 LLM 기반 업무 자동화
+
+과업: {한 줄}
+
+## 문서 안내
+
+1. [모델 비교와 선정](docs/model-comparison.md) — 3종 모델을 같은 기준으로 비교하고 선정한 이유
+2. [시스템 설계](docs/system-design.md) — 페르소나·프롬프트·예시·검증·개선 이력
+3. [실행 로그](docs/run-log.md) — 10턴 대화 전문과 작업 기록
+4. [미해결 기록](docs/unresolved.md) — 끝내 해결하지 못한 과업 2건
+
+## 폴더 구조
+
+```
+.
+|-- docs/
+|   |-- model-comparison.md
+|   |-- system-design.md
+|   |-- run-log.md
+|   `-- unresolved.md
+`-- README.md
+```
+
+## 참고
+
+- 사용 모델: {모델명 / 버전}
+- 실행 시점: {2026-11-17}</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. GitHub ============ -->
+<section id="github">
+  <h2><span class="num">6</span>GitHub 제출 — 유일하게 "컴퓨터"가 필요한 구간</h2>
+  <p class="lead">명령어는 하나도 필요 없습니다. 웹 화면에서 파일을 끌어다 놓으면 끝납니다. 6단계, 약 15분.</p>
+
+  <div class="card">
+    <div class="gh">
+      <div class="dot">1</div>
+      <div>
+        <h4>계정 만들기</h4>
+        <p>github.com → Sign up → 이메일 인증. 무료 플랜으로 충분합니다.</p>
+        <span class="path">github.com</span>
+      </div>
+    </div>
+    <div class="gh">
+      <div class="dot">2</div>
+      <div>
+        <h4>새 저장소 만들기</h4>
+        <p>오른쪽 위 <b>+</b> → New repository → 이름 입력 → <b>Public</b> 선택 → Create.</p>
+        <div class="call danger" style="margin-top:8px;padding:10px 12px">
+          <b>Private으로 만들면 평가자가 볼 수 없습니다.</b> 반드시 Public.
+        </div>
+      </div>
+    </div>
+    <div class="gh">
+      <div class="dot">3</div>
+      <div>
+        <h4><code>docs</code> 폴더 만들기</h4>
+        <p>Add file → Create new file → 파일명 칸에 <span class="kbd">docs/model-comparison.md</span> 처럼 슬래시를 넣으면 폴더가 자동으로 생깁니다.</p>
+        <span class="path">docs/model-comparison.md</span>
+      </div>
+    </div>
+    <div class="gh">
+      <div class="dot">4</div>
+      <div>
+        <h4>내용 붙여넣고 Commit</h4>
+        <p>위 템플릿에서 <b>복사</b> → 빈칸 채우기 → 붙여넣기 → 아래 <b>Commit changes</b>. 나머지 3개 문서도 같은 방법으로.</p>
+        <p class="mini" style="margin-top:6px">이미 만든 파일은 파일 화면 오른쪽 위 <b>연필</b> 아이콘으로 수정합니다.</p>
+      </div>
+    </div>
+    <div class="gh">
+      <div class="dot">5</div>
+      <div>
+        <h4>최종 확인</h4>
+        <p>저장소 첫 화면에서 <code>docs/</code> 안에 파일 4개가 보이는지 확인. 클릭해서 내용이 깨지지 않았는지도 봅니다.</p>
+        <span class="path">저장소 → docs → 파일 4개</span>
+      </div>
+    </div>
+    <div class="gh">
+      <div class="dot">6</div>
+      <div>
+        <h4>URL 복사해서 제출</h4>
+        <p>주소창의 <span class="kbd">https://github.com/내아이디/저장소이름</span> 을 그대로 제출합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="call warn">
+      <b>계정 이메일에 대해</b>
+      문서 본문에는 이메일을 적지 마세요(제약사항). 다만 GitHub 커밋 기록에는 계정 이메일이 남을 수 있습니다.
+      신경 쓰이면 GitHub 설정의 이메일 공개 옵션을 확인하세요.
+    </div>
+    <div class="call ok">
+      <b>PDF 대신 Markdown을 권합니다</b>
+      PDF로 내면 대화 로그의 줄바꿈·공백이 깨져 "편집하지 않은 원문" 요건이 흔들립니다.
+      <span class="kbd">.md</span>를 그대로 올리는 게 가장 안전합니다.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. 함정 ============ -->
+<section id="traps">
+  <h2><span class="num">7</span>가장 흔한 함정 5개</h2>
+  <p class="lead">잘 만들어놓고 여기서 감점되는 경우가 대부분입니다. 제출 전에 하나씩 확인하세요.</p>
+
+  <div class="card">
+    <div class="trap">
+      <div class="n">1</div>
+      <div>
+        <h4>Few-shot 3건 중 "모호한 입력 → 되묻기" 1건 누락</h4>
+        <p>예시 3개를 정상 입력으로만 채우면 요구사항 미충족입니다. 1건은 반드시 <b>일부러 모호하게</b> 넣고 AI가 질문하게 만드세요.</p>
+      </div>
+    </div>
+    <div class="trap">
+      <div class="n">2</div>
+      <div>
+        <h4>모델 버전·실행 시점 미기록</h4>
+        <p>제약사항 위반이고, 비교표의 대상 자체가 확인 불가가 됩니다. 모델 선택기 화면을 스크린샷으로 남겨두면 안전합니다.</p>
+      </div>
+    </div>
+    <div class="trap">
+      <div class="n">3</div>
+      <div>
+        <h4>로그를 "정리"해서 편집</h4>
+        <p>오타 수정, 문장 다듬기, 중간 생략 모두 위험합니다. 화자 표기와 지점 표시만 덧붙이세요.</p>
+      </div>
+    </div>
+    <div class="trap">
+      <div class="n">4</div>
+      <div>
+        <h4>판단 4종을 AI에게 대신 쓰게 함</h4>
+        <p>모델 선택 이유 · 수정 이유 · 막힌 이유 · Pass/Fail 판정. 이 네 개는 반드시 본인 문장이어야 합니다.</p>
+      </div>
+    </div>
+    <div class="trap">
+      <div class="n">5</div>
+      <div>
+        <h4>저장소를 Private으로 생성</h4>
+        <p>Settings → General 맨 아래 Danger Zone에서 Public으로 바꿀 수 있습니다. 제출 직전에 주소창을 열어 로그아웃 상태에서도 보이는지 확인하면 확실합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. FAQ ============ -->
+<section id="faq">
+  <h2><span class="num">8</span>막힐 때 FAQ</h2>
+  <p class="lead">실제로 가장 많이 나오는 질문들입니다. 접어두었으니 필요한 것만 펼쳐 보세요.</p>
+
+  <details>
+    <summary>시스템 프롬프트를 어디에 넣어야 하나요?</summary>
+    <div class="ans">
+      서비스마다 위치가 다릅니다. ChatGPT는 설정의 '사용자 지정 지침', Claude는 '프로젝트 지침', Gemini는 'Gem'입니다.
+      찾다가 시간을 다 쓰는 경우가 많으니, 미션에서 허용된 <b>대화 첫 메시지로 넣는 방식</b>을 쓰세요.
+      첫 메시지에 시스템 프롬프트를 붙이고, 그다음부터 과업 대화를 시작하면 됩니다. 로그에도 그대로 남습니다.
+    </div>
+  </details>
+
+  <details>
+    <summary>무료 모델만 있어도 되나요?</summary>
+    <div class="ans">
+      됩니다. 오히려 세 종 중 <b>하나 이상은 무료 요금제</b>여야 한다는 조건이 있으니 무료 모델이 필요합니다.
+      주의할 점은 무료 한도입니다. 모델 비교는 짧은 입력으로 하고, 10턴 대화는 한도가 넉넉한 모델로 하세요.
+      대화 도중 한도가 소진되면 로그가 끊기므로, 넉넉한 모델을 먼저 확인하는 게 좋습니다.
+    </div>
+  </details>
+
+  <details>
+    <summary>같은 입력을 두 번 넣었는데 답이 달라요. 실패인가요?</summary>
+    <div class="ans">
+      아닙니다. <b>정상이고, 그게 관찰 결과입니다.</b> LLM은 확률적으로 문장을 생성하므로 같은 입력에도 결과가 달라질 수 있습니다.
+      "동일 입력 2회에서 A는 같았고 B는 3줄이 5줄로 늘었다"처럼 <b>무엇이 같고 무엇이 달랐는지</b>를 적으면 그대로 요구사항 충족입니다.
+    </div>
+  </details>
+
+  <details>
+    <summary>10턴이 User 10번인가요, User+AI 합쳐서인가요?</summary>
+    <div class="ans">
+      <b>발화 하나가 1턴</b>입니다. 그래서 User 5번 + AI 5번 = 10턴입니다.
+      여유 있게 12~14턴 정도 만들면 조건 변경·반복 확인을 넣어도 10턴을 넘깁니다.
+    </div>
+  </details>
+
+  <details>
+    <summary>환각이 하나도 안 나왔어요. 어떻게 하죠?</summary>
+    <div class="ans">
+      그럴 수 있습니다. 미션도 "둘 다 나타나지 않았으면 나타나지 않았다고 적어도 충족"이라고 명시합니다.
+      다만 그 경우 v2 수정 근거는 <b>지시와 가장 어긋난 응답 1개</b>를 골라 그것을 고치는 수정으로 잡아야 합니다.
+      그래서 대화 중 "이건 좀 어긋났다" 싶은 응답은 미리 메모해 두세요.
+    </div>
+  </details>
+
+  <details>
+    <summary>Pass/Fail 판정 기준이 두 개라는데, 둘 다 맞아야 하나요?</summary>
+    <div class="ans">
+      아닙니다. <b>하나만 충족해도 Pass</b>입니다.
+      기준 A = 정답을 맞히고 근거를 함께 제시. 기준 B = 모를 때 "모른다" 또는 "확인 필요"를 밝히고 확인 절차를 제안.
+      둘 다 못 하면 Fail입니다. 이걸 모르면 전부 Fail로 적게 됩니다.
+    </div>
+  </details>
+
+  <details>
+    <summary>미해결 기록에 뭘 써야 하나요? 다 성공했는데요.</summary>
+    <div class="ans">
+      실제로 하다 보면 <b>됩니다.</b> 안 되면 그게 미해결입니다. 억지로 만들 필요는 없지만, "완벽하게 못 한 것"을 실패로 인정하기 어려워 여기서 많이 멈춥니다.
+      본인 잘못이 아니라 <b>모델이나 프롬프트의 한계</b>로 적으면 됩니다. 원인을 정확히 몰라도 "무엇을 시도했고 어디서 멈췄는지"가 있으면 충족입니다.
+      성공한 시도는 쓰지 마세요.
+    </div>
+  </details>
+
+  <details>
+    <summary>회사 업무 자료를 넣어도 되나요?</summary>
+    <div class="ans">
+      안 됩니다. 개인정보와 사내 기밀은 상용 AI에 입력 금지입니다.
+      공개 보도자료, 정부 보도자료, 위키 문서, 또는 <b>직접 만든 가상 회의록</b>으로 대체하세요.
+      과업의 형식만 유지하면 되므로 실제 회사 자료일 필요는 없습니다.
+    </div>
+  </details>
+
+  <details>
+    <summary>보너스 과제는 꼭 해야 하나요?</summary>
+    <div class="ans">
+      아닙니다. 게다가 <b>3개를 모두 완료해야만</b> 크레딧이 지급됩니다(부분 점수 없음).
+      3번(Google Apps Script + API 키)이 비전공자에게 가장 어렵습니다.
+      다만 "결제수단 문제로 키를 발급하지 못해도 그 사실을 적으면 충족", "다른 도구로 수행해도 되고 바꾼 이유를 적으면 충족"이라는 탈출구가 있습니다.
+      <b>본편 4개 문서를 끝낸 뒤</b> 여유가 있을 때만 손대세요.
+    </div>
+  </details>
+
+  <details>
+    <summary>소요 시간이 얼마나 걸릴까요?</summary>
+    <div class="ans">
+      퍼실리테이션 가이드는 5시간으로 잡지만, 비전공자는 <b>8~12시간</b>으로 보는 게 현실적입니다.
+      가장 오래 걸리는 구간은 ①환각 검증 Pass/Fail 판정 ②Few-shot 되묻기 예시 ③GitHub 업로드입니다.
+      반대로 10턴 대화와 프롬프트 작성은 생각보다 빨리 끝납니다.
+    </div>
+  </details>
+
+  <div class="call warn" style="margin-top:18px">
+    <b>미션 문서를 읽다가 헷갈리는 지점</b>
+    <code>mission_details.md</code>의 요구사항에는 번호가 없는데 본문은 "요구사항 6", "요구사항 8"처럼 계속 참조합니다.
+    위에서부터 <b>1. 과업 선정 / 2. 모델 3종 비교 / 3. 페르소나 설계 / 4. 프롬프트와 예시 작성 / 5. 대화 수행과 작업 기록 /
+    6. 검증 전략과 환각 검증 / 7. 로그 지점 표시 / 8. 프롬프트 개선과 카테고리 / 9. 미해결 기록</b> 으로 세면 맞습니다.
+    또한 <code>guide.html</code>은 "결과물 3종"이라고 쓰지만 실제 산출물은 <b>4종</b>입니다. 4종을 기준으로 하세요.
+  </div>
+</section>
+
+<footer>
+  <div>B1-1 · LLM 기반 업무 자동화 · 비전공자 시작 가이드</div>
+  <div style="margin-top:6px">이 페이지는 오프라인에서도 열립니다. 체크리스트는 이 브라우저에만 저장되며 외부로 전송되지 않습니다.</div>
+  <button class="reset" id="reset">진행률 초기화</button>
+</footer>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- 체크리스트 ---------- */
+  var KEY = "b1-1-checklist-v1";
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('#steps input[type=checkbox]'));
+  var fill  = document.getElementById('pFill');
+  var pText = document.getElementById('pText');
+
+  function load(){
+    var s = {};
+    try { s = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e){ s = {}; }
+    boxes.forEach(function(b){ b.checked = !!s[b.dataset.k]; });
+  }
+  function save(){
+    var s = {};
+    boxes.forEach(function(b){ if(b.checked) s[b.dataset.k] = 1; });
+    try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e){}
+  }
+  function render(){
+    var done = boxes.filter(function(b){ return b.checked; }).length;
+    var pct = Math.round(done / boxes.length * 100);
+    fill.style.width = pct + "%";
+    pText.textContent = done + " / " + boxes.length + " 완료";
+    boxes.forEach(function(b){
+      b.closest('.step').classList.toggle('done', b.checked);
+    });
+  }
+
+  load(); render();
+
+  boxes.forEach(function(b){
+    b.addEventListener('change', function(){ save(); render(); });
+  });
+
+  document.getElementById('reset').addEventListener('click', function(){
+    boxes.forEach(function(b){ b.checked = false; });
+    save(); render();
+    toast("진행률을 초기화했습니다");
+  });
+
+  /* ---------- 탭 ---------- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){ x.classList.remove('on'); });
+      document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('on'); });
+      t.classList.add('on');
+      var panel = document.getElementById(t.dataset.tab);
+      if(panel) panel.classList.add('on');
+    });
+  });
+
+  /* ---------- 복사 ---------- */
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly','');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '0';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch(e){ ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function copyText(text, cb){
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function(){ cb(true); }, function(){ cb(fallbackCopy(text)); });
+    } else {
+      cb(fallbackCopy(text));
+    }
+  }
+
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 1900);
+  }
+
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var pre = btn.parentElement.querySelector('pre');
+      if(!pre) return;
+      copyText(pre.textContent, function(ok){
+        if(ok){
+          var old = btn.textContent;
+          btn.textContent = "복사됨 ✓";
+          btn.classList.add('done');
+          toast("템플릿을 복사했습니다");
+          setTimeout(function(){
+            btn.textContent = old;
+            btn.classList.remove('done');
+          }, 1600);
+        } else {
+          toast("복사에 실패했습니다. 텍스트를 직접 선택해 주세요");
+        }
+      });
+    });
+  });
+
+  /* ---------- 스크롤 시 네비 활성 표시 (가벼운 버전) ---------- */
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav a'));
+  var sections = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){
+          links.forEach(function(a){ a.style.color = ""; a.style.borderBottomColor = "transparent"; });
+          var i = sections.indexOf(en.target);
+          if(i > -1){ links[i].style.color = "var(--blue)"; links[i].style.borderBottomColor = "var(--blue)"; }
+        }
+      });
+    }, { rootMargin: "-70px 0px -70% 0px" });
+    sections.forEach(function(s){ if(s) io.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>

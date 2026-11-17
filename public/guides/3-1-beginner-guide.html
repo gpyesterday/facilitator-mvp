@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B1-3 비전공자 시작 가이드 · 노코드 자동화 워크플로우</title>
+<style>
+  :root{
+    --blue:#2563eb; --blue-dark:#1d4ed8; --purple:#7c3aed;
+    --green:#059669; --amber:#d97706; --red:#dc2626;
+    --bg:#f1f3f7; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
+    --line:#e5e7eb; --soft:#f8fafc;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+    --radius:12px;
+    --shadow:0 2px 10px rgba(15,23,42,.07);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:76px}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.68;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+
+  /* ---------- header ---------- */
+  header{
+    background:linear-gradient(135deg,#1e3a8a 0%,var(--blue) 45%,var(--purple) 100%);
+    color:#fff;padding:44px 0 38px;
+  }
+  .badge{
+    display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;
+    background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
+    padding:4px 12px;border-radius:999px;margin-bottom:14px;
+  }
+  header h1{font-size:clamp(22px,3.4vw,32px);line-height:1.32;letter-spacing:-.02em}
+  header p.sub{margin-top:10px;font-size:15px;color:rgba(255,255,255,.88);max-width:740px}
+  .hstats{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+  .hstat{
+    background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);
+    border-radius:10px;padding:9px 15px;font-size:13px;
+  }
+  .hstat b{display:block;font-size:17px;margin-bottom:1px}
+  .pbar-wrap{margin-top:24px}
+  .pbar-top{display:flex;justify-content:space-between;font-size:13px;color:rgba(255,255,255,.9);margin-bottom:7px}
+  .pbar{height:9px;background:rgba(255,255,255,.22);border-radius:99px;overflow:hidden}
+  .pbar-fill{height:100%;width:0;background:#fff;border-radius:99px;transition:width .35s ease}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{display:flex;gap:4px;overflow-x:auto;padding:0 20px;scrollbar-width:none}
+  nav .wrap::-webkit-scrollbar{display:none}
+  nav a{
+    flex:none;padding:14px 12px;font-size:13.5px;font-weight:600;color:var(--muted);
+    text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;
+  }
+  nav a:hover{color:var(--blue);border-bottom-color:var(--blue)}
+
+  /* ---------- sections ---------- */
+  section{padding:46px 0 6px}
+  h2{
+    font-size:21px;letter-spacing:-.01em;margin-bottom:6px;
+    display:flex;align-items:center;gap:10px;
+  }
+  h2 .num{
+    flex:none;width:28px;height:28px;border-radius:8px;background:var(--blue);color:#fff;
+    font-size:14px;display:grid;place-items:center;font-weight:700;
+  }
+  .lead{color:var(--muted);font-size:14.5px;margin:2px 0 20px;max-width:800px}
+  h3{font-size:15.5px;margin:24px 0 10px}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px;box-shadow:var(--shadow);margin-bottom:16px;
+  }
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+
+  /* callouts */
+  .call{border-radius:10px;padding:14px 16px;font-size:14px;border-left:4px solid}
+  .call b{display:block;margin-bottom:4px;font-size:13.5px}
+  .call.warn{background:#fffbeb;border-color:var(--amber);color:#78350f}
+  .call.danger{background:#fef2f2;border-color:var(--red);color:#7f1d1d}
+  .call.ok{background:#ecfdf5;border-color:var(--green);color:#065f46}
+  .call.info{background:#eff6ff;border-color:var(--blue);color:#1e3a8a}
+
+  /* pieces */
+  .mini{font-size:13.5px;color:var(--muted)}
+  .kbd{
+    font-family:var(--mono);font-size:12.5px;background:#eef2ff;color:#3730a3;
+    border:1px solid #c7d2fe;border-radius:5px;padding:1px 6px;
+  }
+  .tag{
+    display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;
+    background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;
+  }
+  .tag.free{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}
+  .tag.pain{background:#fef2f2;color:#991b1b;border-color:#fecaca}
+
+  /* term cards */
+  .term{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .term h4{font-size:14px;margin-bottom:6px;color:var(--blue-dark)}
+  .term p{font-size:13.5px;color:#374151}
+  .term .ex{font-size:12.5px;color:var(--muted);margin-top:7px;border-top:1px dashed var(--line);padding-top:7px}
+
+  /* checklist */
+  .step{
+    display:flex;gap:14px;background:var(--card);border:1px solid var(--line);
+    border-radius:10px;padding:15px 17px;margin-bottom:9px;transition:.18s;
+  }
+  .step:hover{border-color:#c7d2fe;box-shadow:var(--shadow)}
+  .step.done{background:#f6fdf9;border-color:#bbf7d0}
+  .step.done .st-title{text-decoration:line-through;color:var(--muted)}
+  .step input{
+    appearance:none;flex:none;width:21px;height:21px;border:2px solid #cbd5e1;border-radius:6px;
+    margin-top:2px;cursor:pointer;position:relative;background:#fff;
+  }
+  .step input:checked{background:var(--green);border-color:var(--green)}
+  .step input:checked::after{
+    content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;
+    border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);
+  }
+  .st-body{flex:1;min-width:0}
+  .st-title{font-size:14.5px;font-weight:700;margin-bottom:3px}
+  .st-desc{font-size:13.5px;color:#4b5563}
+  .st-out{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .st-out code{font-family:var(--mono);font-size:12px;background:var(--soft);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+  .st-time{flex:none;font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap;padding-top:3px}
+
+  /* tabs */
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+  .tab{
+    border:1px solid var(--line);background:#fff;color:var(--muted);font-size:13.5px;
+    font-weight:700;padding:9px 15px;border-radius:9px;cursor:pointer;transition:.15s;
+    font-family:inherit;
+  }
+  .tab:hover{border-color:#c7d2fe;color:var(--blue)}
+  .tab.on{background:var(--blue);border-color:var(--blue);color:#fff}
+  .panel{display:none}
+  .panel.on{display:block;animation:fade .2s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  /* code blocks */
+  .code-wrap{position:relative;margin:10px 0 4px}
+  .code-wrap pre{
+    background:#0f172a;color:#e2e8f0;border-radius:10px;padding:16px 16px 18px;
+    overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.72;
+    white-space:pre;tab-size:2;
+  }
+  .code-wrap pre code{font-family:inherit}
+  .copy{
+    position:absolute;top:9px;right:9px;background:rgba(255,255,255,.12);color:#e2e8f0;
+    border:1px solid rgba(255,255,255,.22);border-radius:7px;font-size:11.5px;font-weight:700;
+    padding:5px 10px;cursor:pointer;font-family:inherit;transition:.15s;
+  }
+  .copy:hover{background:rgba(255,255,255,.24)}
+  .copy.done{background:var(--green);border-color:var(--green);color:#fff}
+
+  /* github steps */
+  .gh{display:flex;gap:14px;margin-bottom:14px}
+  .gh .dot{
+    flex:none;width:26px;height:26px;border-radius:50%;background:#0f172a;color:#fff;
+    font-size:12.5px;font-weight:700;display:grid;place-items:center;margin-top:2px;
+  }
+  .gh h4{font-size:14.5px;margin-bottom:4px}
+  .gh p{font-size:13.5px;color:#4b5563}
+  .gh .path{
+    display:inline-block;font-family:var(--mono);font-size:12px;background:var(--soft);
+    border:1px solid var(--line);border-radius:5px;padding:2px 7px;margin-top:6px;color:#334155;
+  }
+
+  /* traps */
+  .trap{display:flex;gap:13px;padding:14px 0;border-bottom:1px dashed var(--line)}
+  .trap:last-child{border-bottom:0}
+  .trap .n{
+    flex:none;width:24px;height:24px;border-radius:7px;background:#fef2f2;color:var(--red);
+    font-size:12.5px;font-weight:800;display:grid;place-items:center;margin-top:2px;
+    border:1px solid #fecaca;
+  }
+  .trap h4{font-size:14px;margin-bottom:2px}
+  .trap p{font-size:13.5px;color:#4b5563}
+
+  /* faq */
+  details{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    margin-bottom:8px;overflow:hidden;
+  }
+  details[open]{border-color:#c7d2fe}
+  summary{
+    cursor:pointer;padding:14px 17px;font-size:14px;font-weight:700;
+    list-style:none;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"＋";flex:none;color:var(--blue);font-weight:700}
+  details[open] summary::after{content:"−"}
+  details .ans{padding:0 17px 15px;font-size:13.5px;color:#4b5563;border-top:1px solid var(--line);padding-top:12px}
+
+  /* table */
+  .tbl-scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:560px}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:var(--soft);font-weight:700;font-size:13px}
+  td code{font-family:var(--mono);font-size:12px;background:var(--soft);padding:1px 5px;border-radius:4px}
+
+  /* level dots */
+  .lv{font-weight:700;white-space:nowrap}
+  .lv.e{color:var(--green)} .lv.m{color:var(--amber)} .lv.h{color:var(--red)}
+
+  /* toast */
+  #toast{
+    position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);
+    background:#0f172a;color:#fff;font-size:13.5px;font-weight:600;
+    padding:11px 20px;border-radius:9px;opacity:0;pointer-events:none;
+    transition:.22s;z-index:200;
+  }
+  #toast.show{opacity:1;transform:translate(-50%,0)}
+
+  footer{
+    margin-top:52px;padding:26px 0 40px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted);text-align:center;
+  }
+  .reset{
+    margin-top:12px;background:none;border:1px solid var(--line);color:var(--muted);
+    font-size:12.5px;padding:7px 14px;border-radius:8px;cursor:pointer;font-family:inherit;
+  }
+  .reset:hover{border-color:var(--red);color:var(--red)}
+
+  @media (max-width:560px){
+    .st-time{display:none}
+    header{padding:34px 0 30px}
+  }
+  @media print{
+    nav,.copy,#toast,.reset{display:none}
+    body{background:#fff}
+    .panel{display:block!important}
+    .card,.step{box-shadow:none;break-inside:avoid}
+    .code-wrap pre{background:#f8fafc;color:#0f172a;border:1px solid var(--line)}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <span class="badge">B1-3 · AI Tools Essentials · 난이도 2</span>
+    <h1>비전공자 시작 가이드</h1>
+    <p class="sub">
+      "컴퓨터를 잘 못 다뤄도 끝낼 수 있나?" — <b>됩니다. 단, 순서를 지켜야 합니다.</b>
+      이 미션의 진짜 벽은 코딩이 아니라 <b>무료 요금제의 제약</b>과 <b>증빙 캡처 타이밍</b>입니다.
+      도구를 고르기 전에 확인할 것, 실행 전에 캡처할 것을 이 페이지에서 먼저 정리합니다.
+    </p>
+    <div class="hstats">
+      <div class="hstat"><b>10~16시간</b>비전공자 예상 소요 (가이드 배정 30시간)</div>
+      <div class="hstat"><b>3종</b>제출 산출물</div>
+      <div class="hstat"><b>10단계</b>체크리스트</div>
+      <div class="hstat"><b>0줄</b>필요한 코드 (시도는 실패해도 충족)</div>
+    </div>
+    <div class="pbar-wrap">
+      <div class="pbar-top"><span>내 진행률</span><span id="pText">0 / 10 완료</span></div>
+      <div class="pbar"><div class="pbar-fill" id="pFill"></div></div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap">
+    <a href="#mind">마음가짐</a>
+    <a href="#terms">용어 10개</a>
+    <a href="#tool">도구 고르기</a>
+    <a href="#checklist">10단계 체크리스트</a>
+    <a href="#scenario">시나리오 고르기</a>
+    <a href="#shots">캡처 순서</a>
+    <a href="#templates">산출물 템플릿</a>
+    <a href="#github">GitHub 제출</a>
+    <a href="#traps">함정 7개</a>
+    <a href="#faq">막힐 때 FAQ</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ============ 1. 마음가짐 ============ -->
+<section id="mind">
+  <h2><span class="num">1</span>먼저 이것만 알고 시작하세요</h2>
+  <p class="lead">
+    이 미션은 "코딩 없이 업무를 자동화하는 도구 두 개를 비교하고, 하나를 골라 실제로 돌려 보고, 못 만든 것을 기록하는" 과제입니다.
+    코드는 요구하지 않고, <b>코드 시도는 실패해도 요구사항이 충족</b>됩니다.
+  </p>
+
+  <div class="grid g2">
+    <div class="call danger">
+      <b>직접 써야 하는 판단 4종 (AI 대행 금지)</b>
+      ① 도구를 고른 이유 &nbsp;② 무엇이 왜 막혔는지(한계 기록)<br>
+      ③ 코드 시도에서 무엇을 판단했는지 &nbsp;④ 분기를 어떤 기준으로 나눴는지<br>
+      <span style="display:inline-block;margin-top:7px;font-size:13px">
+        미션 문서가 명시한 조건입니다. 이 네 개를 AI가 대신 쓰면 "왜 그렇게 설계했는지"를 확인할 수 없어 감점됩니다.
+        평가 인터뷰에서도 그대로 물어봅니다.
+      </span>
+    </div>
+    <div class="call ok">
+      <b>AI에게 맡겨도 되는 일</b>
+      워크플로우 설계 아이디어 묻기, 비교표 초안, 문서 문장 교정, 마크다운 정리,
+      막힌 기능의 코드 작성 요청. <br>
+      <span style="display:inline-block;margin-top:7px;font-size:13px">
+        단, <b>결과를 그대로 베끼지 말고 "내가 판단한 것"과 구분</b>해서 쓰세요.
+        코드 요청 프롬프트는 산출물 3의 증빙이 되므로 반드시 남겨야 합니다.
+      </span>
+    </div>
+  </div>
+
+  <div class="call warn" style="margin-top:4px">
+    <b>제일 중요한 규칙 하나 — 캡처는 "나중에"가 아니라 "지금"</b>
+    무료 요금제는 실행 횟수에 한도가 있습니다. 같은 워크플로우를 도구 2개로 만들면 실행 한도도 2배로 소모됩니다.
+    미션 문서도 <b>"한도가 남아 있을 때 도구마다 먼저 캡처하라"</b>고 경고합니다. 만들자마자 캡처하는 습관이 없으면 마지막에 증빙이 없습니다.
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin-top:0">이 미션에서 실제로 "어려운 것"은 어디인가</h3>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th style="width:230px">구간</th><th style="width:96px">난이도</th><th>비전공자가 막히는 이유</th></tr>
+        <tr><td>업무 정의·문서 작성</td><td><span class="lv e">쉬움</span></td><td>글쓰기 문제. AI 도움 충분</td></tr>
+        <tr><td>도구 A 구현</td><td><span class="lv m">보통</span></td><td>첫 도구는 안내를 따라가면 됨</td></tr>
+        <tr><td>도구 B에 <b>같은</b> 워크플로우 재구현</td><td><span class="lv h">어려움</span></td><td>UI·용어가 완전히 달라 "같게" 만드는 감각이 필요</td></tr>
+        <tr><td>무료 요금제에서 분기 블록 확보</td><td><span class="lv h">최대 위험</span></td><td>도구에 따라 분기·다단계가 유료. 여기서 프로젝트 1이 붕괴</td></tr>
+        <tr><td>생성형 AI 액션 연결</td><td><span class="lv h">어려움</span></td><td>API 키, 크레딧, 모델 선택, 무료 범위</td></tr>
+        <tr><td>분기 양쪽 경로 실행 + 캡처</td><td><span class="lv h">어려움</span></td><td>반대 조건의 테스트 데이터를 <b>일부러</b> 만들어야 함</td></tr>
+        <tr><td>트리거 자동 실행 이력 캡처</td><td><span class="lv m">보통~어려움</span></td><td>무료는 즉시가 아니라 주기 확인(폴링)인 경우가 많음</td></tr>
+        <tr><td>한계 3건 + 코드 1건 시도</td><td><span class="lv e">쉬움</span></td><td>실패 허용. 적기만 하면 됨</td></tr>
+        <tr><td>GitHub 저장소 만들어 URL 제출</td><td><span class="lv h">어려움</span></td><td>모르면 무한정 막히는 유형(웹 업로드로 해결)</td></tr>
+        <tr><td>(보너스) Apps Script 웹앱 배포</td><td><span class="lv h">매우 어려움</span></td><td>선택 사항. 건너뛰어도 필수 요구사항 충족</td></tr>
+      </table>
+    </div>
+    <p class="mini" style="margin-top:10px">
+      요약: <b>개념·문서는 쉽고, 도구 세팅·증빙은 어렵습니다.</b> 어려운 쪽은 "능력"이 아니라 "확인 목록" 문제라서, 아래 3번(도구 고르기)과 6번(캡처 순서)만 지키면 난이도가 크게 낮아집니다.
+    </p>
+  </div>
+</section>
+
+<!-- ============ 2. 용어 ============ -->
+<section id="terms">
+  <h2><span class="num">2</span>용어 10개만 잡으면 과제가 보입니다</h2>
+  <p class="lead">컴퓨터 지식이 아니라 어휘 문제입니다. 아래 10개를 자기 말로 설명할 수 있으면 문서가 읽힙니다. (평가 인터뷰에서 1·2·3번은 반드시 나옵니다)</p>
+
+  <div class="grid g2">
+    <div class="term">
+      <h4>① 트리거 (Trigger · 시작 조건)</h4>
+      <p>"<b>언제</b> 자동화를 시작할까"를 정하는 것. 폼 제출, 새 메일 도착, 정해진 시간 등.</p>
+      <div class="ex">예: 구글 폼에 새 응답이 저장되었을 때</div>
+    </div>
+    <div class="term">
+      <h4>② 액션 (Action · 실행 동작)</h4>
+      <p>"시작된 다음 <b>무엇을</b> 할까". 시트에 한 줄 추가, 메시지 보내기 등. 이 미션은 <b>2개 이상</b> 필요합니다.</p>
+      <div class="ex">예: 요약문을 시트에 한 줄 추가</div>
+    </div>
+    <div class="term">
+      <h4>③ 조건 분기 / Filter / Router</h4>
+      <p><b>Filter</b> = 통과시킬지 말지(2갈래). <b>Router</b> = 어디로 보낼지(여러 갈래). 이 미션은 <b>1개 이상</b> + <b>경로마다 실행 증빙</b>이 필요합니다.</p>
+      <div class="ex">예: 만족도 점수가 3점 이하인 응답과 나머지로 나눔</div>
+    </div>
+    <div class="term">
+      <h4>④ 생성형 AI 액션</h4>
+      <p>워크플로우 <b>안에서</b> AI가 분류·요약·문장 생성을 하는 단계. 이 미션의 <b>필수 액션</b>입니다.</p>
+      <div class="ex">예: 응답 내용을 한 문장으로 요약해 다음 단계로 넘김</div>
+    </div>
+    <div class="term">
+      <h4>⑤ 시나리오 / Zap / 워크플로우</h4>
+      <p>도구마다 부르는 이름만 다르고 같은 뜻입니다. "트리거부터 마지막 액션까지 이어진 자동화 한 벌".</p>
+      <div class="ex">Make는 Scenario, Zapier는 Zap, n8n은 Workflow</div>
+    </div>
+    <div class="term">
+      <h4>⑥ 실행 1회 (Operation / Task / Execution)</h4>
+      <p>액션 하나를 처리할 때마다 1회씩 차감되는 경우가 많습니다. <b>액션 3개짜리 워크플로우를 1번 돌리면 3회 소모</b>일 수 있습니다.</p>
+      <div class="ex">무료 한도 예: 월 1,000회 / 월 100회 / 체험 기간제 — 도구마다 다름</div>
+    </div>
+    <div class="term">
+      <h4>⑦ 폴링 (주기 확인)</h4>
+      <p>"새 메일 있나?"를 몇 분마다 물어보는 방식. 무료 요금제는 간격이 길어(예: 15분) <b>즉시 실행되지 않습니다</b>.</p>
+      <div class="ex">반대말: 웹훅(Webhook) = 이벤트가 생기면 즉시 알려줌</div>
+    </div>
+    <div class="term">
+      <h4>⑧ 웹훅 (Webhook)</h4>
+      <p>다른 서비스가 "지금 데이터 보냈어"라고 밀어주는 주소. 즉시 실행이 필요할 때 씁니다. 무료 플랜에서 막히는 경우가 있으니 확인 필요.</p>
+      <div class="ex">예: 설문 도구 → 웹훅 → 자동화 시작</div>
+    </div>
+    <div class="term">
+      <h4>⑨ 변수·필드 매핑 (이전 단계 값 넘기기)</h4>
+      <p>앞 단계의 출력(예: AI 요약문)을 뒤 단계 입력칸에 <b>꽂는</b> 작업. 이게 이 미션의 핵심 증빙입니다.</p>
+      <div class="ex">예: AI 요약 → 시트의 "요약" 열에 매핑</div>
+    </div>
+    <div class="term">
+      <h4>⑩ API 키 / 실행 이력</h4>
+      <p><b>API 키</b> = 외부 AI 서비스를 부를 때 쓰는 비밀번호 같은 문자열(캡처 시 반드시 가림). <b>실행 이력</b> = 각 실행이 성공·실패했고 단계별로 어떤 값이 오갔는지 보여주는 기록.</p>
+      <div class="ex">이력 화면이 곧 "자동으로 돌았다"는 증빙입니다</div>
+    </div>
+  </div>
+
+  <div class="call info" style="margin-top:14px">
+    <b>헷갈리기 쉬운 것</b>
+    <b>트리거 ≠ 액션</b> : 트리거는 "감시하다가 시작", 액션은 "시작된 뒤 처리". 트리거 자리에 시트 쓰기를 넣으면 그건 트리거가 아닙니다.<br>
+    <b>분기 ≠ 액션</b> : 분기는 처리하는 단계가 아니라 <b>길을 나누는</b> 단계입니다. 분기 블록에 실행 횟수가 잡히지 않는 도구도 있습니다.
+  </div>
+</section>
+
+<!-- ============ 3. 도구 고르기 ============ -->
+<section id="tool">
+  <h2><span class="num">3</span>도구 고르기 — 여기서 실수하면 처음부터 다시 합니다</h2>
+  <p class="lead">
+    도구 이름보다 <b>"무료로 트리거 1 + 액션 2 + 분기 1 + AI 액션 1이 되는가"</b>가 중요합니다.
+    이걸 확인하지 않고 만들기 시작하면, 다 만든 뒤에 결제창을 만나게 됩니다.
+  </p>
+
+  <div class="card">
+    <h3 style="margin-top:0">도구를 정하기 <b>전에</b> 5분 안에 확인할 4가지</h3>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th style="width:34px">#</th><th style="width:210px">확인 항목</th><th>확인 방법</th></tr>
+        <tr>
+          <td>1</td><td><b>다단계가 무료인가</b></td>
+          <td>무료 플랜에서 "트리거 1개 + 액션 2개"를 실제로 붙여 보고 저장이 되는지 확인. 2단계까지만 무료인 도구가 흔합니다.</td>
+        </tr>
+        <tr>
+          <td>2</td><td><b>분기 블록이 무료인가</b></td>
+          <td>Filter / Router / Paths 블록을 추가해 보고 <b>잠금 아이콘</b>이 뜨는지 확인. 잠겨 있으면 프로젝트 1에서 그 도구를 쓰면 안 됩니다.</td>
+        </tr>
+        <tr>
+          <td>3</td><td><b>AI 액션이 무료인가 + 키 필요 여부</b></td>
+          <td>AI 블록을 추가해 보고 (a) 무료 크레딧이 있는지 (b) 내 OpenAI 등의 API 키를 요구하는지 확인. <b>키를 요구하면 발급부터 해야 합니다.</b></td>
+        </tr>
+        <tr>
+          <td>4</td><td><b>실행 한도가 내 횟수를 버티는가</b></td>
+          <td>액션 수 × 실행 횟수 × <b>도구 2개</b>로 계산. 분기 양쪽을 만들려면 최소 4~6회는 돌려야 합니다.</td>
+        </tr>
+      </table>
+    </div>
+    <div class="call warn" style="margin-top:12px">
+      <b>요금제는 자주 바뀝니다</b>
+      아래 표는 커리큘럼 가이드 기준입니다. <b>가이드 숫자를 믿지 말고 가입 화면의 요금제 안내를 직접 확인</b>하세요. 숫자가 바뀌었다면 바뀐 값으로 보고서에 적으면 됩니다(오히려 좋은 비교 근거).
+    </div>
+    <div class="tbl-scroll" style="margin-top:12px">
+      <table>
+        <tr><th style="width:120px">도구</th><th style="width:150px">가이드 기준 무료 범위</th><th>비전공자 관점 특징</th></tr>
+        <tr>
+          <td><b>Make</b></td>
+          <td>월 1,000 Ops</td>
+          <td>블록을 선으로 잇는 화면. 처음엔 낯설지만 한 번 익히면 다단계·분기가 편함. <span class="tag free">1순위 추천</span></td>
+        </tr>
+        <tr>
+          <td><b>Zapier</b></td>
+          <td>월 100 Tasks</td>
+          <td>위에서 아래로 쌓는 화면. 가장 직관적이지만 <b>무료는 단계 수 제한</b>이 있어 분기·다단계가 막히는 경우가 많음. <span class="tag pain">분기 확인 필수</span></td>
+        </tr>
+        <tr>
+          <td><b>n8n</b></td>
+          <td>셀프 호스팅 무료 / 클라우드 체험</td>
+          <td>"무료"에 끌리기 쉽지만 셀프 호스팅은 <b>Docker 설치·서버 운영</b>이 필요. 컴퓨터 미숙자에게는 사실상 불가. 클라우드는 체험 기간 제한. <span class="tag pain">비추천</span></td>
+        </tr>
+        <tr>
+          <td><b>기타</b></td>
+          <td>도구별</td>
+          <td>커리큘럼은 Make/Zapier/n8n을 다루지만 <b>다른 도구를 골라도 됩니다.</b> 다만 위 4가지를 반드시 화면에서 확인.</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="call danger">
+      <b>이 조합은 피하세요</b>
+      n8n 무료(셀프 호스팅) + 초보 = 설치 단계에서 멈춤.<br>
+      Zapier 무료만으로 분기 포함 = 블록이 잠겨 프로젝트 1 재작업.<br>
+      <b>같은 도구의 요금제만 바꿔 2개 구현</b> = "도구 2개 비교"로 인정되기 어렵습니다.
+    </div>
+    <div class="call ok">
+      <b>무난한 출발 조합</b>
+      ① Make(무료) + Zapier(무료) — 둘 다 Google 계정으로 시작, 비교 서사가 자연스러움<br>
+      ② Make(무료) + 다른 노코드 도구<br>
+      ③ 연결 대상은 <b>Google Sheets + Gmail(또는 폼)</b> 조합이 가장 진입이 쉬움
+    </div>
+  </div>
+
+  <div class="call info" style="margin-top:14px">
+    <b>카드 등록을 요구하면?</b>
+    체험판은 카드 등록을 요구하는 경우가 있습니다. <b>카드 없이 되는 도구</b>로 바꾸는 것이 첫 번째 선택지이고,
+    유료 기능을 쓸 수밖에 없었다면 <b>왜 필요했는지 + 무료로는 어디까지 되는지</b>를 비교 분석 보고서에 적으면 됩니다.
+  </div>
+</section>
+
+<!-- ============ 4. 체크리스트 ============ -->
+<section id="checklist">
+  <h2><span class="num">4</span>10단계 체크리스트</h2>
+  <p class="lead">위에서부터 순서대로 하세요. 체크한 내용은 이 브라우저에 저장됩니다. (탭을 닫아도 유지)</p>
+
+  <div id="steps">
+    <label class="step">
+      <input type="checkbox" data-k="s1">
+      <div class="st-body">
+        <div class="st-title">1. 자동화할 업무 1개를 문장으로 정의</div>
+        <div class="st-desc">"무엇이 들어오면 → 무엇을 → 어디에" 형태로 한 문장. 실제 회사 데이터는 쓰지 않고 <b>가짜 데이터</b>로 설계합니다.</div>
+        <div class="st-out">→ <code>설계문서.md</code> 1번 / <code>비교분석보고서.md</code> 2번에도 같은 내용</div>
+      </div>
+      <div class="st-time">20분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s2">
+      <div class="st-body">
+        <div class="st-title">2. 도구 2개 후보 정하고 무료 범위 4가지 확인</div>
+        <div class="st-desc">다단계 / 분기 / AI 액션 / 실행 한도. 블록을 <b>추가만 해보고 잠금 여부</b>를 확인. 이 단계에서 바꾸면 5분, 나중에 바꾸면 5시간입니다.</div>
+        <div class="st-out">→ 확인 결과를 <code>비교분석보고서.md</code> 4번 표에 미리 메모</div>
+      </div>
+      <div class="st-time">40분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s3">
+      <div class="st-body">
+        <div class="st-title">3. 도구 A로 워크플로우 구현 + <b>바로 캡처</b></div>
+        <div class="st-desc">트리거 → AI 액션 → 액션 → 분기 → 액션 순으로. <b>구성 화면 전체가 한 장에 담기게</b> 캡처(스크롤 캡처 활용). 저장만 하고 넘어가지 말 것.</div>
+        <div class="st-out">→ <code>구성_A.png</code>, <code>실행_A_성공.png</code></div>
+      </div>
+      <div class="st-time">90분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s4">
+      <div class="st-body">
+        <div class="st-title">4. 도구 A에서 분기 양쪽 경로 실행 + AI 결과 전달 확인</div>
+        <div class="st-desc">조건에 맞는 데이터와 맞지 않는 데이터를 <b>각각 한 번씩</b> 흘려보냅니다. AI 액션 출력값이 다음 단계 입력에 매핑된 화면도 함께 캡처.</div>
+        <div class="st-out">→ <code>실행_A_경로1.png</code>, <code>실행_A_경로2.png</code>, <code>AI전달_A.png</code></div>
+      </div>
+      <div class="st-time">60분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s5">
+      <div class="st-body">
+        <div class="st-title">5. 도구 B에 <b>같은</b> 워크플로우 재구현 + 캡처</div>
+        <div class="st-desc">시작 이벤트·핵심 액션·분기 조건·최종 결과를 <b>똑같이</b> 맞춥니다. 도구 B에서 분기가 잠겨 있으면 <b>여기서 멈추고 도구를 교체</b>하세요(그 사실 자체가 좋은 비교 기록입니다).</div>
+        <div class="st-out">→ <code>구성_B.png</code>, <code>실행_B_경로1.png</code>, <code>실행_B_경로2.png</code></div>
+      </div>
+      <div class="st-time">120분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s6">
+      <div class="st-body">
+        <div class="st-title">6. 비교 항목 5개 이상 정리 → 도구 선정</div>
+        <div class="st-desc">느낌이 아니라 관찰로. "좋음" ❌ / "분기 블록이 무료에서 잠겨 우회해야 했음" ⭕. 그다음 자유 주제에 쓸 도구를 <b>비교 항목 2개 이상</b>과 연결해 선정.</div>
+        <div class="st-out">→ <code>비교분석보고서.md</code> 4~6번 + <code>설계문서.md</code> 2번</div>
+      </div>
+      <div class="st-time">50분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s7">
+      <div class="st-body">
+        <div class="st-title">7. 자유 주제 워크플로우 설계 → 선정 도구로 구현</div>
+        <div class="st-desc">트리거 1 + 액션 2(그중 1개 AI) + 분기 1. 설계 문서에 <b>흐름도와 분기 기준</b>을 먼저 그리고, 그대로 구현합니다.</div>
+        <div class="st-out">→ <code>설계문서.md</code> 3~4번 + 구현 캡처</div>
+      </div>
+      <div class="st-time">120분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s8">
+      <div class="st-body">
+        <div class="st-title">8. 자동 실행 이력 + 분기별 결과 캡처</div>
+        <div class="st-desc">"수동 실행(Run)"이 아니라 <b>트리거가 발생해서</b> 실행된 기록이어야 합니다. 폴링형이면 몇 분 기다려야 합니다. 기다리는 동안 작업 기록을 씁니다.</div>
+        <div class="st-out">→ <code>자동실행이력.png</code>, <code>분기_경로1/2.png</code></div>
+      </div>
+      <div class="st-time">60분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s9">
+      <div class="st-body">
+        <div class="st-title">9. 한계 3건 + 코드 시도 1건 기록</div>
+        <div class="st-desc">못 만든 기능 3건과 <b>막힌 이유(직접 작성)</b>. 그중 1건을 AI에게 코드로 요청 → 받은 코드 → 넣은 위치 → 붙여 본 결과. <b>실패해도 충족</b>.</div>
+        <div class="st-out">→ <code>한계기록서.md</code> (요청·코드·위치·결과 4항목)</div>
+      </div>
+      <div class="st-time">90분</div>
+    </label>
+
+    <label class="step">
+      <input type="checkbox" data-k="s10">
+      <div class="st-body">
+        <div class="st-title">10. 작업 기록·프롬프트 3건 정리 + 마스킹 + GitHub 업로드</div>
+        <div class="st-desc">작업 기록은 <b>한 항목에 하나씩</b>, 수정한 이력 1건 이상. 프롬프트 3건에 카테고리(자동화) 표시. 키·토큰·이메일 가린 뒤 Public 저장소에 문서 3개 업로드.</div>
+        <div class="st-out">→ <code>설계문서.md</code> 7~8번 + 저장소 URL</div>
+      </div>
+      <div class="st-time">80분</div>
+    </label>
+  </div>
+
+  <div class="call warn" style="margin-top:14px">
+    <b>시간이 부족할 때의 우선순위</b>
+    ① 프로젝트 1의 두 도구 캡처 ② 프로젝트 2의 자동 실행 이력 ③ 비교 항목 5개 ④ 한계 3건.
+    이 네 개가 점수의 대부분입니다. <b>보너스는 맨 마지막</b>입니다.
+  </div>
+</section>
+
+<!-- ============ 5. 시나리오 ============ -->
+<section id="scenario">
+  <h2><span class="num">5</span>시나리오 고르기 — "내 업무"라고 생각하면 막힙니다</h2>
+  <p class="lead">
+    조건은 딱 두 개입니다. <b>① 반복된다 ② 판단 기준을 말로 쓸 수 있다.</b>
+    회사 자료를 쓸 필요는 없습니다. 가짜 데이터로 같은 형식만 만들면 됩니다.
+  </p>
+
+  <div class="card">
+    <h3 style="margin-top:0">바로 쓸 수 있는 시나리오 예시</h3>
+    <div class="grid g3">
+      <div class="term"><h4>문의 메일 분류</h4><p>새 메일 → AI가 문의/견적/광고로 분류 → 시트 기록 → 급한 건만 알림</p></div>
+      <div class="term"><h4>설문 응답 정리</h4><p>폼 응답 → AI 한 줄 요약 → 시트 누적 → 불만만 담당자 알림</p></div>
+      <div class="term"><h4>리뷰 감정 분류</h4><p>리뷰 등록 → AI가 긍정/부정 판정 → 부정만 별도 시트 + 알림</p></div>
+      <div class="term"><h4>지원 접수 처리</h4><p>신청 폼 → AI가 요약·우선순위 → 명단 시트 → 마감 임박 건 알림</p></div>
+      <div class="term"><h4>일일 보고 수집</h4><p>정해진 시간 → AI가 취합 요약 → 시트 기록 → 특이사항 알림</p></div>
+      <div class="term"><h4>파일 이름 정리</h4><p>업로드 감지 → AI가 분류 → 폴더 이동·시트 기록</p></div>
+    </div>
+  </div>
+
+  <div class="call danger">
+    <b>절대 쓰면 안 되는 소재</b>
+    실제 고객 메일, 고객 이름·연락처, 사내 미공개 자료는 자동화 대상으로 쓰지 않습니다(미션 제약사항).
+    데이터가 외부 서비스로 전송되는 구조이기 때문입니다. <b>내 메일함에 직접 만든 테스트 메일</b>, 공개 자료, 가상 신청 폼으로 대체하세요.
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h3 style="margin-top:0">테스트 데이터는 <b>3종 세트</b>로 미리 만들어 두세요</h3>
+    <p class="mini" style="margin-bottom:10px">이걸 미리 안 만들어 두면 "분기 반대쪽을 어떻게 실행하지?"에서 멈춥니다. 가장 흔한 정체 구간입니다.</p>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th style="width:130px">구분</th><th>용도</th><th>예시 (만족도 분기)</th></tr>
+        <tr><td><b>A. 조건 통과</b></td><td>분기 한쪽 경로 실행</td><td>만족도 2점 응답</td></tr>
+        <tr><td><b>B. 조건 미통과</b></td><td>분기 반대쪽 경로 실행</td><td>만족도 5점 응답</td></tr>
+        <tr><td><b>C. 경계값</b></td><td>기준이 정확한지 확인</td><td>만족도 3점 응답 (기준이 3 이하일 때)</td></tr>
+      </table>
+    </div>
+    <div class="call info" style="margin-top:12px">
+      <b>경계값을 넣어 보면 좋은 것이 하나 더 있습니다</b>
+      숫자 <span class="kbd">"3"</span>과 문자 <span class="kbd">"3"</span>이 다르게 판정되는 경우가 있습니다.
+      분기가 예상과 다르게 동작하면 <b>거의 항상 데이터 타입 문제</b>입니다. 이걸 발견하면 작업 기록에 "수정 1건"으로 남길 수 있습니다.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. 캡처 ============ -->
+<section id="shots">
+  <h2><span class="num">6</span>캡처 순서 — 이 미션의 진짜 승부처</h2>
+  <p class="lead">
+    무료 한도는 <b>되돌릴 수 없습니다.</b> "다 만들고 나중에 캡처"는 가장 위험한 순서입니다.
+    아래 순서대로, <b>만드는 즉시</b> 찍으세요.
+  </p>
+
+  <div class="card">
+    <div class="tbl-scroll">
+      <table>
+        <tr><th style="width:44px">순서</th><th style="width:230px">캡처 대상</th><th>왜 이 순서인가</th></tr>
+        <tr><td><b>1</b></td><td>도구 A 구성 화면 (전체)</td><td>아직 실행 0회. 실패해도 남길 수 있는 유일한 시점</td></tr>
+        <tr><td><b>2</b></td><td>도구 A 실행 성공 + AI 출력값</td><td>한도가 가장 넉넉할 때</td></tr>
+        <tr><td><b>3</b></td><td>도구 A 분기 경로 1 / 경로 2</td><td>테스트 데이터 3종을 미리 만들어 두면 한 번에 가능</td></tr>
+        <tr><td><b>4</b></td><td>도구 B 구성 화면 (전체)</td><td>구현 직후. 아직 실행 전</td></tr>
+        <tr><td><b>5</b></td><td>도구 B 실행 + 분기 경로 2종</td><td>여기서 한도가 바닥나기 시작</td></tr>
+        <tr><td><b>6</b></td><td>프로젝트 2 자동 실행 이력</td><td>수동 실행이 아닌 <b>트리거 발생</b> 기록. 폴링 대기 필요</td></tr>
+        <tr><td><b>7</b></td><td>요금제/한도 화면</td><td>보고서에 "무료 범위" 근거로 씀. 숫자 확인용</td></tr>
+      </table>
+    </div>
+
+    <h3>캡처할 때 반드시 확인할 3가지</h3>
+    <div class="grid g3">
+      <div class="call ok"><b>① 한 장에 다 보이게</b>트리거부터 마지막 액션까지. 잘려서 일부만 보이면 "구성 화면 캡처"로 약합니다. 브라우저 전체 화면 캡처나 스크롤 캡처를 쓰세요.</div>
+      <div class="call ok"><b>② 값이 보이게</b>"성공" 아이콘만 있고 실제 값이 안 보이면 증빙이 약합니다. AI가 만든 문장, 시트에 들어간 행이 보여야 합니다.</div>
+      <div class="call ok"><b>③ 비밀은 가리기</b>API 키·토큰·비밀번호는 전체, 이메일은 일부. 캡처 안의 작은 글씨도 대상입니다.</div>
+    </div>
+
+    <div class="call danger" style="margin-top:14px">
+      <b>가장 흔한 증빙 실패 3종</b>
+      ⓐ "테스트 실행" 결과만 있고 <b>트리거로 자동 실행된 이력</b>이 없음 &nbsp;·&nbsp;
+      ⓑ 분기 한쪽만 실행해서 <b>반대 경로 캡처가 없음</b> &nbsp;·&nbsp;
+      ⓒ AI가 만든 결과가 다음 단계로 넘어간 화면이 없어 <b>"AI 액션을 썼다"만 주장</b>하게 됨
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. 템플릿 ============ -->
+<section id="templates">
+  <h2><span class="num">7</span>산출물 3종 템플릿</h2>
+  <p class="lead">
+    빈칸(<span class="kbd">{...}</span>)만 채우면 됩니다. 오른쪽 위 <b>복사</b>를 눌러 <code>.md</code> 파일로 저장하세요.
+    <b>세 문서는 한 폴더에 모아</b> GitHub에 올립니다.
+  </p>
+
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-tab="t1">① 비교분석보고서.md</button>
+    <button class="tab" data-tab="t2">② 설계문서.md</button>
+    <button class="tab" data-tab="t3">③ 한계기록서.md</button>
+    <button class="tab" data-tab="t4">README.md (선택)</button>
+  </div>
+
+  <!-- T1 -->
+  <div class="panel on" id="t1">
+    <div class="call info" style="margin-bottom:12px">
+      <b>체크 포인트</b>
+      도구 2개 이상 · 양쪽 구성 화면 + 실행 결과 캡처 · 비교 항목 5개 이상 · 장단점 · 적합 상황 의견(직접) · 연결 계정·외부 서비스 · 유료 기능 사용 여부
+    </div>
+    <div class="code-wrap">
+      <button class="copy">복사</button>
+      <pre><code># 자동화 도구 비교 분석 보고서
+
+- 작성자: {이름 또는 아이디}
+- 작성 시점: {2026-11-17}
+
+## 1. 비교 대상 도구
+
+| 구분 | 도구 A | 도구 B |
+|---|---|---|
+| 도구 이름 | {예: Make} | {예: Zapier} |
+| 요금제 | 무료 | 무료 |
+| 연결한 계정 (가림) | {abc***@gmail.com} | {abc***@gmail.com} |
+| 연결한 외부 서비스 | {Google Sheets, Gmail} | {Google Sheets, Slack} |
+| 확인 시점 | 2026-11-17 | 2026-11-17 |
+
+> 계정 이메일은 일부를 가립니다. 키·토큰·비밀번호는 어떤 형태로도 남기지 않습니다.
+
+## 2. 두 구현에서 동일하게 맞춘 워크플로우
+
+| 요소 | 내용 (양쪽 동일) |
+|---|---|
+| 시작 이벤트(트리거) | {예: 새 문의 메일이 도착했을 때} |
+| 핵심 액션 1 (생성형 AI) | {예: 메일 본문을 문의/견적/광고로 분류하고 한 줄 요약} |
+| 핵심 액션 2 | {예: 분류 결과를 시트에 한 줄 추가} |
+| 분기 조건 | {예: 분류 결과가 "견적"이면 알림, 아니면 기록만} |
+| 최종 결과 | {예: 시트 기록 + 견적 건은 팀 채널 알림} |
+
+## 3. 구현 과정 요약
+
+### 도구 A — {도구명}
+1. {계정 생성 후 어떤 앱을 연결했는지}
+2. {트리거 블록을 어떻게 추가했는지}
+3. {AI 액션을 어떻게 넣었는지 (모델/키 필요 여부 포함)}
+4. {분기 블록을 어떻게 설정했는지}
+5. {마지막 액션과 실행 결과}
+- 구성 화면: ![구성 A](구성_A.png)
+- 실행 결과: ![실행 A](실행_A.png)
+
+### 도구 B — {도구명}
+1. {같은 순서로, 다른 점 위주로}
+2. {도구 A와 달라서 헤맨 지점}
+3. {결국 어떻게 맞췄는지}
+- 구성 화면: ![구성 B](구성_B.png)
+- 실행 결과: ![실행 B](실행_B.png)
+
+## 4. 비교 항목 (5개 이상)
+
+| 비교 항목 | 도구 A | 도구 B | 업무에 미치는 영향 |
+|---|---|---|---|
+| 화면 구성 방식 | {예: 블록을 선으로 잇는 방식} | {예: 단계를 위에서 아래로 쌓는 방식} | {처음 배우는 시간 / 수정 편의} |
+| 분기 블록 설정 | {예: 분기 블록 하나에 조건 여러 개} | {예: 조건마다 블록 하나} | {분기가 늘어날 때 관리 난이도} |
+| 무료 플랜 범위 | {트리거/액션/분기 가능 여부, 월 한도} | {동일} | {이 업무를 무료로 돌릴 수 있는가} |
+| 생성형 AI 준비 난이도 | {내장 AI인지 / API 키 필요 여부} | {동일} | {키 발급 부담, 과금 위험} |
+| 실행 이력에서 보이는 정보 | {예: 단계마다 들어온 값·나간 값} | {예: 성공/실패만} | {문제 생겼을 때 원인 파악 속도} |
+| 설정 난이도 (첫 실행까지) | {예: 90분, 튜토리얼 필요} | {예: 40분, 화면이 단순} | {팀원이 혼자 쓸 수 있는가} |
+| 연동 서비스 찾기 | {검색 방식, 개수} | {동일} | {다른 업무로 확장할 때} |
+
+## 5. 도구별 장단점
+
+### 도구 A — {도구명}
+- 장점: { } / { }
+- 단점: { } / { }
+
+### 도구 B — {도구명}
+- 장점: { } / { }
+- 단점: { } / { }
+
+## 6. 어떤 상황에 적합한가 (의견 — 직접 작성)
+
+- 도구 A가 적합한 상황: {예: 분기가 3개 이상으로 늘어날 것 같고, 실행 로그를 보며
+  디버깅해야 하는 업무. 화면이 복잡해 처음 배우는 시간이 더 들지만
+  한 번 익히면 수정이 빠르다.}
+- 도구 B가 적합한 상황: {예: 단순 2~3단계 알림 자동화를 오늘 바로 만들어
+  팀원에게 공유해야 하는 경우. 설명이 필요 없을 만큼 화면이 단순하다.}
+- 이번 업무에는 {도구명}이 더 맞다고 본 이유: { }
+
+## 7. 유료 기능을 사용했다면 (해당 시)
+
+- 사용한 유료 기능: {없음 / 기능명}
+- 왜 필요했는지: { }
+- 무료로는 어디까지 가능한지: { }
+- 결제를 피하기 위해 시도한 것: {예: 분기를 2개로 줄임, 다른 도구로 교체}
+
+## 8. 캡처 목록
+
+| # | 캡처 내용 | 파일명 | 문서 내 위치 |
+|---|---|---|---|
+| 1 | 도구 A 구성 화면 | 구성_A.png | 3번 |
+| 2 | 도구 A 실행 결과 | 실행_A.png | 3번 |
+| 3 | 도구 B 구성 화면 | 구성_B.png | 3번 |
+| 4 | 도구 B 실행 결과 | 실행_B.png | 3번 |</code></pre>
+    </div>
+  </div>
+
+  <!-- T2 -->
+  <div class="panel" id="t2">
+    <div class="call info" style="margin-bottom:12px">
+      <b>체크 포인트</b>
+      업무 정의 문장 · 도구 선정 이유 2개 이상 · 트리거/액션2+/AI액션/분기 설계 · 흐름도 · 연결 계정·서비스 · 분기별 실행 캡처 · AI 결과 전달 캡처 · 자동 실행 이력 · 작업 기록 · 프롬프트 3건 카테고리
+    </div>
+    <div class="code-wrap">
+      <button class="copy">복사</button>
+      <pre><code># 자동화 설계 문서
+
+## 1. 자동화 대상 업무 (문장으로 정의)
+
+> {예: "새 문의 메일이 오면 담당자가 메일을 읽고 분류해 시트에 옮기고,
+>  견적 문의만 팀 채널에 알린다"는 반복 업무를 자동화한다.}
+
+- 지금 하는 방식(수동): {누가, 얼마나 자주, 몇 분 걸리는지}
+- 자동화 후 바뀌는 점: {사람이 하던 판단 중 무엇을 AI가 대신하는지}
+- 사용하는 테스트 데이터: {실제 고객 데이터가 아님을 명시. 예: 직접 만든 테스트 메일 3통}
+
+## 2. 도구 선정 이유 (비교 항목 2개 이상 근거)
+
+- 선정 도구: {도구명}
+- 근거 1 — {비교 항목명}: {예: 무료 플랜에서 분기 블록이 잠기지 않아
+  분기 경로 2개를 모두 구현할 수 있었다. (다른 도구는 유료였음)}
+- 근거 2 — {비교 항목명}: {예: 실행 이력에서 단계별 입출력 값이 보여
+  AI가 만든 요약이 다음 단계로 넘어갔는지 확인하기 쉬웠다.}
+- (선택) 근거 3 — { }
+
+## 3. 워크플로우 설계
+
+### 3-1. 요소 정리
+
+| 구분 | 내용 | 도구에서 쓴 블록 이름 |
+|---|---|---|
+| 트리거 | {예: 새 메일 도착} | { } |
+| 액션 1 (생성형 AI) | {예: 분류 + 한 줄 요약} | { } |
+| 분기 | {예: 분류 = "견적"} | { } |
+| 액션 2 (분기 A) | {예: 팀 채널 알림} | { } |
+| 액션 3 (분기 B) | {예: 시트 기록만} | { } |
+| 최종 결과 | { } | { } |
+
+### 3-2. 흐름도
+
+```
+[트리거] 새 메일 도착
+      |
+      v
+[액션 1 · AI] 분류 + 요약  ->  출력: {분류}, {요약}
+      |
+      v
+[분기] 분류 == "견적" ?
+   ├── 예  -> [액션 2] 팀 채널 알림 (요약 + 시각)
+   └── 아니오 -> [액션 3] 시트에 기록만
+```
+
+### 3-3. 분기 기준과 경로별 결과
+
+- 분기 기준: {왜 이 기준인가 — 직접 작성. 예: 견적 문의는 당일 응답이
+  필요해 사람이 바로 봐야 하고, 광고 메일은 기록만 하면 되기 때문}
+- 경로 1 (조건 충족) 결과: {무엇이 만들어졌는지}
+- 경로 2 (조건 미충족) 결과: {무엇이 만들어졌는지}
+
+## 4. 연결한 계정과 외부 서비스
+
+| 구분 | 내용 | 권한 범위 |
+|---|---|---|
+| 자동화 도구 계정 | {abc***@gmail.com} | - |
+| 서비스 1 | {Google Sheets} | {해당 시트 편집만} |
+| 서비스 2 | {Gmail 또는 Slack} | {읽기 / 메시지 전송} |
+| AI 서비스 | {도구 내장 AI / 외부 LLM} | {API 키 필요 여부} |
+
+> 권한은 워크플로우에 필요한 것만 허용했습니다. 키 값은 ***로 가립니다.
+
+## 5. 실행 증빙
+
+| 증빙 | 캡처 | 확인할 점 |
+|---|---|---|
+| 분기 경로 1 실행 | ![경로1](분기_경로1.png) | 조건 충족 시 액션 2가 실행됨 |
+| 분기 경로 2 실행 | ![경로2](분기_경로2.png) | 조건 미충족 시 액션 3만 실행됨 |
+| AI 결과가 다음 단계로 전달 | ![AI전달](AI전달.png) | AI 출력값이 다음 블록 입력에 매핑됨 |
+| 트리거로 자동 실행된 이력 | ![자동](자동실행이력.png) | 수동 실행이 아닌 자동 실행 기록 |
+
+## 6. 작업 기록
+
+> 작업 하나를 한 항목으로 적습니다. 무엇을 어떻게 했는지가 드러나게.
+> 수정한 이력 1건 이상 반드시 포함.
+
+- {시작: 어떤 업무를 자동화 대상으로 정했고 왜 골랐는지}
+- {두 도구의 무료 범위를 확인: 어디서 무엇을 눌러 확인했고 결과가 어땠는지}
+- {도구 A에서 트리거 블록을 추가하고 어떤 앱을 연결했는지}
+- {AI 액션을 추가: 어떤 모델을 골랐고 키가 필요했는지}
+- {분기 조건을 처음에 '점수 3 미만'으로 넣었다가 '3 이하'로 수정한 이유}
+- {실행했는데 자동 실행이 안 되어 폴링 간격을 확인한 일}
+- {도구 B로 같은 흐름을 옮기며 블록 이름이 달라 헤맨 지점}
+- {AI 요약이 다음 단계로 넘어가지 않아 필드 매핑을 고친 일}
+- {분기 반대 경로를 실행하려고 테스트 데이터를 새로 만든 일}
+- {마무리: 캡처를 정리하고 민감정보를 가린 일}
+
+## 7. 프롬프트 3건 (카테고리 표시)
+
+| # | 카테고리 | 무엇을 물었는지 | 프롬프트 원문 |
+|---|---|---|---|
+| 1 | 자동화 — 워크플로우 설계 | 분기 기준 설계 | `{원문}` |
+| 2 | 자동화 — 워크플로우 설계 | 도구별 블록 대응 | `{원문}` |
+| 3 | 자동화 — 코드 요청 | 한계 1건을 코드로 | `{원문}` |
+
+### 프롬프트 원문
+
+**[1] 카테고리: 자동화 (워크플로우 설계)**
+```
+{예: 새 메일을 문의/견적/광고로 나누고, 견적만 알림을 보내는
+자동화를 만들려고 한다. 분기 기준을 어떻게 잡으면 좋을지,
+조건을 몇 개로 나누는 게 나은지 알려줘.}
+```
+
+**[2] 카테고리: 자동화 (워크플로우 설계)**
+```
+{예: Make에서 만든 라우터 구조를 Zapier에서 같은 의미로
+만들려면 어떤 블록을 써야 하는지 알려줘.}
+```
+
+**[3] 카테고리: 자동화 (코드 요청)**
+```
+{예: 메일 제목에서 4자리 날짜를 찾아 YYYY-MM 형태로 바꿔 주는
+코드를 만들어 줘. 제목 규칙은 일정하지 않아.}
+```
+
+## 8. 민감정보 확인
+
+- [ ] API 키 / 토큰 / 비밀번호가 캡처에 보이지 않는다
+- [ ] 계정 이메일이 일부 가려져 있다
+- [ ] 실제 고객·사내 데이터를 쓰지 않았다</code></pre>
+    </div>
+  </div>
+
+  <!-- T3 -->
+  <div class="panel" id="t3">
+    <div class="call info" style="margin-bottom:12px">
+      <b>체크 포인트</b>
+      3건 서로 구분 · 막힌 이유는 <b>직접 작성</b> · 우회해서 해결한 기능은 쓰지 않음 · 코드 시도는 요청/코드/위치/결과 <b>4항목 모두</b> · 실패해도 충족
+    </div>
+    <div class="code-wrap">
+      <button class="copy">복사</button>
+      <pre><code># 한계 기록서
+
+> 노코드로 구현하지 못한 기능만 적습니다.
+> 다른 방법으로 우회해서 해결한 기능은 적지 않습니다. (도구의 한계가 아니게 되기 때문)
+> AI가 준 코드를 붙여 해결한 기능은 "노코드로는 못 했다"에 해당하므로 적을 수 있습니다.
+
+## [한계 1] {기능 한 줄}
+
+- 시도한 도구: {도구명 / 요금제}
+- 무엇을 하려 했는지: { }
+- 막힌 이유 (직접 작성):
+  {예: 제목에서 날짜만 뽑아 시트의 날짜 열에 넣으려 했다.
+  문자열을 자르는 블록이 있긴 한데 '앞에서 몇 글자'처럼 위치를
+  고정으로만 받아서, 제목 길이가 다르면 엉뚱한 곳을 잘랐다.
+  조건 분기를 여러 개 붙여 흉내내 봤지만 경우의 수가 너무 많았다.}
+- 우회하지 않고 멈춘 지점: { }
+
+## [한계 2] {기능 한 줄}
+
+- 시도한 도구: { }
+- 무엇을 하려 했는지: { }
+- 막힌 이유 (직접 작성):
+  {예: 요약문을 두 줄로 고정하고 싶었는데 AI 블록에 길이 제한
+  설정이 없었다. 프롬프트에 '두 줄'이라고 써도 세 줄로 늘어났다.
+  무료 요금제에서는 AI 블록에 상세 설정이 열리지 않았다.}
+- 우회하지 않고 멈춘 지점: { }
+
+## [한계 3] {기능 한 줄}
+
+- 시도한 도구: { }
+- 무엇을 하려 했는지: { }
+- 막힌 이유 (직접 작성):
+  {예: 같은 메일이 두 번 처리되지 않게 하고 싶었는데,
+  무료 플랜에는 중복 체크 블록이 없고 조건 분기로는
+  '이미 처리한 값'을 기억할 방법이 없었다.}
+- 우회하지 않고 멈춘 지점: { }
+
+---
+
+# 코드 시도 기록
+
+> 한계 3건 가운데 1건을 골라 AI에게 코드로 요청한 기록입니다.
+> 코드가 동작하지 않아도, 붙이지 못했어도 이 기록으로 요구사항이 충족됩니다.
+
+- 대상: {한계 2}
+
+## 1. AI에게 요청한 내용 (프롬프트 원문)
+
+```
+{예: 메일 제목에서 4자리 숫자 날짜를 찾아 YYYY-MM 폴더명으로
+바꿔 주는 코드를 만들어 줘. 제목 규칙은 일정하지 않고,
+연도가 없는 경우도 있어. 파이썬으로.}
+```
+
+- 사용한 AI: {서비스명 / 모델명}
+
+## 2. 받은 코드
+
+```
+{AI가 준 코드를 그대로 붙입니다. 고치지 않습니다.}
+```
+
+## 3. 코드를 넣은 위치
+
+- 사용한 도구: {도구명}
+- 위치: {예: 'Code by Zapier' 단계 / 'Run Code' 노드 / Apps Script 편집기}
+- 넣기까지 걸린 과정: {예: 무료 플랜에는 코드 블록이 없어서
+  다른 도구로 옮겨 코드 단계를 추가했다.}
+
+> 코드를 넣을 위치가 아예 없었다면 그 사실과 무엇이 막았는지를 여기에 적으면 됩니다.
+> 예: "쓰던 도구의 무료 요금제에는 코드 실행 블록이 없었고,
+>      유료로 바꾸지 않으면 추가할 수 없었다."
+
+## 4. 붙여 본 결과
+
+- 실행 여부: {실행됨 / 실행조차 못 함}
+- 나온 결과: {예: 실행은 되었지만 '0913'을 2009년 13월로 읽었다.
+  제목에 연도가 없어서 앞 두 자리를 연도로 본 것 같다.}
+- 여기서 판단한 것 (직접 작성):
+  {예: 규칙을 더 주면 고칠 수 있을 것 같았지만, 어떤 규칙을 더 줘야
+  하는지 몰라 여기서 멈췄다. 코드를 붙이는 위치를 찾는 데도
+  예상보다 오래 걸려, 이번에는 여기까지가 한계라고 판단했다.}</code></pre>
+    </div>
+  </div>
+
+  <!-- T4 -->
+  <div class="panel" id="t4">
+    <div class="call info" style="margin-bottom:12px">
+      <b>선택 사항</b> 세 문서의 순서와 한 줄 소개만 있으면 됩니다. 평가자가 30초 안에 구조를 파악하게 해 줍니다.
+    </div>
+    <div class="code-wrap">
+      <button class="copy">복사</button>
+      <pre><code># B1-3 노코드 자동화 워크플로우
+
+자동화 업무: {한 줄}
+
+## 문서 안내
+
+1. [비교분석보고서](비교분석보고서.md) — 도구 2개 구현 비교, 비교 항목 5개 이상, 적합 상황 의견
+2. [설계문서](설계문서.md) — 업무 정의, 도구 선정 이유, 워크플로우 설계, 실행 증빙, 작업 기록, 프롬프트 3건
+3. [한계기록서](한계기록서.md) — 구현하지 못한 기능 3건과 코드 시도 1건
+
+## 폴더 구조
+
+```
+.
+|-- 비교분석보고서.md
+|-- 설계문서.md
+|-- 한계기록서.md
+`-- images/
+    |-- 구성_A.png
+    |-- 구성_B.png
+    `-- ...
+```
+
+## 참고
+
+- 사용 도구: {도구 A} / {도구 B}
+- 최종 선정 도구: {도구명}
+- 작성 시점: {2026-11-17}</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. GitHub ============ -->
+<section id="github">
+  <h2><span class="num">8</span>GitHub 제출 — 유일하게 "컴퓨터"가 필요한 구간</h2>
+  <p class="lead">명령어는 하나도 필요 없습니다. 웹 화면에서 파일을 끌어다 놓으면 끝납니다. 6단계, 약 20분.</p>
+
+  <div class="card">
+    <div class="gh">
+      <div class="dot">1</div>
+      <div>
+        <h4>계정 만들기</h4>
+        <p>github.com → Sign up → 이메일 인증. 무료 플랜으로 충분합니다.</p>
+        <span class="path">github.com</span>
+      </div>
+    </div>
+    <div class="gh">
+      <div class="dot">2</div>
+      <div>
+        <h4>새 저장소 만들기</h4>
+        <p>오른쪽 위 <b>+</b> → New repository → 이름 입력 → <b>Public</b> 선택 → Create.</p>
+        <div class="call danger" style="margin-top:8px;padding:10px 12px">
+          <b>Private으로 만들면 평가자가 볼 수 없습니다.</b> 반드시 Public.
+        </div>
+      </div>
+    </div>
+    <div class="gh">
+      <div class="dot">3</div>
+      <div>
+        <h4>문서 3개 올리기</h4>
+        <p>Add file → <b>Upload files</b> → 만든 <code>.md</code> 파일과 캡처 <code>.png</code>를 끌어다 놓기 → 아래 Commit changes.
+        (파일이 몇 개 안 되면 Create new file로 내용을 붙여넣어도 됩니다.)</p>
+        <span class="path">Add file → Upload files</span>
+      </div>
+    </div>
+    <div class="gh">
+      <div class="dot">4</div>
+      <div>
+        <h4>이미지 경로 확인</h4>
+        <p>문서 안의 <code>![구성 A](구성_A.png)</code>가 실제 파일명과 <b>정확히 같아야</b> 이미지가 보입니다. 대소문자·언더스코어까지 맞추세요.
+        <code>images/</code> 폴더에 넣었다면 <code>![구성 A](images/구성_A.png)</code>로 적어야 합니다.</p>
+        <span class="path">![구성 A](images/구성_A.png)</span>
+      </div>
+    </div>
+    <div class="gh">
+      <div class="dot">5</div>
+      <div>
+        <h4>최종 확인</h4>
+        <p>저장소 첫 화면에서 문서 3개가 보이고, 클릭했을 때 <b>캡처가 실제로 보이는지</b> 확인합니다. 이미지가 깨져 있으면 4번으로 돌아갑니다.</p>
+        <span class="path">저장소 → 문서 클릭 → 캡처 확인</span>
+      </div>
+    </div>
+    <div class="gh">
+      <div class="dot">6</div>
+      <div>
+        <h4>URL 복사해서 제출</h4>
+        <p>주소창의 <span class="kbd">https://github.com/내아이디/저장소이름</span> 을 그대로 제출합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="call warn">
+      <b>올리기 전 마지막 5분 점검</b>
+      캡처를 원본 크기로 눌러 <b>작은 글씨에 이메일·키가 없는지</b> 확인하세요.
+      화면 한쪽 구석의 계정 이메일이 가장 흔한 사고입니다.
+    </div>
+    <div class="call ok">
+      <b>PDF 대신 Markdown을 권합니다</b>
+      캡처를 문서 안에 넣어야 하고, 수정도 쉬우며, 이미지 깨짐 확인도 바로 됩니다.
+      <span class="kbd">.md</span> + <span class="kbd">.png</span> 조합이 가장 안전합니다.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. 함정 ============ -->
+<section id="traps">
+  <h2><span class="num">9</span>가장 흔한 함정 7개</h2>
+  <p class="lead">다 만들어 놓고 여기서 감점·재작업되는 경우가 대부분입니다. 제출 전에 하나씩 확인하세요.</p>
+
+  <div class="card">
+    <div class="trap">
+      <div class="n">1</div>
+      <div>
+        <h4>분기 블록이 유료인지 확인하지 않고 도구를 정함</h4>
+        <p>가장 비싼 실수입니다. 다 만든 뒤 결제창을 만나면 프로젝트 1을 처음부터 다시 해야 합니다. <b>블록을 추가해 보는 것만으로</b> 5분 안에 확인됩니다.</p>
+      </div>
+    </div>
+    <div class="trap">
+      <div class="n">2</div>
+      <div>
+        <h4>캡처를 나중으로 미룸</h4>
+        <p>두 도구 × (AI 액션 + 분기 2경로)면 실행 횟수가 금방 사라집니다. 한도가 바닥나면 <b>이미 잘 도는 워크플로우를 다시 못 돌립니다</b>. 만들자마자 찍으세요.</p>
+      </div>
+    </div>
+    <div class="trap">
+      <div class="n">3</div>
+      <div>
+        <h4>"무료"라는 말만 보고 n8n 셀프 호스팅 선택</h4>
+        <p>Docker 설치·서버 운영이 필요합니다. 설치 단계에서 멈추면 아무 산출물도 못 만듭니다. 클라우드 체험판으로 시작하세요.</p>
+      </div>
+    </div>
+    <div class="trap">
+      <div class="n">4</div>
+      <div>
+        <h4>두 구현을 "비슷하게" 만들어 동일성 설명 불가</h4>
+        <p>시작 이벤트·핵심 액션·분기 조건·최종 결과를 <b>같게</b> 맞춰야 합니다. 액션 개수나 분기 기준이 다르면 비교가 성립하지 않습니다. 설계 문서 2번 표를 먼저 채우고 시작하세요.</p>
+      </div>
+    </div>
+    <div class="trap">
+      <div class="n">5</div>
+      <div>
+        <h4>우회해서 해결한 기능을 한계 기록에 적음</h4>
+        <p>다른 블록 조합으로 해결했다면 그건 도구의 한계가 아닙니다. 기록의 목적이 흐려져 감점됩니다. <b>정말 막힌 것</b>만 3건.</p>
+      </div>
+    </div>
+    <div class="trap">
+      <div class="n">6</div>
+      <div>
+        <h4>"내가 몰라서 못 했다"를 한계로 적음</h4>
+        <p>한계 기록은 <b>도구가 제공하지 않아서</b> 못 한 기능의 기록입니다. "블록을 못 찾았다"가 아니라 "블록이 없거나 무료에서 잠겨 있었다"로 적어야 합니다. 못 찾은 것은 찾으면 됩니다.</p>
+      </div>
+    </div>
+    <div class="trap">
+      <div class="n">7</div>
+      <div>
+        <h4>캡처에 계정 이메일·API 키 노출</h4>
+        <p>가장 아까운 감점입니다. 이미지는 확대하면 다 보입니다. 제출 전 <b>원본 크기로 확대해서</b> 확인하세요. 키가 노출됐다면 즉시 폐기 후 재발급입니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10. FAQ ============ -->
+<section id="faq">
+  <h2><span class="num">10</span>막힐 때 FAQ</h2>
+  <p class="lead">실제로 가장 많이 나오는 질문들입니다. 접어두었으니 필요한 것만 펼쳐 보세요.</p>
+
+  <details>
+    <summary>도구를 뭘 골라야 하나요? 추천해 주세요.</summary>
+    <div class="ans">
+      <b>Make + Zapier</b> 조합이 비교 서사를 만들기 가장 쉽습니다. 둘 다 Google 계정으로 시작하고, 화면 방식이 달라 비교 항목이 자연스럽게 나옵니다.
+      단, <b>Zapier 무료 플랜은 단계 수 제한</b>이 있어 분기·다단계가 막힐 수 있습니다. 만들기 전에 블록을 추가해 보고 잠금 여부를 확인하세요.
+      분기가 잠겨 있다면 그 사실 자체를 비교 항목으로 쓰고, 다른 도구(예: Make + 다른 노코드 도구)로 교체하면 됩니다. <b>교체는 지금이 가장 싸다</b>는 점만 기억하세요.
+    </div>
+  </details>
+
+  <details>
+    <summary>무료 플랜에서 분기 블록이 잠겨 있어요.</summary>
+    <div class="ans">
+      세 가지 길이 있습니다. ① <b>다른 도구로 교체</b>(가장 안전) ② 무료로 분기가 되는 도구를 도구 B로 옮기고, 도구 A는 분기를 지원하는 다른 서비스로 교체 ③ 유료 결제 후 <b>왜 필요했는지 + 무료로는 어디까지 되는지</b>를 보고서에 기록.
+      미션은 유료 결제를 금지하지 않습니다. 다만 기록을 요구합니다. 카드 등록이 부담되면 ①을 권합니다.
+    </div>
+  </details>
+
+  <details>
+    <summary>AI 액션에 API 키가 필요하다고 나옵니다.</summary>
+    <div class="ans">
+      두 종류가 있습니다. <b>도구 내장 AI</b>(키 불필요, 크레딧 소모)와 <b>외부 LLM 연결</b>(내 API 키 필요).
+      키가 필요한 경우: 발급 사이트에서 키를 만들고 복사해 붙여넣습니다. <b>이 키는 절대 캡처·문서에 남기지 마세요.</b>
+      발급이 어렵거나 결제수단이 없다면, <b>내장 AI가 있는 도구</b>로 바꾸는 것이 가장 빠릅니다. 이 판단 자체를 비교 항목("AI 준비 난이도")으로 쓰면 좋은 근거가 됩니다.
+    </div>
+  </details>
+
+  <details>
+    <summary>실행했는데 아무 일도 안 일어나요.</summary>
+    <div class="ans">
+      순서대로 확인하세요. ① 트리거가 <b>폴링형</b>인지 — 폴링형이면 5~15분 기다려야 합니다(즉시 아님). ② 트리거를 <b>대기/수신 상태</b>로 켜 두고 데이터를 넣었는지. ③ 앱 <b>권한 재인증</b>이 필요한지. ④ 실행 이력에 오류 메시지가 있는지 — 있으면 <b>그 문장 그대로</b> 검색하면 대부분 답이 나옵니다.
+      이 확인 과정을 작업 기록에 적으면 그 자체가 좋은 기록입니다.
+    </div>
+  </details>
+
+  <details>
+    <summary>분기 반대쪽 경로는 어떻게 실행하나요?</summary>
+    <div class="ans">
+      <b>조건에 맞지 않는 데이터를 새로 만들어</b> 한 번 더 흘려보내면 됩니다. 예를 들어 "만족도 3 이하"가 조건이면 5점짜리 응답을 하나 더 제출합니다.
+      그래서 미리 <b>테스트 데이터 3종(A 통과 / B 미통과 / C 경계값)</b>을 만들어 두라고 한 것입니다. 이걸 안 만들어 두면 여기서 오래 멈춥니다.
+    </div>
+  </details>
+
+  <details>
+    <summary>AI 결과가 다음 단계로 안 넘어가요.</summary>
+    <div class="ans">
+      대부분 <b>필드 매핑</b> 문제입니다. 다음 단계의 입력칸에 글자를 직접 타이핑하지 말고, <b>앞 단계의 출력값(토큰/변수)을 클릭해서 꽂아야</b> 합니다.
+      "요약문"을 직접 타이핑하면 그건 고정 텍스트가 되어 매번 같은 말이 들어갑니다. 매핑이 되면 칸에 <span class="kbd">{{1.summary}}</span> 같은 표시가 생깁니다.
+    </div>
+  </details>
+
+  <details>
+    <summary>같은 기록이 두 번 생겼어요.</summary>
+    <div class="ans">
+      재시도나 중복 트리거 때문입니다. 이건 <b>실패가 아니라 발견</b>입니다. 보너스 2(오류 알림·중복 방지)의 좋은 소재이고, 한계 기록 후보이기도 합니다.
+      "같은 트리거로 한 번 더 실행했더니 시트에 두 줄이 생겼다"처럼 <b>관찰한 그대로</b> 적으면 됩니다.
+    </div>
+  </details>
+
+  <details>
+    <summary>두 도구에서 "같게" 만든다는 게 어디까지 같아야 하나요?</summary>
+    <div class="ans">
+      네 가지만 같으면 됩니다: <b>시작 이벤트 / 핵심 액션 / 분기 조건 / 최종 결과.</b>
+      액션 개수는 도구 사정상 1개 차이 날 수 있지만, <b>분기 기준과 최종 결과물</b>은 같아야 비교가 성립합니다.
+      블록 이름이 다르고 화면이 다른 것은 "다른 점"으로 기록하면 그게 곧 비교 항목입니다.
+    </div>
+  </details>
+
+  <details>
+    <summary>한계 3건이 안 떠오릅니다. 다 만들었는데요.</summary>
+    <div class="ans">
+      미션도 "요구사항을 모두 구현했더라도 <b>만들다가 고려했다가 포기한 기능</b>을 적으면 충족"이라고 명시합니다.
+      후보: ① 중복 실행 방지 ② 첨부파일 이름으로 분류 ③ 요약 길이 고정 ④ 특정 시간 이후 알림 보류 ⑤ 실패 시 재시도 ⑥ 여러 조건(3개 이상) 동시 분기 ⑦ 처리 이력 남기기.
+      주의: <b>우회해서 해결한 것은 쓰지 마세요.</b> 정말 막힌 것만.
+    </div>
+  </details>
+
+  <details>
+    <summary>코드를 넣을 곳이 없는데요?</summary>
+    <div class="ans">
+      그게 정상적인 답입니다. 미션도 <b>"코드를 넣을 위치가 없었다면 그 사실과 무엇이 막았는지"</b>를 적으면 충족한다고 명시합니다.
+      "무료 요금제에 코드 실행 블록이 없어서 다른 도구로 옮겨 코드 단계에 넣었다" 같은 서술이면 충분합니다.
+      코드가 <b>동작하지 않아도</b>, <b>붙이지 못해도</b> 요구사항 5는 충족입니다. 여기서 멈추지 마세요.
+    </div>
+  </details>
+
+  <details>
+    <summary>GitHub 명령어를 몰라요.</summary>
+    <div class="ans">
+      명령어 없이 됩니다. 저장소 화면에서 <b>Add file → Upload files</b>로 파일을 끌어다 놓고 Commit만 누르면 끝입니다.
+      폴더를 만들고 싶으면 파일명을 <span class="kbd">images/구성_A.png</span>처럼 슬래시로 쓰면 자동 생성됩니다.
+    </div>
+  </details>
+
+  <details>
+    <summary>실제 회사 메일로 해도 되나요?</summary>
+    <div class="ans">
+      안 됩니다. 실제 업무 데이터와 개인정보는 자동화 대상으로 쓰지 않습니다(미션 제약사항). 데이터가 외부 서비스로 전송되는 구조이기 때문입니다.
+      <b>내 계정으로 직접 만든 테스트 메일</b>이나 가상 신청 폼으로 하면 업무 형식은 그대로 유지됩니다.
+    </div>
+  </details>
+
+  <details>
+    <summary>보너스 과제는 꼭 해야 하나요?</summary>
+    <div class="ans">
+      아닙니다. 게다가 <b>3개를 모두 완료해야만</b> 크레딧이 지급됩니다(부분 점수 없음).
+      3번(Google Apps Script 웹앱 배포)이 비전공자에게 가장 어렵습니다.
+      <b>본편 산출물 3개를 완전히 끝낸 뒤</b> 여유가 있을 때만 손대세요. 본편이 미완성인데 보너스부터 하면 점수를 잃습니다.
+    </div>
+  </details>
+
+  <details>
+    <summary>소요 시간이 얼마나 걸릴까요?</summary>
+    <div class="ans">
+      가이드는 학습시간 30시간으로 잡습니다. 비전공자가 필수 요구사항만 하면 <b>10~16시간</b>이 현실적입니다.
+      가장 오래 걸리는 구간은 ①도구 B 재구현 ②자동 실행 이력 대기 ③한계 기록 3건 ④GitHub 이미지 경로 확인입니다.
+      반대로 업무 정의·문서 작성·코드 시도 기록은 생각보다 빨리 끝납니다.
+    </div>
+  </details>
+
+  <div class="call warn" style="margin-top:18px">
+    <b>문서를 읽다가 헷갈리는 지점</b>
+    <code>mission_details.md</code>는 "요구사항 1~5"를 세 문서에 나눠 적으라고 하고, 본문에서는 "요구사항 3", "요구사항 5"를 계속 참조합니다.
+    <b>1. 두 도구 비교 구현 / 2. 대상 업무와 도구 선정 / 3. 워크플로우 설계와 구현 / 4. 노코드 한계 기록 / 5. 코드 시도 기록</b> 으로 세면 맞습니다.
+    또 <code>guide.html</code>은 최종 결과물을 "2종"으로 소개하지만, 실제 제출물은 <b>비교분석보고서 · 설계문서 · 한계기록서 3종</b>입니다. 3종을 기준으로 하세요.
+  </div>
+</section>
+
+<footer>
+  <div>B1-3 · 노코드 자동화 워크플로우 · 비전공자 시작 가이드</div>
+  <div style="margin-top:6px">이 페이지는 오프라인에서도 열립니다. 체크리스트는 이 브라우저에만 저장되며 외부로 전송되지 않습니다.</div>
+  <button class="reset" id="reset">진행률 초기화</button>
+</footer>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- 체크리스트 ---------- */
+  var KEY = "b1-3-checklist-v1";
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('#steps input[type=checkbox]'));
+  var fill  = document.getElementById('pFill');
+  var pText = document.getElementById('pText');
+
+  function load(){
+    var s = {};
+    try { s = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e){ s = {}; }
+    boxes.forEach(function(b){ b.checked = !!s[b.dataset.k]; });
+  }
+  function save(){
+    var s = {};
+    boxes.forEach(function(b){ if(b.checked) s[b.dataset.k] = 1; });
+    try { localStorage.setItem(KEY, JSON.stringify(s)); } catch(e){}
+  }
+  function render(){
+    var done = boxes.filter(function(b){ return b.checked; }).length;
+    var pct = boxes.length ? Math.round(done / boxes.length * 100) : 0;
+    fill.style.width = pct + "%";
+    pText.textContent = done + " / " + boxes.length + " 완료";
+    boxes.forEach(function(b){
+      b.closest('.step').classList.toggle('done', b.checked);
+    });
+  }
+
+  load(); render();
+
+  boxes.forEach(function(b){
+    b.addEventListener('change', function(){ save(); render(); });
+  });
+
+  document.getElementById('reset').addEventListener('click', function(){
+    boxes.forEach(function(b){ b.checked = false; });
+    save(); render();
+    toast("진행률을 초기화했습니다");
+  });
+
+  /* ---------- 탭 ---------- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){ x.classList.remove('on'); });
+      document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('on'); });
+      t.classList.add('on');
+      var panel = document.getElementById(t.dataset.tab);
+      if(panel) panel.classList.add('on');
+    });
+  });
+
+  /* ---------- 복사 ---------- */
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly','');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '0';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch(e){ ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function copyText(text, cb){
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function(){ cb(true); }, function(){ cb(fallbackCopy(text)); });
+    } else {
+      cb(fallbackCopy(text));
+    }
+  }
+
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 1900);
+  }
+
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var pre = btn.parentElement.querySelector('pre');
+      if(!pre) return;
+      copyText(pre.textContent, function(ok){
+        if(ok){
+          var old = btn.textContent;
+          btn.textContent = "복사됨 ✓";
+          btn.classList.add('done');
+          toast("템플릿을 복사했습니다");
+          setTimeout(function(){
+            btn.textContent = old;
+            btn.classList.remove('done');
+          }, 1600);
+        } else {
+          toast("복사에 실패했습니다. 텍스트를 직접 선택해 주세요");
+        }
+      });
+    });
+  });
+
+  /* ---------- 스크롤 시 네비 활성 표시 ---------- */
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav a'));
+  var sections = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){
+          links.forEach(function(a){ a.style.color = ""; a.style.borderBottomColor = "transparent"; });
+          var i = sections.indexOf(en.target);
+          if(i > -1){ links[i].style.color = "var(--blue)"; links[i].style.borderBottomColor = "var(--blue)"; }
+        }
+      });
+    }, { rootMargin: "-70px 0px -70% 0px" });
+    sections.forEach(function(s){ if(s) io.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>
